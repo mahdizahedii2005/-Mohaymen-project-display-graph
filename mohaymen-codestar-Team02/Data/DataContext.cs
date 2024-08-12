@@ -3,10 +3,12 @@ using mohaymen_codestar_Team02.Models;
 
 namespace mohaymen_codestar_Team02.Data
 {
-    public class ProjectDbContext : DbContext
+    public class DataContext : DbContext
     {
-        public ProjectDbContext(DbContextOptions<ProjectDbContext> options) : base(options)
+        public DataContext(DbContextOptions<DataContext> options, DbSet<User> users, DbSet<Role> roles) : base(options)
         {
+            Users = users;
+            Roles = roles;
         }
 
         public DbSet<User> Users { get; set; }

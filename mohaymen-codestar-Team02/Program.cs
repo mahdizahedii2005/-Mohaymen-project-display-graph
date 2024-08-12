@@ -1,7 +1,8 @@
 using mohaymen_codestar_Team02.initialProgram;
-using mohaymen_codestar_Team02.Models;
 
-public class Program()
+namespace mohaymen_codestar_Team02;
+
+public class Program
 {
     public static void Main(string[] args)
     {

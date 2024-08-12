@@ -4,13 +4,13 @@ using mohaymen_codestar_Team02.Data;
 
 namespace mohaymen_codestar_Team02.initialProgram;
 
-public class InitialApp()
+public class InitialApp
 {
     public static void Init(WebApplicationBuilder builder)
     {
         var connectionString = Environment.GetEnvironmentVariable("connectionStringForDb");
         Console.WriteLine(connectionString);
-        builder.Services.AddDbContext<ProjectDbContext>(options =>
+        builder.Services.AddDbContext<DataContext>(options =>
             options.UseNpgsql(builder.Configuration.GetConnectionString(connectionString)));
 
         builder.Services.AddSwaggerGen(c =>

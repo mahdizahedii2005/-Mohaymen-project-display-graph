@@ -9,7 +9,7 @@ using mohaymen_codestar_Team02.Data;
 
 namespace mohaymen_codestar_Team02.Migrations
 {
-    [DbContext(typeof(ProjectDbContext))]
+    [DbContext(typeof(DataContext))]
     partial class ProjectDbContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)

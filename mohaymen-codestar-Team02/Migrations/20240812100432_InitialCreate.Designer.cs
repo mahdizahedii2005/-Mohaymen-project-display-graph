@@ -10,7 +10,7 @@ using mohaymen_codestar_Team02.Data;
 
 namespace mohaymen_codestar_Team02.Migrations
 {
-    [DbContext(typeof(ProjectDbContext))]
+    [DbContext(typeof(DataContext))]
     [Migration("20240812100432_InitialCreate")]
     partial class InitialCreate
     {
