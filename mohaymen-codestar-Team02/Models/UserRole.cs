@@ -7,4 +7,6 @@ public class UserRole
 
     public long RoleId { get; set; }
     public Role Role { get; set; }
+    
+    
 }

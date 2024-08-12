@@ -3,9 +3,9 @@ using mohaymen_codestar_Team02.Models;
 
 namespace mohaymen_codestar_Team02.Data;
 
-public class ProjectDbContext : DbContext
+public class DataContext : DbContext
 {
-    public ProjectDbContext(DbContextOptions<ProjectDbContext> options) : base(options) { }
+    public DataContext(DbContextOptions<DataContext> options) : base(options) { }
 
     public DbSet<User> Users { get; set; }
     public DbSet<Role> Roles { get; set; }

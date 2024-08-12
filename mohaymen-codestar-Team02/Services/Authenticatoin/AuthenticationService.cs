@@ -26,7 +26,7 @@ public class AuthenticationService : IAuthenticationService
             response.Type = ApiResponse.NotFound;
             response.Message = "User not found.";
         }
-        else if (!VerifyPasswordHash(password, user.PasswordHash, user.PasswordSalt))
+        else if (!VerifyPasswordHash(password, user.PasswordHash, user.Salt))
         {
             response.Type = ApiResponse.BadRequest;
             response.Message = "Wrong password.";

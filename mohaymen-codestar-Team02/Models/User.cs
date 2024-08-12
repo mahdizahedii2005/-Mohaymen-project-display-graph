@@ -7,6 +7,7 @@ public class User
     public string Username { get; set; }
     public string Email { get; set; }
     //dont add normal pass
-    public byte[] PasswordSalt { get; set; }
+    public byte[] Salt { get; set; }
+    public byte[] PasswordHash { get; set; }
     public HashSet<UserRole> UserRoles { get; set; }
 }

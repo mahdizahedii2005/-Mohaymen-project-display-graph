@@ -33,7 +33,7 @@ public class AdminService : IAdminService
             {
                 response.Type = ApiResponse.BadRequest;
                 response.Message = "User not found";
-            } else if (!admin.Roles.Any(x => x.RoleType.Equals(RoleType.SystemAdmin)))
+            } else if (!admin.UserRoles.Any(x => x.Role.RoleType.Equals(RoleType.SystemAdmin)))
             {
                 response.Type = ApiResponse.Forbidden;
                 response.Message = "access denied";
@@ -42,8 +42,8 @@ public class AdminService : IAdminService
             {
                 Role role = _context.Roles.FirstOrDefault(x => x.RoleId == roleId);
 
-                user.Roles.Append(role);
-                _context.Users.Update(user); //
+                user.UserRoles.Add(new UserRole(){ Role = role , User = user , RoleId = roleId , UserId = user.UserId});
+                
                 await _context.SaveChangesAsync();
 
                 response.Type = ApiResponse.Success; // redirect
@@ -71,19 +71,19 @@ public class AdminService : IAdminService
             {
                 response.Type = ApiResponse.BadRequest;
                 response.Message = "User not found";
-            } else if (!admin.Roles.Any(x => x.RoleType.Equals(RoleType.SystemAdmin)))
+            } else if (!admin.UserRoles.Any(x => x.Role.RoleType.Equals(RoleType.SystemAdmin)))
             {
                 response.Type = ApiResponse.Forbidden;
                 response.Message = "access denied";
             }
             else
             {
-                Role role = user.Roles.FirstOrDefault(x => x.RoleId == roleId);
+                var userRoleole = user.UserRoles.FirstOrDefault(x => x.RoleId == roleId);
 
-                if (role != null)
+                if (userRoleole != null)
                 {
-                    user.Roles.Remove(role);
-                    _context.Users.Update(user); //
+                    user.UserRoles.Remove(userRoleole);
+                    
                     await _context.SaveChangesAsync();
                     
                     response.Type = ApiResponse.Success; // redirect
@@ -119,7 +119,7 @@ public class AdminService : IAdminService
             {
                 response.Type = ApiResponse.BadRequest;
                 response.Message = "User not found";
-            } else if (!user.Roles.Any(x => x.RoleType.Equals(RoleType.SystemAdmin)))
+            } else if (!user.UserRoles.Any(x => x.Role.RoleType.Equals(RoleType.SystemAdmin)))
             {
                 response.Type = ApiResponse.Forbidden;
                 response.Message = "access denied";
@@ -136,7 +136,7 @@ public class AdminService : IAdminService
                 CreatePasswordHash(password, out byte[] passwordHash, out byte[] passwordSalt); //
 
                 user.PasswordHash = passwordHash;
-                user.PasswordSalt = passwordSalt;
+                user.Salt = passwordSalt;
         
                 await _context.Users.AddAsync(user);
                 await _context.SaveChangesAsync();
@@ -161,7 +161,7 @@ public class AdminService : IAdminService
 
     private void CreatePasswordHash(long password, out byte[] passwordHash, out byte[] passwordSalt)
     {
-        using (var hmac = new System.Security.Cryptography.HMACSHA512()) //
+        using (var hmac = new System.Security.Cryptography.HMACSHA512()) 
         {
             passwordSalt = hmac.Key;
             passwordHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password.ToString()));

@@ -34,7 +34,7 @@ public class ProfileService : IProfileService
             {
                 response.Type = ApiResponse.BadRequest;
                 response.Message = "User not found";
-            } else if (user.Roles.All(x => x.RoleType != RoleType.SystemAdmin))
+            } else if (user.UserRoles.All(x => x.Role.RoleType != RoleType.SystemAdmin))
             {
                 response.Type = ApiResponse.Forbidden;
                 response.Message = "access denied";
@@ -45,7 +45,7 @@ public class ProfileService : IProfileService
                 CreatePasswordHash(newPassword, out byte[] passwordHash, out byte[] passwordSalt);
 
                 user.PasswordHash = passwordHash;
-                user.PasswordSalt = passwordSalt;
+                user.Salt = passwordSalt;
         
                 _context.Users.Update(user);
                 await _context.SaveChangesAsync();
