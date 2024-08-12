@@ -8,8 +8,7 @@ public class InitialApp()
 {
     public static void Init(WebApplicationBuilder builder)
     {
-        var connectionString =
-            "Host=localhost;Database=mohaymen_group02_project;Username=postgres;Password=1274542332Mz;";
+        var connectionString = Environment.GetEnvironmentVariable("connectionStringForDb");
         Console.WriteLine(connectionString);
         builder.Services.AddDbContext<ProjectDbContext>(options =>
             options.UseNpgsql(builder.Configuration.GetConnectionString(connectionString)));

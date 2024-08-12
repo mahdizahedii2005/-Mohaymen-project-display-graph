@@ -5,8 +5,7 @@ namespace mohaymen_codestar_Team02.Data
 {
     public class ProjectDbContext : DbContext
     {
-        public ProjectDbContext(DbContextOptions<ProjectDbContext> options)
-            : base(options)
+        public ProjectDbContext(DbContextOptions<ProjectDbContext> options) : base(options)
         {
         }
 
