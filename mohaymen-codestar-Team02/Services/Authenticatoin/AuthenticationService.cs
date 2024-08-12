@@ -1,0 +1,71 @@
+using Microsoft.EntityFrameworkCore;
+using mohaymen_codestar_Team02.Data;
+using mohaymen_codestar_Team02.Models;
+
+namespace mohaymen_codestar_Team02.Services.Authenticatoin;
+
+public class AuthenticationService : IAuthenticationService
+{
+    private readonly DataContext _context;
+    private readonly IHttpContextAccessor _httpContextAccessor;
+
+
+    public AuthenticationService(DataContext context, IHttpContextAccessor httpContextAccessor)
+    {
+        _context = context;
+        _httpContextAccessor = httpContextAccessor;
+    }
+
+    public async Task<ServiceResponse<string>> Login(string username, string password)
+    {
+        ServiceResponse<string> response = new ServiceResponse<string>();
+        User user = await _context.Users.FirstOrDefaultAsync(x => x.Username.ToLower().Equals(username.ToLower()));
+        
+        if (user is null)
+        {
+            response.Type = ApiResponse.NotFound;
+            response.Message = "User not found.";
+        }
+        else if (!VerifyPasswordHash(password, user.PasswordHash, user.PasswordSalt))
+        {
+            response.Type = ApiResponse.BadRequest;
+            response.Message = "Wrong password.";
+        }
+        else
+        {
+            string userId = user.UserId.ToString();
+
+            var cookieOptions = new CookieOptions
+            {
+                HttpOnly = true,  
+                Secure = true,    
+                Expires = DateTime.Now.AddHours(1)
+            };
+
+            _httpContextAccessor.HttpContext?.Response.Cookies.Append("userId", userId, cookieOptions);
+
+            response.Type = ApiResponse.Success;
+            response.Message = "Login successful.";
+        }
+
+        return response;
+    }
+    
+    private bool VerifyPasswordHash(string password, byte[] passwordHash, byte[] passwordSalt)
+    {
+        using (var hmac = new System.Security.Cryptography.HMACSHA512(passwordSalt))
+        {
+            var computedHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
+
+            for (int i = 0; i < computedHash.Length; i++)
+            {
+                if (computedHash[i] != passwordHash[i])
+                {
+                    return false;
+                } 
+            }
+            return true;
+        }
+    }
+
+}

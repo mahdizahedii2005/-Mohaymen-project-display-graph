@@ -1,0 +1,26 @@
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using mohaymen_codestar_Team02.Models;
+using mohaymen_codestar_Team02.Services.Authenticatoin;
+
+
+namespace mohaymen_codestar_Team02.Controllers;
+
+[ApiController]
+[Route("[controller]")]
+public class AuthenticationController : ControllerBase
+{
+    private readonly IAuthenticationService _authenticationService;
+
+    public AuthenticationController(IAuthenticationService authenticationService)
+    {
+        _authenticationService = authenticationService;
+    }
+    
+    [HttpPost("login")]
+    public async Task<IActionResult> Login(UserLoginDto request)
+    {
+        ServiceResponse<string> response = await _authenticationService.Login(request.username, request.password);
+        return StatusCode((int)response.Type, response.Message);
+    }
+}
