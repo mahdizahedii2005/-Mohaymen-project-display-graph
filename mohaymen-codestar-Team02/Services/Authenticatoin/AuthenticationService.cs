@@ -16,7 +16,7 @@ public class AuthenticationService : IAuthenticationService
         _httpContextAccessor = httpContextAccessor;
     }
 
-    public async Task<ServiceResponse<string>> Login(string username, string password)
+    public async Task<ServiceResponse<string>> Login(string username, long password)
     {
         ServiceResponse<string> response = new ServiceResponse<string>();
         User user = await _context.Users.FirstOrDefaultAsync(x => x.Username.ToLower().Equals(username.ToLower()));
@@ -51,11 +51,11 @@ public class AuthenticationService : IAuthenticationService
         return response;
     }
     
-    private bool VerifyPasswordHash(string password, byte[] passwordHash, byte[] passwordSalt)
+    private bool VerifyPasswordHash(long password, byte[] passwordHash, byte[] passwordSalt)
     {
         using (var hmac = new System.Security.Cryptography.HMACSHA512(passwordSalt))
         {
-            var computedHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
+            var computedHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password.ToString()));
 
             for (int i = 0; i < computedHash.Length; i++)
             {

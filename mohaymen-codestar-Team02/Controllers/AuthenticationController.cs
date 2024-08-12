@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using mohaymen_codestar_Team02.Dto.UserDtos;
 using mohaymen_codestar_Team02.Models;
 using mohaymen_codestar_Team02.Services.Authenticatoin;
 
@@ -20,7 +21,7 @@ public class AuthenticationController : ControllerBase
     [HttpPost("login")]
     public async Task<IActionResult> Login(UserLoginDto request)
     {
-        ServiceResponse<string> response = await _authenticationService.Login(request.username, request.password);
+        ServiceResponse<string> response = await _authenticationService.Login(request.Username, request.Password);
         return StatusCode((int)response.Type, response.Message);
     }
 }

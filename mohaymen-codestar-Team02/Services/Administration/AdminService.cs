@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using mohaymen_codestar_Team02.Data;
 using mohaymen_codestar_Team02.Models;
 
@@ -14,7 +15,45 @@ public class AdminService : IAdminService
         _context = context;
     }
 
-    public async Task<ServiceResponse<string>> ChangeRole(User user, RoleType newRoleType)
+    public async Task<ServiceResponse<string>> AddRole(User user, int roleId)
+    {
+        ServiceResponse<string> response = new ServiceResponse<string>();
+        var adminId = _httpContextAccessor.HttpContext?.Request.Cookies["userId"];
+
+        if (string.IsNullOrEmpty(adminId))
+        {
+            response.Type = ApiResponse.Unauthorized;
+            response.Message = "Unauthorized";
+        }
+        else
+        {
+            User admin = _context.Users.FirstOrDefault(x => x.UserId.ToString() == adminId);
+            
+            if (admin is null)
+            {
+                response.Type = ApiResponse.BadRequest;
+                response.Message = "User not found";
+            } else if (!admin.Roles.Any(x => x.RoleType.Equals(RoleType.SystemAdmin)))
+            {
+                response.Type = ApiResponse.Forbidden;
+                response.Message = "access denied";
+            }
+            else
+            {
+                Role role = _context.Roles.FirstOrDefault(x => x.RoleId == roleId);
+
+                user.Roles.Append(role);
+                _context.Users.Update(user); //
+                await _context.SaveChangesAsync();
+
+                response.Type = ApiResponse.Success; // redirect
+            }
+        }
+        return response;
+    }
+ 
+    
+    public async Task<ServiceResponse<string>> DeleteRole(User user, int roleId)
     {
         ServiceResponse<string> response = new ServiceResponse<string>();
         var userId = _httpContextAccessor.HttpContext?.Request.Cookies["userId"];
@@ -26,46 +65,61 @@ public class AdminService : IAdminService
         }
         else
         {
-            User user = _context.Users.FirstOrDefault(x => x.Id.ToString() == userId);
-            if (user is null)
+            User admin = _context.Users.FirstOrDefault(x => x.UserId.ToString() == userId);
+            
+            if (admin is null)
             {
                 response.Type = ApiResponse.BadRequest;
                 response.Message = "User not found";
-            } else if (!user.Roles.contains(RoleType.Admin))
+            } else if (!admin.Roles.Any(x => x.RoleType.Equals(RoleType.SystemAdmin)))
             {
                 response.Type = ApiResponse.Forbidden;
                 response.Message = "access denied";
             }
             else
             {
-                await _context.Users.UpdateAsync(); //
-                await _context.SaveChangesAsync();
+                Role role = user.Roles.FirstOrDefault(x => x.RoleId == roleId);
 
-                response.Type = ApiResponse.Success; // redirect
+                if (role != null)
+                {
+                    user.Roles.Remove(role);
+                    _context.Users.Update(user); //
+                    await _context.SaveChangesAsync();
+                    
+                    response.Type = ApiResponse.Success; // redirect
+
+                }
+                else
+                {
+                    response.Type = ApiResponse.NotFound;
+                    response.Message = "This user doesn't have this role";
+                }
+
             }
         }
         return response;
     }
- 
-    public async Task<ServiceResponse<int>> Register(User user, string password)
+
+    
+    public async Task<ServiceResponse<int>> Register(User user, long password)
     {
         ServiceResponse<int> response = new ServiceResponse<int>();
-        var userId = _httpContextAccessor.HttpContext?.Request.Cookies["userId"];
+        var adminId = _httpContextAccessor.HttpContext?.Request.Cookies["userId"];
 
-        if (string.IsNullOrEmpty(userId))
+        if (string.IsNullOrEmpty(adminId))
         {
             response.Type = ApiResponse.Unauthorized;
             response.Message = "Unauthorized";
         }
         else
         {
-            User user = _context.Users.FirstOrDefault(x => x.Id.ToString() == userId);
+            User admin = _context.Users.FirstOrDefault(x => x.UserId.ToString() == adminId);
 
-            if (user is null)
+            if (admin is null)
             {
                 response.Type = ApiResponse.BadRequest;
                 response.Message = "User not found";
-            } else if (!user.Roles.contains(RoleType.Admin))
+            } else if (!user.Roles.Any(x => x.RoleType.Equals(RoleType.SystemAdmin)))
             {
                 response.Type = ApiResponse.Forbidden;
                 response.Message = "access denied";
@@ -86,8 +140,7 @@ public class AdminService : IAdminService
         
                 await _context.Users.AddAsync(user);
                 await _context.SaveChangesAsync();
-
-                response.Data = user.Id;
+                
                 response.Type = ApiResponse.Success; // redirect
 
                 return response;
@@ -106,12 +159,12 @@ public class AdminService : IAdminService
         return false;
     }
 
-    private void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
+    private void CreatePasswordHash(long password, out byte[] passwordHash, out byte[] passwordSalt)
     {
         using (var hmac = new System.Security.Cryptography.HMACSHA512()) //
         {
             passwordSalt = hmac.Key;
-            passwordHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
+            passwordHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password.ToString()));
         }
     }
     

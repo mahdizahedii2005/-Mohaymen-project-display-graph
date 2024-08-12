@@ -16,7 +16,7 @@ public class ProfileService : IProfileService
         _httpContextAccessor = httpContextAccessor;
     }
 
-    public async Task<ServiceResponse<string>> ChangePassword(string username, string newPassword)
+    public async Task<ServiceResponse<string>> ChangePassword(string username, long newPassword)
     {
         ServiceResponse<string> response = new ServiceResponse<string>();
         var userId = _httpContextAccessor.HttpContext?.Request.Cookies["userId"];
@@ -34,7 +34,7 @@ public class ProfileService : IProfileService
             {
                 response.Type = ApiResponse.BadRequest;
                 response.Message = "User not found";
-            } else if (!user.Roles.Where(x=>x.RoleType == RoleType.SystemAdmin).Any())
+            } else if (user.Roles.All(x => x.RoleType != RoleType.SystemAdmin))
             {
                 response.Type = ApiResponse.Forbidden;
                 response.Message = "access denied";
@@ -47,12 +47,8 @@ public class ProfileService : IProfileService
                 user.PasswordHash = passwordHash;
                 user.PasswordSalt = passwordSalt;
         
-                
-                _context.Users.Update(); //
+                _context.Users.Update(user);
                 await _context.SaveChangesAsync();
-
-                //response.Data = user.Id;
-
             }
         }
         return response;
@@ -64,12 +60,12 @@ public class ProfileService : IProfileService
     }
 
 
-    private void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
+    private void CreatePasswordHash(long password, out byte[] passwordHash, out byte[] passwordSalt)
     {
         using (var hmac = new System.Security.Cryptography.HMACSHA512()) //
         {
             passwordSalt = hmac.Key;
-            passwordHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
+            passwordHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password.ToString()));
         }
     }
 }

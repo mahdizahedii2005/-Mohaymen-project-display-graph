@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using mohaymen_codestar_Team02.Dto.UserDtos;
 using mohaymen_codestar_Team02.Models;
 using mohaymen_codestar_Team02.Services.Administration;
 
@@ -23,11 +24,19 @@ public class AdminController : ControllerBase
         return StatusCode((int)response.Type, response.Message);
     }
     
-    [HttpPost("changeRole")]
-    public async Task<IActionResult> ChangeRole(UserChangeAccessLevelDto request)
+    [HttpPost("addRole")]
+    public async Task<IActionResult> AddRole(UserAddRoleDto request)
     {
         ServiceResponse<string> response =
-            await _adminService.ChangeRole(new User {Username = request.Username}, request.newRole);
+            await _adminService.AddRole(new User {Username = request.Username}, request.RoleId);
+        return StatusCode((int)response.Type, response.Message);
+    }
+    
+    [HttpPost("deleteRole")]
+    public async Task<IActionResult> AddRole(UserDeleteRoleDto request)
+    {
+        ServiceResponse<string> response =
+            await _adminService.AddRole(new User {Username = request.Username}, request.RoleId);
         return StatusCode((int)response.Type, response.Message);
     }
 }
