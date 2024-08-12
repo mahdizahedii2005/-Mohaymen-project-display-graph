@@ -19,6 +19,10 @@
     <data name="UserAlreadyExistsMessage">
         <value>User already exists</value>
     </data>
+    <data name="dontHaveThisRole">
+        <value>This user doesn't have this role</value>
+    </data>
+
 
 
     <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema"

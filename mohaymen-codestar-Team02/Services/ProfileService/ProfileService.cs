@@ -10,7 +10,7 @@ public class ProfileService : IProfileService
     private readonly DataContext _context;
     private readonly IHttpContextAccessor _httpContextAccessor;
 
-    public ProfileService(DataContext context, IHttpContextAccessor httpContextAccessor)
+    public ProfileService(IHttpContextAccessor httpContextAccessor,DataContext context)
     {
         _context = context;
         _httpContextAccessor = httpContextAccessor;

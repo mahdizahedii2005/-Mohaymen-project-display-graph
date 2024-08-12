@@ -10,7 +10,7 @@ public class AuthenticationService : IAuthenticationService
     private readonly IHttpContextAccessor _httpContextAccessor;
 
 
-    public AuthenticationService(DataContext context, IHttpContextAccessor httpContextAccessor)
+    public AuthenticationService( IHttpContextAccessor httpContextAccessor,DataContext context)
     {
         _context = context;
         _httpContextAccessor = httpContextAccessor;
@@ -20,16 +20,16 @@ public class AuthenticationService : IAuthenticationService
     {
         ServiceResponse<string> response = new ServiceResponse<string>();
         User user = await _context.Users.FirstOrDefaultAsync(x => x.Username.ToLower().Equals(username.ToLower()));
-        
+
         if (user is null)
         {
             response.Type = ApiResponse.NotFound;
-            response.Message = "User not found.";
+            response.Message = Resources.UserNotFoundMessage;
         }
         else if (!VerifyPasswordHash(password, user.PasswordHash, user.Salt))
         {
             response.Type = ApiResponse.BadRequest;
-            response.Message = "Wrong password.";
+            response.Message = Resources.WrongPasswordMessage;
         }
         else
         {
@@ -37,20 +37,20 @@ public class AuthenticationService : IAuthenticationService
 
             var cookieOptions = new CookieOptions
             {
-                HttpOnly = true,  
-                Secure = true,    
+                HttpOnly = true,
+                Secure = true,
                 Expires = DateTime.Now.AddHours(1)
             };
 
             _httpContextAccessor.HttpContext?.Response.Cookies.Append("userId", userId, cookieOptions);
 
             response.Type = ApiResponse.Success;
-            response.Message = "Login successful.";
+            response.Message = Resources.LoginSuccessfulMessage;
         }
 
         return response;
     }
-    
+
     private bool VerifyPasswordHash(long password, byte[] passwordHash, byte[] passwordSalt)
     {
         using (var hmac = new System.Security.Cryptography.HMACSHA512(passwordSalt))
@@ -62,10 +62,10 @@ public class AuthenticationService : IAuthenticationService
                 if (computedHash[i] != passwordHash[i])
                 {
                     return false;
-                } 
+                }
             }
+
             return true;
         }
     }
-
 }
