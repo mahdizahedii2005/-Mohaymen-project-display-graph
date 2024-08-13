@@ -4,7 +4,6 @@ namespace mohaymen_codestar_Team02.Models;
 
 public class User
 {
-    [Key]
     public long UserId { get; init; }
     public string Name { get; set; } = string.Empty;
     public string Username { get; set; } = string.Empty;

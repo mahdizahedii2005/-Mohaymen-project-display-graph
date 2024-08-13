@@ -107,13 +107,13 @@ public class AdminService : IAdminService
 
         UserRole userRole = new UserRole
         {
-            Role = role,
+            Role = foundRole,
             User = foundUser,
             RoleId = foundRole.RoleId,
             UserId = foundUser.UserId
         };
 
-        await _context.UserRoles.AddAsync(userRole);
+        _context.UserRoles.Add(userRole);
         await _context.SaveChangesAsync();
 
         response.Type = ApiResponse.Success;
