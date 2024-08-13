@@ -9,5 +9,4 @@ public interface IAdminService
     Task<ServiceResponse<int>> Register(User user, long password);
     Task<ServiceResponse<string>> AddRole(User user, int roleId);
     Task<ServiceResponse<string>> DeleteRole(User user, int roleId);
-
 }
