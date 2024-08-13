@@ -69,11 +69,56 @@ namespace mohaymen_codestar_Team02.Data {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to This user doesn&apos;t have this role.
+        /// </summary>
+        internal static string dontHaveThisRole {
+            get {
+                return ResourceManager.GetString("dontHaveThisRole", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Login successful..
         /// </summary>
         internal static string LoginSuccessfulMessage {
             get {
                 return ResourceManager.GetString("LoginSuccessfulMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Role added successfuly..
+        /// </summary>
+        internal static string RoleAddedSuccessfulyMassage {
+            get {
+                return ResourceManager.GetString("RoleAddedSuccessfulyMassage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This role is already assigned to the user..
+        /// </summary>
+        internal static string RoleAlreadyAssigned {
+            get {
+                return ResourceManager.GetString("RoleAlreadyAssigned", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Role not found..
+        /// </summary>
+        internal static string RoleNotFoundMessage {
+            get {
+                return ResourceManager.GetString("RoleNotFoundMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Role removed successfuly..
+        /// </summary>
+        internal static string RoleRemovedSuccessfullyMessage {
+            get {
+                return ResourceManager.GetString("RoleRemovedSuccessfullyMessage", resourceCulture);
             }
         }
         
@@ -92,6 +137,15 @@ namespace mohaymen_codestar_Team02.Data {
         internal static string UserAlreadyExistsMessage {
             get {
                 return ResourceManager.GetString("UserAlreadyExistsMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to User created successfuly..
+        /// </summary>
+        internal static string UserCreatedSuccessfullyMessage {
+            get {
+                return ResourceManager.GetString("UserCreatedSuccessfullyMessage", resourceCulture);
             }
         }
         

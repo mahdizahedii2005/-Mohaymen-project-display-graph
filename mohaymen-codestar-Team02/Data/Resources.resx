@@ -47,4 +47,19 @@
             PublicKeyToken=b77a5c561934e089
         </value>
     </resheader>
+    <data name="RoleRemovedSuccessfullyMessage" xml:space="preserve">
+        <value>Role removed successfuly.</value>
+    </data>
+    <data name="RoleNotFoundMessage" xml:space="preserve">
+        <value>Role not found.</value>
+    </data>
+    <data name="RoleAddedSuccessfulyMassage" xml:space="preserve">
+        <value>Role added successfuly.</value>
+    </data>
+    <data name="RoleAlreadyAssigned" xml:space="preserve">
+        <value>This role is already assigned to the user.</value>
+    </data>
+    <data name="UserCreatedSuccessfullyMessage" xml:space="preserve">
+        <value>User created successfuly.</value>
+    </data>
 </root>
