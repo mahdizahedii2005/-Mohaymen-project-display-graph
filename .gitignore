@@ -2,3 +2,6 @@ mohaymen-codestar-Team02/bin
 mohaymen-codestar-Team02/obj
 .idea
 mohaymen-codestar-Team02/appsettings.Development.json
+
+*.env
+docker-compose.override.*
