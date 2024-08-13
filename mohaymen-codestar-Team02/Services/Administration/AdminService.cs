@@ -103,7 +103,23 @@ public class AdminService : IAdminService
         return response;
     }
 
+    public async Task<ServiceResponse<int>> Register1(User user, long password)
+    {
+        ServiceResponse<int> response = new ServiceResponse<int>();
 
+        CreatePasswordHash(password, out byte[] passwordHash, out byte[] passwordSalt); //
+
+        user.PasswordHash = passwordHash;
+        user.Salt = passwordSalt;
+
+        await _context.Users.AddAsync(user);
+        await _context.SaveChangesAsync();
+
+        response.Type = ApiResponse.Success;
+        return response;
+    }
+
+    
     public async Task<ServiceResponse<int>> Register(User user, long password)
     {
         ServiceResponse<int> response = new ServiceResponse<int>();

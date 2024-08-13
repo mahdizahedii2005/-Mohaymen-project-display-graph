@@ -1,13 +1,39 @@
-using mohaymen_codestar_Team02.initialProgram;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.EntityFrameworkCore;
+using mohaymen_codestar_Team02.Data;
+using mohaymen_codestar_Team02.Services.Administration;
+using mohaymen_codestar_Team02.Services.ProfileService;
+using AuthenticationService = mohaymen_codestar_Team02.Services.Authenticatoin.AuthenticationService;
+using IAuthenticationService = mohaymen_codestar_Team02.Services.Authenticatoin.IAuthenticationService;
 
-namespace mohaymen_codestar_Team02;
+var builder = WebApplication.CreateBuilder(args);
 
-public class Program
+// Add services to the container.
+// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+builder.Services.AddControllers();
+
+
+
+//var connectionString = "Host=localhost;Port=5432;Database=mohaymen_group02_project;Username=postgres;Password=@Simpleuser01;";
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddDbContext<DataContext>(options =>
+        options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")))
+    .AddScoped<IAuthenticationService, AuthenticationService>()
+    .AddScoped<IAdminService, AdminService>()
+    .AddScoped<IProfileService, ProfileService>();
+
+var app = builder.Build();
+
+// Configure the HTTP request pipeline.
+if (app.Environment.IsDevelopment())
 {
-    public static void Main(string[] args)
-    {
-        var builder = WebApplication.CreateBuilder(args);
-        InitialServices.Init(builder);
-        InitialApp.Init(builder);
-    }
+    app.UseSwagger();
+    app.UseSwaggerUI();
 }
+
+app.UseHttpsRedirection();
+app.MapControllers();
+
+app.Run();

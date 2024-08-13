@@ -45,7 +45,8 @@ public class AuthenticationService : IAuthenticationService
             _httpContextAccessor.HttpContext?.Response.Cookies.Append("userId", userId, cookieOptions);
 
             response.Type = ApiResponse.Success;
-            response.Message = Resources.LoginSuccessfulMessage;
+            //response.Message = Resources.LoginSuccessfulMessage;
+            response.Message = "successful";
         }
 
         return response;
