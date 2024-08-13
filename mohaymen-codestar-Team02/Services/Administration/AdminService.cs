@@ -40,7 +40,19 @@ public class AdminService : IAdminService
     }
 
     
-    public async Task<ServiceResponse<string>> AddRole(User user, int roleId)
+    public async Task<ServiceResponse<string>> AddRole1()
+    {
+        ServiceResponse<string> response = new ServiceResponse<string>();
+        Role role = new Role() {RoleType = RoleType.SystemAdmin, RoleId = 3};
+        _context.Roles.Add(role);
+        await _context.SaveChangesAsync();
+       
+        response.Type = ApiResponse.Success;
+        return response;
+    }
+
+    
+    public async Task<ServiceResponse<string>> AddRole(User user, Role role)
     {
         ServiceResponse<string> response = new ServiceResponse<string>();
         var adminId = _httpContextAccessor.HttpContext?.Request.Cookies["userId"];
@@ -49,38 +61,67 @@ public class AdminService : IAdminService
         {
             response.Type = ApiResponse.Unauthorized;
             response.Message = Resources.UnauthorizedMessage;
+            return response;
         }
-        else
+
+        User admin = _context.Users.FirstOrDefault(x => x.UserId.ToString() == adminId);
+
+        if (admin is null)
         {
-            User admin = _context.Users.FirstOrDefault(x => x.UserId.ToString() == adminId);
-
-            if (admin is null)
-            {
-                response.Type = ApiResponse.BadRequest;
-                response.Message = Resources.UserNotFoundMessage;
-            }
-            else if (!admin.UserRoles.Any(x => x.Role.RoleType.Equals(RoleType.SystemAdmin)))
-            {
-                response.Type = ApiResponse.Forbidden;
-                response.Message = Resources.accessDeniedMessage;
-            }
-            else
-            {
-                Role role = _context.Roles.FirstOrDefault(x => x.RoleId == roleId);
-
-                user.UserRoles.Add(new UserRole() { Role = role, User = user, RoleId = roleId, UserId = user.UserId });
-
-                await _context.SaveChangesAsync();
-
-                response.Type = ApiResponse.Success; // redirect
-            }
+            response.Type = ApiResponse.BadRequest;
+            response.Message = Resources.accessDeniedMessage;
+            return response;
         }
 
+        bool isAdmin = _context.UserRoles.Any(x => x.UserId == admin.UserId && x.RoleId == 2);
+        if (!isAdmin)
+        {
+            response.Type = ApiResponse.Forbidden;
+            response.Message = Resources.accessDeniedMessage;
+            return response;
+        }
+
+        User foundUser = _context.Users.FirstOrDefault(x => x.Username == user.Username);
+        if (foundUser is null)
+        {
+            response.Type = ApiResponse.NotFound;
+            response.Message = Resources.UserNotFoundMessage;
+            return response;
+        }
+        
+        Role foundRole = _context.Roles.FirstOrDefault(x => x.RoleId == role.RoleId);
+        if (foundRole is null)
+        {
+            response.Type = ApiResponse.BadRequest;
+            response.Message = Resources.RoleNotFoundMessage;
+            return response;
+        }
+        
+        UserRole userRoleExists = _context.UserRoles.FirstOrDefault(x => x.UserId == foundUser.UserId && x.RoleId == foundRole.RoleId);
+        if (userRoleExists is not null)
+        {
+            response.Type = ApiResponse.BadRequest;
+            response.Message = Resources.RoleAlreadyAssigned;
+            return response;
+        }
+
+        UserRole userRole = new UserRole
+        {
+            Role = role,
+            User = foundUser,
+            RoleId = foundRole.RoleId,
+            UserId = foundUser.UserId
+        };
+
+        await _context.UserRoles.AddAsync(userRole);
+        await _context.SaveChangesAsync();
+
+        response.Type = ApiResponse.Success;
+        response.Message = Resources.RoleAddedSuccessfulyMassage;
         return response;
     }
 
-
-    public async Task<ServiceResponse<string>> DeleteRole(User user, int roleId)
+    public async Task<ServiceResponse<string>> DeleteRole(User user, Role role)
     {
         ServiceResponse<string> response = new ServiceResponse<string>();
         var userId = _httpContextAccessor.HttpContext?.Request.Cookies["userId"];
@@ -89,43 +130,62 @@ public class AdminService : IAdminService
         {
             response.Type = ApiResponse.Unauthorized;
             response.Message = Resources.UnauthorizedMessage;
+            return response;
+        }
+
+        var admin = _context.Users.FirstOrDefault(x => x.UserId.ToString() == userId);
+
+        if (admin == null)
+        {
+            response.Type = ApiResponse.BadRequest;
+            response.Message = Resources.UserNotFoundMessage;
+            return response;
+        }
+
+        bool isAdmin = _context.UserRoles.Any(x => x.UserId == admin.UserId && x.RoleId == 2);
+        if (!isAdmin)
+        {
+            response.Type = ApiResponse.Forbidden;
+            response.Message = Resources.accessDeniedMessage;
+            return response;
+        }
+        
+        User foundUser = _context.Users.FirstOrDefault(x => x.Username == user.Username);
+        if (foundUser is null)
+        {
+            response.Type = ApiResponse.NotFound;
+            response.Message = Resources.UserNotFoundMessage;
+            return response;
+        }
+        
+        Role foundRole = _context.Roles.FirstOrDefault(x => x.RoleId == role.RoleId);
+        if (role is null)
+        {
+            response.Type = ApiResponse.BadRequest;
+            response.Message = Resources.RoleNotFoundMessage;
+            return response;
+        }
+
+
+        var userRole = _context.UserRoles.FirstOrDefault(x => x.RoleId == foundRole.RoleId && x.User.Username == foundUser.Username);
+        if (userRole is null)
+        {
+            
+            response.Type = ApiResponse.NotFound;
+            response.Message = Resources.dontHaveThisRole; 
         }
         else
         {
-            User admin = _context.Users.FirstOrDefault(x => x.UserId.ToString() == userId);
+            _context.UserRoles.Remove(userRole);
+            await _context.SaveChangesAsync();
 
-            if (admin is null)
-            {
-                response.Type = ApiResponse.BadRequest;
-                response.Message = Resources.UserNotFoundMessage;
-            }
-            else if (!admin.UserRoles.Any(x => x.Role.RoleType.Equals(RoleType.SystemAdmin)))
-            {
-                response.Type = ApiResponse.Forbidden;
-                response.Message = Resources.accessDeniedMessage;
-            }
-            else
-            {
-                var userRoleole = user.UserRoles.FirstOrDefault(x => x.RoleId == roleId);
-
-                if (userRoleole != null)
-                {
-                    user.UserRoles.Remove(userRoleole);
-
-                    await _context.SaveChangesAsync();
-
-                    response.Type = ApiResponse.Success; // redirect
-                }
-                else
-                {
-                    response.Type = ApiResponse.NotFound;
-                    response.Message = Resources.UserNotFoundMessage;
-                }
-            }
+            response.Type = ApiResponse.Success;
+            response.Message = Resources.RoleRemovedSuccessfullyMessage;
         }
 
         return response;
     }
+
 
     public async Task<ServiceResponse<int>> Register1(User user, long password)
     {
@@ -153,46 +213,44 @@ public class AdminService : IAdminService
         {
             response.Type = ApiResponse.Unauthorized;
             response.Message = Resources.UnauthorizedMessage;
+            return response;
         }
-        else
+
+        var admin = _context.Users.FirstOrDefault(x => x.UserId.ToString() == adminId);
+        if (admin == null)
         {
-            User admin = _context.Users.FirstOrDefault(x => x.UserId.ToString() == adminId);
-
-            if (admin is null)
-            {
-                response.Type = ApiResponse.BadRequest;
-                response.Message = Resources.UserNotFoundMessage;
-            }
-            else if(!_context.UserRoles.Any(x=>(x.UserId==admin.UserId && x.RoleId==2)))
-            {
-                response.Type = ApiResponse.Forbidden;
-                response.Message = Resources.accessDeniedMessage;
-            }
-            else
-            {
-                if (await UserExists(user.Username))
-                {
-                    response.Type = ApiResponse.Conflict;
-                    response.Message = Resources.UserAlreadyExistsMessage;
-                    return response;
-                }
-
-                CreatePasswordHash(password, out byte[] passwordHash, out byte[] passwordSalt); //
-
-                user.PasswordHash = passwordHash;
-                user.Salt = passwordSalt;
-
-                await _context.Users.AddAsync(user);
-                await _context.SaveChangesAsync();
-
-                response.Type = ApiResponse.Created; // redirect
-
-                return response;
-            }
+            response.Type = ApiResponse.BadRequest;
+            response.Message = Resources.UserNotFoundMessage;
+            return response;
         }
 
+        bool isAdmin = _context.UserRoles.Any(x => x.UserId == admin.UserId && x.RoleId == 2);
+        if (!isAdmin)
+        {
+            response.Type = ApiResponse.Forbidden;
+            response.Message = Resources.accessDeniedMessage;
+            return response;
+        }
+
+        if (await UserExists(user.Username))
+        {
+            response.Type = ApiResponse.Conflict;
+            response.Message = Resources.UserAlreadyExistsMessage;
+            return response;
+        }
+
+        CreatePasswordHash(password, out byte[] passwordHash, out byte[] passwordSalt);
+        user.PasswordHash = passwordHash;
+        user.Salt = passwordSalt;
+
+        await _context.Users.AddAsync(user);
+        await _context.SaveChangesAsync();
+
+        response.Type = ApiResponse.Created;
+        response.Message = Resources.UserCreatedSuccessfullyMessage;
         return response;
     }
+
 
     public async Task<bool> UserExists(string username)
     {

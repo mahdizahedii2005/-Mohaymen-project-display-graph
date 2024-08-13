@@ -14,10 +14,17 @@ public class ProfileController : ControllerBase
         _profileService = profileService;
     }
     
-    [HttpPost("changePassword")]
+    [HttpPut("changePassword")]
     public async Task<IActionResult> ChangePassword(UserChangePasswordDto request)
     {
         ServiceResponse<string> response = await _profileService.ChangePassword(request.Username, request.NewPassword);
+        return StatusCode((int)response.Type, response.Message);
+    }
+    
+    [HttpGet("logout")]
+    public async Task<IActionResult> Logout()
+    {
+        ServiceResponse<string> response = await _profileService.Logout();
         return StatusCode((int)response.Type, response.Message);
     }
 }

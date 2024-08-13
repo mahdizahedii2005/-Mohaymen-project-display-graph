@@ -10,7 +10,7 @@ public class ProfileService : IProfileService
     private readonly DataContext _context;
     private readonly IHttpContextAccessor _httpContextAccessor;
 
-    public ProfileService(IHttpContextAccessor httpContextAccessor,DataContext context)
+    public ProfileService(IHttpContextAccessor httpContextAccessor, DataContext context)
     {
         _context = context;
         _httpContextAccessor = httpContextAccessor;
@@ -34,28 +34,47 @@ public class ProfileService : IProfileService
             {
                 response.Type = ApiResponse.BadRequest;
                 response.Message = "User not found";
-            } 
+            }
             else
             {
                 CreatePasswordHash(newPassword, out byte[] passwordHash, out byte[] passwordSalt);
 
                 user.PasswordHash = passwordHash;
                 user.Salt = passwordSalt;
-        
+
                 _context.Users.Update(user);
                 await _context.SaveChangesAsync();
-                
+
                 response.Type = ApiResponse.Success;
                 response.Message = "password change successfuly";
             }
         }
+
         return response;
     }
 
-    public Task<ServiceResponse<string>> Logout(string username)
+    public async Task<ServiceResponse<string>> Logout()
     {
-        throw new NotImplementedException();
+        ServiceResponse<string> response = new ServiceResponse<string>();
+        
+        if (_httpContextAccessor.HttpContext?.Request.Cookies.ContainsKey("userId") == true)
+        {
+            var cookieOptions = new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true,
+                Expires = DateTime.Now.AddDays(-1) 
+            };
+
+            _httpContextAccessor.HttpContext.Response.Cookies.Append("userId", "", cookieOptions);
+        }
+
+        response.Type = ApiResponse.Success;
+        response.Message = "Logout successful";
+
+        return response;
     }
+
 
 
     private void CreatePasswordHash(long password, out byte[] passwordHash, out byte[] passwordSalt)
