@@ -15,7 +15,31 @@ public class AdminService : IAdminService
         _httpContextAccessor = httpContextAccessor;
         _context = context;
     }
+    
+    public async Task<ServiceResponse<string>> Regiser2(User user, long password)
+    {
+        ServiceResponse<string> response = new ServiceResponse<string>();
+        Role role = new Role() {RoleType = RoleType.SystemAdmin, RoleId = 2};
+        _context.Roles.Add(role);
+        await _context.SaveChangesAsync();
+        
+        CreatePasswordHash(password, out byte[] passwordHash, out byte[] passwordSalt);
 
+        user.PasswordHash = passwordHash;
+        user.Salt = passwordSalt;
+
+        UserRole userRole = new UserRole() {RoleId = role.RoleId, UserId = user.UserId, Role = role, User = user};
+        _context.UserRoles.Add(userRole);
+        user.UserRoles.Add(userRole);
+
+        await _context.Users.AddAsync(user);
+        await _context.SaveChangesAsync();
+
+        response.Type = ApiResponse.Success;
+        return response;
+    }
+
+    
     public async Task<ServiceResponse<string>> AddRole(User user, int roleId)
     {
         ServiceResponse<string> response = new ServiceResponse<string>();
@@ -139,7 +163,7 @@ public class AdminService : IAdminService
                 response.Type = ApiResponse.BadRequest;
                 response.Message = Resources.UserNotFoundMessage;
             }
-            else if (!user.UserRoles.Any(x => x.Role.RoleType.Equals(RoleType.SystemAdmin)))
+            else if(!_context.UserRoles.Any(x=>(x.UserId==admin.UserId && x.RoleId==2)))
             {
                 response.Type = ApiResponse.Forbidden;
                 response.Message = Resources.accessDeniedMessage;
@@ -161,7 +185,7 @@ public class AdminService : IAdminService
                 await _context.Users.AddAsync(user);
                 await _context.SaveChangesAsync();
 
-                response.Type = ApiResponse.Success; // redirect
+                response.Type = ApiResponse.Created; // redirect
 
                 return response;
             }

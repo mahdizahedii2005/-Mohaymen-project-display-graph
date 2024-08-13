@@ -52,6 +52,7 @@ public class AuthenticationService : IAuthenticationService
         return response;
     }
 
+    
     private bool VerifyPasswordHash(long password, byte[] passwordHash, byte[] passwordSalt)
     {
         using (var hmac = new System.Security.Cryptography.HMACSHA512(passwordSalt))
