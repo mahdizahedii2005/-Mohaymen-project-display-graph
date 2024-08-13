@@ -9,5 +9,5 @@ public class User
     //dont add normal pass
     public byte[] Salt { get; set; }
     public byte[] PasswordHash { get; set; }
-    public HashSet<UserRole> UserRoles { get; set; }
+    public HashSet<UserRole> UserRoles { get; set; } = new();
 }

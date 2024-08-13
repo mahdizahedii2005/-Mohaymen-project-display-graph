@@ -25,5 +25,11 @@ public class DataContext : DbContext
             .HasOne(ur => ur.Role)
             .WithMany(r => r.UserRoles)
             .HasForeignKey(ur => ur.RoleId);
+
+        modelBuilder.Entity<Role>()
+            .Property(ur => ur.RoleType)
+            .HasConversion<int>(); 
+
+        base.OnModelCreating(modelBuilder);
     } 
 }
