@@ -25,5 +25,5 @@ public class DataContext : DbContext
             .HasOne(ur => ur.Role)
             .WithMany(r => r.UserRoles)
             .HasForeignKey(ur => ur.RoleId);
-    }
+    } 
 }

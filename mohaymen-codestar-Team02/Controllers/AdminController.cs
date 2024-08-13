@@ -16,6 +16,14 @@ public class AdminController : ControllerBase
         _adminService = adminService;
     }
     
+    [HttpPost("register2")]
+    public async Task<IActionResult> Register2(UserRegisterDto request)
+    {
+        ServiceResponse<string> response =
+            await _adminService.Regiser2(new User {Username = request.Username}, request.Password);
+        return StatusCode((int)response.Type, response.Message);
+    }
+    
     [HttpPost("register1")]
     public async Task<IActionResult> Register1(UserRegisterDto request)
     {
