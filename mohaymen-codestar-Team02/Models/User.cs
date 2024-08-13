@@ -1,5 +1,3 @@
-using System.ComponentModel.DataAnnotations;
-
 namespace mohaymen_codestar_Team02.Models;
 
 public class User
@@ -13,5 +11,5 @@ public class User
     //dont add normal pass
     public byte[] Salt { get; set; }
     public byte[] PasswordHash { get; set; }
-    public HashSet<UserRole> UserRoles { get; set; } = new();
+    public virtual ICollection<UserRole> UserRoles { get; set; }
 }
