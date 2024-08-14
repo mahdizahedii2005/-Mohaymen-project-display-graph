@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using mohaymen_codestar_Team02.Data;
 using mohaymen_codestar_Team02.Models;
 using mohaymen_codestar_Team02.Services.Administration;
+using mohaymen_codestar_Team02.Services.CookieService;
 using NSubstitute;
 
 namespace mohaymen_codestar_Team02_XUnitTest.Servies.Administration;
@@ -10,17 +11,17 @@ namespace mohaymen_codestar_Team02_XUnitTest.Servies.Administration;
 public class AdminServiceTests
 {
     private readonly AdminService _sut;
-    private readonly IHttpContextAccessor _mockHttpContextAccessor;
+    private readonly ICookieService _cookieService;
     private readonly DataContext _mockContext;
 
     public AdminServiceTests()
     {
-        _mockHttpContextAccessor = Substitute.For<IHttpContextAccessor>();
+        _cookieService = Substitute.For<ICookieService>();
         var options = new DbContextOptionsBuilder<DataContext>()
             .UseInMemoryDatabase(databaseName: "TestDatabase")
             .Options;
         _mockContext = new DataContext(options);
-        _sut = new AdminService(_mockHttpContextAccessor, _mockContext);
+        _sut = new AdminService( _mockContext,_cookieService);
     }
 
     [Fact]
@@ -28,7 +29,6 @@ public class AdminServiceTests
     {
         // Arrange
         FixTheReturnOfCookies("admin");
-        AddUserWithRole("admin", RoleType.Analyst, 1);
         // Act
         var response = await _sut.AddRole(null, null);
         // Assert
@@ -52,7 +52,7 @@ public class AdminServiceTests
     {
         // Arrange
         // Act
-        var result = await _sut.AddRole(new User(), null);
+        var result = await _sut.AddRole(null, null);
         // Assert
         Assert.Equal(ApiResponse.Unauthorized, result.Type);
     }
@@ -70,15 +70,17 @@ public class AdminServiceTests
         // Assert
         Assert.Equal(ApiResponse.Success, result.Type);
     }
+
     [Fact]
     public async Task DeleteRole_ShouldReturnUnauthorized_WhenCookiesIsEmpty()
     {
         // Arrange
         // Act
-        var result = await _sut.DeleteRole(new User(), null);
+        var result = await _sut.DeleteRole(null, null);
         // Assert
         Assert.Equal(ApiResponse.Unauthorized, result.Type);
     }
+
     [Fact]
     public async Task DeleteRole_ShouldReturnBadRequest_WhenAdminNotFound()
     {
@@ -89,6 +91,7 @@ public class AdminServiceTests
         // Assert
         Assert.Equal(ApiResponse.BadRequest, response.Type);
     }
+
     [Fact]
     public async Task DeleteRole_ShouldReturnForbidden_WhenCommenderIsNotSystemAdmin()
     {
@@ -100,31 +103,34 @@ public class AdminServiceTests
         // Assert
         Assert.Equal(ApiResponse.Forbidden, result.Type);
     }
+
     [Fact]
-    public async Task DeleteRole_ShouldReturnNotFound_WhenUserRoleNotExists()
+    public async Task DeleteRole_ShouldReturnBAdReq_WhenUserRoleNotExists()
     {
         // Arrange
         FixTheReturnOfCookies("admin");
         AddUserWithRole("admin", RoleType.SystemAdmin, 1);
+        AddUserWithRole("lol", RoleType.SystemAdmin, 44);
         // Act
-        var result = await _sut.DeleteRole(new User(){Username = "lol"}, null);
+        var result = await _sut.DeleteRole(new User() { Username = "lol" }, null);
         // Assert
-        Assert.Equal(ApiResponse.NotFound, result.Type);
+        Assert.Equal(ApiResponse.BadRequest, result.Type);
     }
 
     [Fact]
-    public async Task DeleteRole_ShouldReturn_WhenUserRoleExistsAndUserDontHaveRole()
+    public async Task DeleteRole_ShouldReturnBadReq_WhenUserRoleExistsAndUserDontHaveRole()
     {
         // Arrange
         FixTheReturnOfCookies("admin");
         AddUserWithRole("admin", RoleType.SystemAdmin, 1);
         var user = AddUserWithRole("target", RoleType.DataAdmin, 2);
-        var role = AddUserWithRole("targetRole", RoleType.Analyst,30);
+        var role = AddUserWithRole("targetRole", RoleType.Analyst, 30);
         // Act
         var result = await _sut.DeleteRole(user.User, role.Role);
         // Assert
-        Assert.Equal(ApiResponse.NotFound, result.Type);
+        Assert.Equal(ApiResponse.BadRequest, result.Type);
     }
+
     [Fact]
     public async Task DeleteRole_ShouldReturnSuccess_WhenUserRoleExistsAndUserIsAdmin()
     {
@@ -141,13 +147,7 @@ public class AdminServiceTests
 
     private void FixTheReturnOfCookies(string returnThis)
     {
-        var mockHttpContext = Substitute.For<HttpContext>();
-        var mockRequest = Substitute.For<HttpRequest>();
-        var mockCookies = Substitute.For<IRequestCookieCollection>();
-        mockCookies["login"].Returns(returnThis);
-        mockRequest.Cookies.Returns(mockCookies);
-        mockHttpContext.Request.Returns(mockRequest);
-        _mockHttpContextAccessor.HttpContext.Returns(mockHttpContext);
+        _cookieService.GetCookieValue().Returns(returnThis);
     }
 
     private UserRole AddUserWithRole(string UserName, RoleType roleType, long id)

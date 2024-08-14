@@ -4,6 +4,6 @@ namespace mohaymen_codestar_Team02.Services.ProfileService;
 
 public interface IProfileService
 {
-    Task<ServiceResponse<string>> ChangePassword(string username, string password);
-    Task<ServiceResponse<string>> Logout();
+    Task<ServiceResponse<string>> ChangePassword(string password);
+    ServiceResponse<string> Logout();
 }
