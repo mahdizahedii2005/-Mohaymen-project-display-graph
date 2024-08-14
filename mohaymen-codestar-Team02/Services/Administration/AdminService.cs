@@ -22,7 +22,7 @@ public class AdminService : IAdminService
         ServiceResponse<int> response = new ServiceResponse<int>();
         
         var adminId = _cookieService.GetCookieValue();
-        if (adminId is null)
+        if (string.IsNullOrEmpty(adminId))
         {
             response.Type = ApiResponse.Unauthorized;
             response.Message = Resources.UnauthorizedMessage;
@@ -69,7 +69,7 @@ public class AdminService : IAdminService
         ServiceResponse<string> response = new ServiceResponse<string>();
         
         var adminId = _cookieService.GetCookieValue();
-        if (adminId is null)
+        if (string.IsNullOrEmpty(adminId))
         {
             response.Type = ApiResponse.Unauthorized;
             response.Message = Resources.UnauthorizedMessage;
@@ -136,7 +136,7 @@ public class AdminService : IAdminService
         ServiceResponse<string> response = new ServiceResponse<string>();
         
         var adminId = _cookieService.GetCookieValue();
-        if (adminId is null)
+        if (string.IsNullOrEmpty(adminId))
         {
             response.Type = ApiResponse.Unauthorized;
             response.Message = Resources.UnauthorizedMessage;

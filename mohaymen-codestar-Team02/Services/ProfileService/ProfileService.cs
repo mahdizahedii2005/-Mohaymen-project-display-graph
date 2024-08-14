@@ -2,6 +2,7 @@ using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using mohaymen_codestar_Team02.Data;
 using mohaymen_codestar_Team02.Models;
+using mohaymen_codestar_Team02.Services.CookieService;
 
 namespace mohaymen_codestar_Team02.Services.ProfileService;
 
@@ -9,16 +10,15 @@ public class ProfileService : IProfileService
 {
     private readonly DataContext _context;
     private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly ICookieService _cookieService;
+    private readonly ITokenService _tokenService;
 
-    public ProfileService(IHttpContextAccessor httpContextAccessor, DataContext context)
+    public ProfileService(IHttpContextAccessor httpContextAccessor, DataContext context, ICookieService cookieService, ITokenService tokenService)
     {
         _context = context;
+        _cookieService = cookieService;
+        _tokenService = tokenService;
         _httpContextAccessor = httpContextAccessor;
-    }
-
-    private long? GetCookieValue()
-    {
-        return long.Parse(_httpContextAccessor.HttpContext?.Request.Cookies["login"]!);
     }
 
     private async Task<User?> GetUserById(long? userId)
@@ -26,26 +26,25 @@ public class ProfileService : IProfileService
         return await _context.Users.FirstOrDefaultAsync(x => x.UserId == userId);
     }
     
-    private async Task<User?> GetUserByUsername(string username)
+    private async Task<User?> GetUser(string username)
     {
         return await _context.Users.FirstOrDefaultAsync(x => x.Username.ToLower().Equals(username.ToLower()));
     }
 
     
-    public async Task<ServiceResponse<string>> ChangePassword(string username, string newPassword)
+    public async Task<ServiceResponse<string>> ChangePassword(string newPassword)
     {
         ServiceResponse<string> response = new ServiceResponse<string>();
-        
-        
-        var adminId = GetCookieValue();
-        if (adminId is null)
+
+        var username = _cookieService.GetCookieValue();
+        if (string.IsNullOrEmpty(username))
         {
             response.Type = ApiResponse.Unauthorized;
             response.Message = Resources.UnauthorizedMessage;
             return response;
         }
         
-        var user = await GetUserByUsername(username);
+        var user = await GetUser(username);
         if (user is null)
         {
             response.Type = ApiResponse.BadRequest;
@@ -66,7 +65,7 @@ public class ProfileService : IProfileService
         return response;
     }
 
-    public async Task<ServiceResponse<string>> Logout()
+    public ServiceResponse<string> Logout()
     {
         ServiceResponse<string> response = new ServiceResponse<string>();
         
