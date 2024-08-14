@@ -19,7 +19,7 @@ public class AuthenticationController : ControllerBase
     }
     
     [HttpPost("login")]
-    public async Task<IActionResult> Login(UserLoginDto request)
+    public async Task<IActionResult> Login(LoginUserDto request)
     {
         ServiceResponse<string> response = await _authenticationService.Login(request.Username, request.Password);
         return StatusCode((int)response.Type, response.Message);
