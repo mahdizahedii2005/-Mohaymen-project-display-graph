@@ -13,7 +13,8 @@ public class ProfileService : IProfileService
     private readonly ICookieService _cookieService;
     private readonly ITokenService _tokenService;
 
-    public ProfileService(IHttpContextAccessor httpContextAccessor, DataContext context, ICookieService cookieService, ITokenService tokenService)
+    public ProfileService(IHttpContextAccessor httpContextAccessor, DataContext context, ICookieService cookieService,
+        ITokenService tokenService)
     {
         _context = context;
         _cookieService = cookieService;
@@ -25,13 +26,13 @@ public class ProfileService : IProfileService
     {
         return await _context.Users.FirstOrDefaultAsync(x => x.UserId == userId);
     }
-    
+
     private async Task<User?> GetUser(string username)
     {
         return await _context.Users.FirstOrDefaultAsync(x => x.Username.ToLower().Equals(username.ToLower()));
     }
 
-    
+
     public async Task<ServiceResponse<string>> ChangePassword(string newPassword)
     {
         ServiceResponse<string> response = new ServiceResponse<string>();
@@ -43,7 +44,7 @@ public class ProfileService : IProfileService
             response.Message = Resources.UnauthorizedMessage;
             return response;
         }
-        
+
         var user = await GetUser(username);
         if (user is null)
         {
@@ -51,7 +52,7 @@ public class ProfileService : IProfileService
             response.Message = Resources.UserNotFoundMessage;
             return response;
         }
-        
+
         CreatePasswordHash(newPassword, out byte[] passwordHash, out byte[] passwordSalt);
         user.PasswordHash = passwordHash;
         user.Salt = passwordSalt;
@@ -68,14 +69,14 @@ public class ProfileService : IProfileService
     public ServiceResponse<string> Logout()
     {
         ServiceResponse<string> response = new ServiceResponse<string>();
-        
+
         if (_httpContextAccessor.HttpContext?.Request.Cookies.ContainsKey("login") == true)
         {
             var cookieOptions = new CookieOptions
             {
                 HttpOnly = true,
                 Secure = true,
-                Expires = DateTime.Now.AddDays(-1) 
+                Expires = DateTime.Now.AddDays(-1)
             };
 
             _httpContextAccessor.HttpContext.Response.Cookies.Append("login", "", cookieOptions);
@@ -86,7 +87,7 @@ public class ProfileService : IProfileService
 
         return response;
     }
-    
+
     private void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
     {
         using (var hmac = new System.Security.Cryptography.HMACSHA512()) //

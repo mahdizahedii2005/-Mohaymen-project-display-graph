@@ -1,4 +1,3 @@
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using mohaymen_codestar_Team02.Dto.UserDtos;
 using mohaymen_codestar_Team02.Models;
@@ -17,7 +16,7 @@ public class AuthenticationController : ControllerBase
     {
         _authenticationService = authenticationService;
     }
-    
+
     [HttpPost("login")]
     public async Task<IActionResult> Login(LoginUserDto request)
     {

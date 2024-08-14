@@ -1,4 +1,7 @@
+using System.Text;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using mohaymen_codestar_Team02.Data;
 using mohaymen_codestar_Team02.Services;
 using mohaymen_codestar_Team02.Services.Administration;
@@ -17,7 +20,6 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddControllers();
 
 
-
 //var connectionString = "Host=localhost;Port=5432;Database=mohaymen_group02_project;Username=postgres;Password=@Simpleuser01;";
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddDbContext<DataContext>(options =>
@@ -27,6 +29,43 @@ builder.Services.AddDbContext<DataContext>(options =>
     .AddScoped<IProfileService, ProfileService>()
     .AddScoped<ITokenService, TokenService>()
     .AddScoped<ICookieService, CookieService>();
+
+
+builder.Services.AddAuthentication(options =>
+    {
+        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    })
+    .AddJwtBearer(options =>
+    {
+        options.Events = new JwtBearerEvents
+        {
+            OnMessageReceived = context =>
+            {
+                var token = context.HttpContext.Request.Cookies["login"];
+                if (!string.IsNullOrEmpty(token))
+                {
+                    context.Token = token;
+                }
+
+                return Task.CompletedTask;
+            }
+        };
+
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = false,
+            ValidateAudience = false,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey =
+                new SymmetricSecurityKey(Encoding.UTF8.GetBytes(
+                    "my top secret key is right here hehe jkjkjkj yguguygugyuguyguuygggyuguyuygu    jhj"))
+        };
+    });
+
+
+builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
@@ -52,5 +91,11 @@ app.MapControllers();
         context.Database.Migrate();
     }
 }*/
+
+
+app.UseAuthentication();
+app.UseAuthorization();
+
+app.MapControllers();
 
 app.Run();
