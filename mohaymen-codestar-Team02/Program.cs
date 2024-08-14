@@ -1,7 +1,10 @@
 using Microsoft.EntityFrameworkCore;
 using mohaymen_codestar_Team02.Data;
+using mohaymen_codestar_Team02.Services;
 using mohaymen_codestar_Team02.Services.Administration;
+using mohaymen_codestar_Team02.Services.CookieService;
 using mohaymen_codestar_Team02.Services.ProfileService;
+using mohaymen_codestar_Team02.Services.TokenService;
 using AuthenticationService = mohaymen_codestar_Team02.Services.Authenticatoin.AuthenticationService;
 using IAuthenticationService = mohaymen_codestar_Team02.Services.Authenticatoin.IAuthenticationService;
 
@@ -21,7 +24,9 @@ builder.Services.AddDbContext<DataContext>(options =>
         options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")))
     .AddScoped<IAuthenticationService, AuthenticationService>()
     .AddScoped<IAdminService, AdminService>()
-    .AddScoped<IProfileService, ProfileService>();
+    .AddScoped<IProfileService, ProfileService>()
+    .AddScoped<ITokenService, TokenService>()
+    .AddScoped<ICookieService, CookieService>();
 
 var app = builder.Build();
 

@@ -2,18 +2,18 @@ using System.Security.Claims;
 using Microsoft.EntityFrameworkCore;
 using mohaymen_codestar_Team02.Data;
 using mohaymen_codestar_Team02.Models;
+using mohaymen_codestar_Team02.Services.CookieService;
 
 namespace mohaymen_codestar_Team02.Services.Administration;
 
 public class AdminService : IAdminService
 {
     private readonly DataContext _context;
-    private readonly IHttpContextAccessor _httpContextAccessor;
-    
-    public AdminService(IHttpContextAccessor httpContextAccessor, DataContext context)
+    private readonly ICookieService _cookieService;
+    public AdminService(DataContext context, ICookieService cookieService)
     {
         _context = context;
-        _httpContextAccessor = httpContextAccessor;
+        _cookieService = cookieService;
     }
     
     
@@ -21,7 +21,7 @@ public class AdminService : IAdminService
     {
         ServiceResponse<int> response = new ServiceResponse<int>();
         
-        var adminId = GetCookieValue();
+        var adminId = _cookieService.GetCookieValue();
         if (adminId is null)
         {
             response.Type = ApiResponse.Unauthorized;
@@ -29,7 +29,7 @@ public class AdminService : IAdminService
             return response;
         }
 
-        var admin = await GetUserById(adminId);
+        var admin = await GetUser(adminId);
         if (admin is null)
         {
             response.Type = ApiResponse.BadRequest;
@@ -68,7 +68,7 @@ public class AdminService : IAdminService
     {
         ServiceResponse<string> response = new ServiceResponse<string>();
         
-        var adminId = GetCookieValue();
+        var adminId = _cookieService.GetCookieValue();
         if (adminId is null)
         {
             response.Type = ApiResponse.Unauthorized;
@@ -76,7 +76,7 @@ public class AdminService : IAdminService
             return response;
         }
         
-        var admin = await GetUserById(adminId);
+        var admin = await GetUser(adminId);
         if (admin is null)
         {
             response.Type = ApiResponse.BadRequest;
@@ -91,7 +91,7 @@ public class AdminService : IAdminService
             return response;
         }
 
-        var foundUser = await GetUserByUsername(user.Username);
+        var foundUser = await GetUser(user.Username);
         if (foundUser is null)
         {
             response.Type = ApiResponse.NotFound;
@@ -135,7 +135,7 @@ public class AdminService : IAdminService
     {
         ServiceResponse<string> response = new ServiceResponse<string>();
         
-        var adminId = GetCookieValue();
+        var adminId = _cookieService.GetCookieValue();
         if (adminId is null)
         {
             response.Type = ApiResponse.Unauthorized;
@@ -143,7 +143,7 @@ public class AdminService : IAdminService
             return response;
         }
         
-        var admin = await GetUserById(adminId);
+        var admin = await GetUser(adminId);
         if (admin is null)
         {
             response.Type = ApiResponse.BadRequest;
@@ -158,7 +158,7 @@ public class AdminService : IAdminService
             return response;
         }
 
-        var foundUser = await GetUserByUsername(user.Username);
+        var foundUser = await GetUser(user.Username);
         if (foundUser is null)
         {
             response.Type = ApiResponse.NotFound;
@@ -193,18 +193,8 @@ public class AdminService : IAdminService
 
         return response;
     }
-    
-    private long? GetCookieValue()
-    {
-        return long.Parse(_httpContextAccessor.HttpContext?.Request.Cookies["login"]!);
-    }
 
-    private async Task<User?> GetUserById(long? userId)
-    {
-        return await _context.Users.FirstOrDefaultAsync(x => x.UserId == userId);
-    }
-    
-    private async Task<User?> GetUserByUsername(string username)
+    private async Task<User?> GetUser(string username)
     {
         return await _context.Users.FirstOrDefaultAsync(x => x.Username.ToLower().Equals(username.ToLower()));
     }
