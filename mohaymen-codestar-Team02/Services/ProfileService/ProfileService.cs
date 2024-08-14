@@ -16,39 +16,52 @@ public class ProfileService : IProfileService
         _httpContextAccessor = httpContextAccessor;
     }
 
-    public async Task<ServiceResponse<string>> ChangePassword(string username, long newPassword)
+    private long? GetCookieValue()
+    {
+        return long.Parse(_httpContextAccessor.HttpContext?.Request.Cookies["login"]!);
+    }
+
+    private async Task<User?> GetUserById(long? userId)
+    {
+        return await _context.Users.FirstOrDefaultAsync(x => x.UserId == userId);
+    }
+    
+    private async Task<User?> GetUserByUsername(string username)
+    {
+        return await _context.Users.FirstOrDefaultAsync(x => x.Username.ToLower().Equals(username.ToLower()));
+    }
+
+    
+    public async Task<ServiceResponse<string>> ChangePassword(string username, string newPassword)
     {
         ServiceResponse<string> response = new ServiceResponse<string>();
-        var userId = _httpContextAccessor.HttpContext?.Request.Cookies["userId"];
-
-        if (string.IsNullOrEmpty(userId))
+        
+        
+        var adminId = GetCookieValue();
+        if (adminId is null)
         {
             response.Type = ApiResponse.Unauthorized;
-            response.Message = "Unauthorized";
+            response.Message = Resources.UnauthorizedMessage;
+            return response;
         }
-        else
+        
+        var user = await GetUserByUsername(username);
+        if (user is null)
         {
-            User user = _context.Users.FirstOrDefault(x => x.UserId.ToString() == userId);
-
-            if (user is null)
-            {
-                response.Type = ApiResponse.BadRequest;
-                response.Message = "User not found";
-            }
-            else
-            {
-                CreatePasswordHash(newPassword, out byte[] passwordHash, out byte[] passwordSalt);
-
-                user.PasswordHash = passwordHash;
-                user.Salt = passwordSalt;
-
-                _context.Users.Update(user);
-                await _context.SaveChangesAsync();
-
-                response.Type = ApiResponse.Success;
-                response.Message = "password change successfuly";
-            }
+            response.Type = ApiResponse.BadRequest;
+            response.Message = Resources.UserNotFoundMessage;
+            return response;
         }
+        
+        CreatePasswordHash(newPassword, out byte[] passwordHash, out byte[] passwordSalt);
+        user.PasswordHash = passwordHash;
+        user.Salt = passwordSalt;
+
+        _context.Users.Update(user);
+        await _context.SaveChangesAsync();
+
+        response.Type = ApiResponse.Success;
+        response.Message = Resources.PasswordChangedSuccessfulyMessage;
 
         return response;
     }
@@ -57,7 +70,7 @@ public class ProfileService : IProfileService
     {
         ServiceResponse<string> response = new ServiceResponse<string>();
         
-        if (_httpContextAccessor.HttpContext?.Request.Cookies.ContainsKey("userId") == true)
+        if (_httpContextAccessor.HttpContext?.Request.Cookies.ContainsKey("login") == true)
         {
             var cookieOptions = new CookieOptions
             {
@@ -66,18 +79,16 @@ public class ProfileService : IProfileService
                 Expires = DateTime.Now.AddDays(-1) 
             };
 
-            _httpContextAccessor.HttpContext.Response.Cookies.Append("userId", "", cookieOptions);
+            _httpContextAccessor.HttpContext.Response.Cookies.Append("login", "", cookieOptions);
         }
 
         response.Type = ApiResponse.Success;
-        response.Message = "Logout successful";
+        response.Message = Resources.LogoutSuccessfuly;
 
         return response;
     }
-
-
-
-    private void CreatePasswordHash(long password, out byte[] passwordHash, out byte[] passwordSalt)
+    
+    private void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
     {
         using (var hmac = new System.Security.Cryptography.HMACSHA512()) //
         {
