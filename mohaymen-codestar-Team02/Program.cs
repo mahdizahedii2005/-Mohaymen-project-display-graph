@@ -1,3 +1,4 @@
+using DotNetEnv;
 using Microsoft.EntityFrameworkCore;
 using mohaymen_codestar_Team02.Data;
 using mohaymen_codestar_Team02.Services;
@@ -9,19 +10,17 @@ using AuthenticationService = mohaymen_codestar_Team02.Services.Authenticatoin.A
 using IAuthenticationService = mohaymen_codestar_Team02.Services.Authenticatoin.IAuthenticationService;
 
 var builder = WebApplication.CreateBuilder(args);
-
-// Add services to the container.
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+Env.Load();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddControllers();
 
 
-
-//var connectionString = "Host=localhost;Port=5432;Database=mohaymen_group02_project;Username=postgres;Password=@Simpleuser01;";
+var connectionString = Environment.GetEnvironmentVariable("CONNECTION_STRING");
+Console.WriteLine(connectionString);
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddDbContext<DataContext>(options =>
-        options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")))
+        options.UseNpgsql(builder.Configuration.GetConnectionString(connectionString)))
     .AddScoped<IAuthenticationService, AuthenticationService>()
     .AddScoped<IAdminService, AdminService>()
     .AddScoped<IProfileService, ProfileService>()
