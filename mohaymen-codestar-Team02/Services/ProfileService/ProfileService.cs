@@ -1,4 +1,3 @@
-using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using mohaymen_codestar_Team02.Data;
 using mohaymen_codestar_Team02.Models;
@@ -35,7 +34,6 @@ public class ProfileService : IProfileService
     public async Task<ServiceResponse<string>> ChangePassword(string newPassword)
     {
         ServiceResponse<string> response = new ServiceResponse<string>();
-
         var username = _cookieService.GetCookieValue();
         if (string.IsNullOrEmpty(username))
         {
@@ -43,7 +41,6 @@ public class ProfileService : IProfileService
             response.Message = Resources.UnauthorizedMessage;
             return response;
         }
-        
         var user = await GetUser(username);
         if (user is null)
         {
@@ -51,7 +48,7 @@ public class ProfileService : IProfileService
             response.Message = Resources.UserNotFoundMessage;
             return response;
         }
-        
+  
         CreatePasswordHash(newPassword, out byte[] passwordHash, out byte[] passwordSalt);
         user.PasswordHash = passwordHash;
         user.Salt = passwordSalt;

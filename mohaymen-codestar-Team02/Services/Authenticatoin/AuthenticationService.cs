@@ -10,19 +10,9 @@ using mohaymen_codestar_Team02.Services.CookieService;
 
 namespace mohaymen_codestar_Team02.Services.Authenticatoin;
 
-public class AuthenticationService : IAuthenticationService
+public class AuthenticationService(DataContext context, ICookieService cookieService, ITokenService tokenService)
+    : IAuthenticationService
 {
-    private readonly DataContext _context;
-    private readonly ICookieService _cookieService;
-    private readonly ITokenService _tokenService;
-
-    public AuthenticationService(DataContext context, ICookieService cookieService, ITokenService tokenService)
-    {
-        _context = context;
-        _cookieService = cookieService;
-        _tokenService = tokenService;
-    }
-
     public async Task<ServiceResponse<string>> Login(string username, string password)
     {
         ServiceResponse<string> response = new ServiceResponse<string>();
@@ -42,7 +32,7 @@ public class AuthenticationService : IAuthenticationService
         }
         else
         {
-            _cookieService.CreateCookie(_tokenService.CreateToken(user));
+            cookieService.CreateCookie(tokenService.CreateToken(user));
             
             response.Type = ApiResponse.Success;
             response.Message = Resources.LoginSuccessfulMessage;
@@ -55,7 +45,7 @@ public class AuthenticationService : IAuthenticationService
 
     private async Task<User?> GetUser(string username)
     {
-        return await _context.Users.FirstOrDefaultAsync(x => x.Username.ToLower().Equals(username.ToLower()));
+        return await context.Users.FirstOrDefaultAsync(x => x.Username.ToLower().Equals(username.ToLower()));
     }
     private bool VerifyPasswordHash(string password, byte[] passwordHash, byte[] passwordSalt)
     {

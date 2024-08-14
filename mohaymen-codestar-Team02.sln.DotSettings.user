@@ -10,18 +10,34 @@
     &lt;TestId&gt;xUnit::DBCC3406-305C-4B21-AF94-8BF8B78D1040::net8.0::AdminServiceTests.AddRole_ShouldReturnBadRequest_WhenAdminNotFound&lt;/TestId&gt;&#xD;
   &lt;/TestAncestor&gt;&#xD;
 &lt;/SessionState&gt;</s:String>
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=3dfecffe_002Db52b_002D42a2_002Db842_002Dae73476825b9/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="DeleteRole_ShouldRollBeNullIfLoockingForIt_WhenUserRoleExistsAndUserIsAdmin" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
+  &lt;Or&gt;&#xD;
+    &lt;TestAncestor&gt;&#xD;
+      &lt;TestId&gt;xUnit::DBCC3406-305C-4B21-AF94-8BF8B78D1040::net8.0::mohaymen_codestar_Team02_XUnitTest.Servies.Administration.AdminServiceTests.DeleteRole_ShouldRollBeNullIfLoockingForIt_WhenUserRoleExistsAndUserIsAdmin&lt;/TestId&gt;&#xD;
+      &lt;TestId&gt;xUnit::DBCC3406-305C-4B21-AF94-8BF8B78D1040::net8.0::AuthenticationServiceTests.Login_ShouldReturnBadRequest_WhenPasswordIsNullOrEmpty&lt;/TestId&gt;&#xD;
+      &lt;TestId&gt;xUnit::DBCC3406-305C-4B21-AF94-8BF8B78D1040::net8.0::AuthenticationServiceTests.Login_ShouldReturnNotFound_WhenUserDoesNotExist&lt;/TestId&gt;&#xD;
+      &lt;TestId&gt;xUnit::DBCC3406-305C-4B21-AF94-8BF8B78D1040::net8.0::AuthenticationServiceTests.Login_ShouldReturnBadRequest_WhenPasswordIsIncorrect&lt;/TestId&gt;&#xD;
+      &lt;TestId&gt;xUnit::DBCC3406-305C-4B21-AF94-8BF8B78D1040::net8.0::AuthenticationServiceTests.Login_ShouldReturnSuccess_WhenCredentialsAreCorrect&lt;/TestId&gt;&#xD;
+      &lt;TestId&gt;xUnit::DBCC3406-305C-4B21-AF94-8BF8B78D1040::net8.0::ProfileServiceTests.ChangePassword_ShouldReturnSuccess_WhenPasswordIsChanged&lt;/TestId&gt;&#xD;
+      &lt;TestId&gt;xUnit::DBCC3406-305C-4B21-AF94-8BF8B78D1040::net8.0::ProfileServiceTests.Logout_ShouldClearLoginCookie_WhenCookieExists&lt;/TestId&gt;&#xD;
+      &lt;TestId&gt;xUnit::DBCC3406-305C-4B21-AF94-8BF8B78D1040::net8.0::mohaymen_codestar_Team02_XUnitTest.Servies.CookieService.CookieServiceTestTests&lt;/TestId&gt;&#xD;
+    &lt;/TestAncestor&gt;&#xD;
+    &lt;ProjectFile&gt;DBCC3406-305C-4B21-AF94-8BF8B78D1040/d:Servies/d:Authenticatoin/f:AuthenticationService.cs&lt;/ProjectFile&gt;&#xD;
+  &lt;/Or&gt;&#xD;
+&lt;/SessionState&gt;</s:String>
 	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=49547ccc_002D0961_002D454c_002D92db_002D7c5db33a1b92/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="AddRole_ShouldReturnSuccess_WhenCommenderIsAdmin" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
   &lt;TestAncestor&gt;&#xD;
     &lt;TestId&gt;xUnit::DBCC3406-305C-4B21-AF94-8BF8B78D1040::net8.0::mohaymen_codestar_Team02_XUnitTest.Servies.Administration.AdminServiceTests.AddRole_ShouldReturnSuccess_WhenCommenderIsAdmin&lt;/TestId&gt;&#xD;
   &lt;/TestAncestor&gt;&#xD;
 &lt;/SessionState&gt;</s:String>
-	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=6f1abcdb_002D8711_002D402b_002D985d_002D6a856d4533ad/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="DeleteRole_ShouldReturnBadRequest_WhenAdminNotFound" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=6f1abcdb_002D8711_002D402b_002D985d_002D6a856d4533ad/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="DeleteRole_ShouldReturnBadRequest_WhenAdminNotFound" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
   &lt;TestAncestor&gt;&#xD;
     &lt;TestId&gt;xUnit::DBCC3406-305C-4B21-AF94-8BF8B78D1040::net8.0::mohaymen_codestar_Team02_XUnitTest.Servies.Administration.AdminServiceTests.DeleteRole_ShouldReturnBadRequest_WhenAdminNotFound&lt;/TestId&gt;&#xD;
     &lt;TestId&gt;xUnit::DBCC3406-305C-4B21-AF94-8BF8B78D1040::net8.0::mohaymen_codestar_Team02_XUnitTest.Servies.Administration.AdminServiceTests.DeleteRole_ShouldReturnForbidden_WhenCommenderIsNotSystemAdmin&lt;/TestId&gt;&#xD;
     &lt;TestId&gt;xUnit::DBCC3406-305C-4B21-AF94-8BF8B78D1040::net8.0::mohaymen_codestar_Team02_XUnitTest.Servies.Administration.AdminServiceTests.DeleteRole_ShouldReturnNotFound_WhenUserRoleNotExists&lt;/TestId&gt;&#xD;
     &lt;TestId&gt;xUnit::DBCC3406-305C-4B21-AF94-8BF8B78D1040::net8.0::mohaymen_codestar_Team02_XUnitTest.Servies.Administration.AdminServiceTests.DeleteRole_ShouldReturnBadReq_WhenUserRoleExistsAndUserDontHaveRole&lt;/TestId&gt;&#xD;
     &lt;TestId&gt;xUnit::DBCC3406-305C-4B21-AF94-8BF8B78D1040::net8.0::mohaymen_codestar_Team02_XUnitTest.Servies.Administration.AdminServiceTests.DeleteRole_ShouldReturnBAdReq_WhenUserRoleNotExists&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;xUnit::DBCC3406-305C-4B21-AF94-8BF8B78D1040::net8.0::mohaymen_codestar_Team02_XUnitTest.Servies.Administration.AdminServiceTests.DeleteRole_ShouldRollBeNullIfLoockingForIt_WhenUserRoleExistsAndUserIsAdmin&lt;/TestId&gt;&#xD;
   &lt;/TestAncestor&gt;&#xD;
 &lt;/SessionState&gt;</s:String>
 	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=9367e02b_002Def39_002D409e_002D89e7_002D791756079406/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="AddRole_ShouldReturnBadRequest_WhenAdminNotFound" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
@@ -57,11 +73,12 @@
     &lt;TestId&gt;xUnit::DBCC3406-305C-4B21-AF94-8BF8B78D1040::net8.0::mohaymen_codestar_Team02_XUnitTest.Servies.Administration.AdminServiceTests.AddRole_ShouldReturnSuccess_WhenCommenderIsAdmin&lt;/TestId&gt;&#xD;
   &lt;/TestAncestor&gt;&#xD;
 &lt;/SessionState&gt;</s:String>
-	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=fced91d1_002D2327_002D439b_002Db976_002Ddfa7acddce54/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="AddRole_ShouldReturnSuccess_WhenCommenderIsAdmin #4" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=fced91d1_002D2327_002D439b_002Db976_002Ddfa7acddce54/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="AddRole_ShouldReturnSuccess_WhenCommenderIsAdmin #4" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
   &lt;TestAncestor&gt;&#xD;
     &lt;TestId&gt;xUnit::DBCC3406-305C-4B21-AF94-8BF8B78D1040::net8.0::mohaymen_codestar_Team02_XUnitTest.Servies.Administration.AdminServiceTests.AddRole_ShouldReturnSuccess_WhenCommenderIsAdmin&lt;/TestId&gt;&#xD;
     &lt;TestId&gt;xUnit::DBCC3406-305C-4B21-AF94-8BF8B78D1040::net8.0::mohaymen_codestar_Team02_XUnitTest.Servies.Administration.AdminServiceTests.DeleteRole_ShouldReturnUnauthorized_WhenCookiesIsEmpty&lt;/TestId&gt;&#xD;
     &lt;TestId&gt;xUnit::DBCC3406-305C-4B21-AF94-8BF8B78D1040::net8.0::mohaymen_codestar_Team02_XUnitTest.Servies.Administration.AdminServiceTests.DeleteRole_ShouldReturnBadRequest_WhenAdminNotFound&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;xUnit::DBCC3406-305C-4B21-AF94-8BF8B78D1040::net8.0::ProfileServiceTests.Logout_ShouldClearLoginCookie_WhenCookieExists&lt;/TestId&gt;&#xD;
   &lt;/TestAncestor&gt;&#xD;
 &lt;/SessionState&gt;</s:String>
 	<s:Boolean x:Key="/Default/ResxEditorPersonal/CheckedGroups/=mohaymen_002Dcodestar_002DTeam02_002FData_002FResources/@EntryIndexedValue">True</s:Boolean>
