@@ -1,11 +1,11 @@
-using System.Runtime.InteropServices.JavaScript;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using mohaymen_codestar_Team02.Data;
 using mohaymen_codestar_Team02.Models;
 using mohaymen_codestar_Team02.Services.Administration;
 using NSubstitute;
-using MockQueryable.NSubstitute;
+
+namespace mohaymen_codestar_Team02_XUnitTest.Servies.Administration;
 
 public class AdminServiceTests
 {
@@ -24,197 +24,142 @@ public class AdminServiceTests
     }
 
     [Fact]
-    public void AddRole_ShouldReturnBadRequest_WhenAdminNotFound()
+    public async Task AddRole_ShouldReturnBadRequest_WhenAdminNotFound()
     {
         // Arrange
-        FixTheReturnOfCookies("1");
-        var user = new User { UserId = 2, Username = "TestUser" };
-        _mockContext.Users.Add(user);
-        _mockContext.SaveChangesAsync();
-
+        FixTheReturnOfCookies("admin");
+        AddUserWithRole("admin", RoleType.Analyst, 1);
         // Act
-        var response = _sut.AddRole(user, null);
-
+        var response = await _sut.AddRole(null, null);
         // Assert
-        Assert.Equal(ApiResponse.BadRequest, response.Result.Type);
+        Assert.Equal(ApiResponse.BadRequest, response.Type);
     }
 
     [Fact]
-    public void AddRole_ShouldReturnForbidden_WhenCommenderIsNotSystemAdmin()
+    public async Task AddRole_ShouldReturnForbidden_WhenCommenderIsNotSystemAdmin()
     {
         // Arrange
-        var user = new User
-        {
-            PasswordHash = Array.Empty<byte>(),
-            Salt = Array.Empty<byte>(),
-            UserId = 1,
-        };
-        var UserRoles = new UserRole
-            { User = user, Role = new Role { RoleId = 1, RoleType = RoleType.Analyst } };
-        _mockContext.UserRoles.Add(UserRoles);
-        _mockContext.Users.Add(user);
-        _mockContext.SaveChanges();
-        FixTheReturnOfCookies("1");
+        FixTheReturnOfCookies("fakeAdmin");
+        AddUserWithRole("fakeAdmin", RoleType.Analyst, 1);
         // Act
-        var result = _sut.AddRole(user, null);
-
+        var result = await _sut.AddRole(null, null);
         // Assert
-        Assert.Equal(ApiResponse.Forbidden, result.Result.Type);
+        Assert.Equal(ApiResponse.Forbidden, result.Type);
     }
 
     [Fact]
-    public void AddRole_ShouldReturnUnauthorized_WhenCookiesIsEmpty()
+    public async Task AddRole_ShouldReturnUnauthorized_WhenCookiesIsEmpty()
     {
         // Arrange
         // Act
-        var result = _sut.AddRole(new User(), null);
+        var result = await _sut.AddRole(new User(), null);
         // Assert
-        Assert.Equal(ApiResponse.Unauthorized, result.Result.Type);
+        Assert.Equal(ApiResponse.Unauthorized, result.Type);
     }
 
     [Fact]
-    public void AddRole_ShouldReturnSuccess_WhenUserIsAdmin()
+    public async Task AddRole_ShouldReturnSuccess_WhenCommenderIsAdmin()
     {
         // Arrange
-        FixTheReturnOfCookies("1");
-
-        User admin = new User()
-        {
-            PasswordHash = Array.Empty<byte>(),
-            Salt = Array.Empty<byte>(),
-            UserId = 1
-        };
-        User targetUser = new User()
-        {
-            PasswordHash = Array.Empty<byte>(),
-            Salt = Array.Empty<byte>(),
-            UserId = 4
-        };
-        UserRole userRole = new UserRole()
-        {
-            Role = new Role() { RoleId = 2, RoleType = RoleType.SystemAdmin },
-            User = admin
-        };
-        _mockContext.Users.Add(admin);
-        _mockContext.Users.Add(targetUser);
-        _mockContext.UserRoles.Add(userRole);
-        _mockContext.SaveChanges();
+        FixTheReturnOfCookies("admin");
+        AddUserWithRole("admin", RoleType.SystemAdmin, 1);
+        var user = AddUserWithRole("target", RoleType.DataAdmin, 2);
+        var role = AddUserWithRole("fakeUser", RoleType.Analyst, 3);
         // Act
-        var result = _sut.AddRole(targetUser, new Role() { RoleId = 0 });
+        var result = await _sut.AddRole(user.User, role.Role);
         // Assert
-        Assert.Equal(ApiResponse.Success, result.Result.Type);
+        Assert.Equal(ApiResponse.Success, result.Type);
+    }
+    [Fact]
+    public async Task DeleteRole_ShouldReturnUnauthorized_WhenCookiesIsEmpty()
+    {
+        // Arrange
+        // Act
+        var result = await _sut.DeleteRole(new User(), null);
+        // Assert
+        Assert.Equal(ApiResponse.Unauthorized, result.Type);
+    }
+    [Fact]
+    public async Task DeleteRole_ShouldReturnBadRequest_WhenAdminNotFound()
+    {
+        // Arrange
+        FixTheReturnOfCookies("admin");
+        // Act
+        var response = await _sut.DeleteRole(null, null);
+        // Assert
+        Assert.Equal(ApiResponse.BadRequest, response.Type);
+    }
+    [Fact]
+    public async Task DeleteRole_ShouldReturnForbidden_WhenCommenderIsNotSystemAdmin()
+    {
+        // Arrange
+        FixTheReturnOfCookies("fakeAdmin");
+        AddUserWithRole("fakeAdmin", RoleType.Analyst, 1);
+        // Act
+        var result = await _sut.DeleteRole(null, null);
+        // Assert
+        Assert.Equal(ApiResponse.Forbidden, result.Type);
+    }
+    [Fact]
+    public async Task DeleteRole_ShouldReturnNotFound_WhenUserRoleNotExists()
+    {
+        // Arrange
+        FixTheReturnOfCookies("admin");
+        AddUserWithRole("admin", RoleType.SystemAdmin, 1);
+        // Act
+        var result = await _sut.DeleteRole(new User(){Username = "lol"}, null);
+        // Assert
+        Assert.Equal(ApiResponse.NotFound, result.Type);
     }
 
     [Fact]
-    public void DeletRole_ShouldReturnUnauthorized_WhenCookiesIsEmpty()
+    public async Task DeleteRole_ShouldReturn_WhenUserRoleExistsAndUserDontHaveRole()
     {
         // Arrange
+        FixTheReturnOfCookies("admin");
+        AddUserWithRole("admin", RoleType.SystemAdmin, 1);
+        var user = AddUserWithRole("target", RoleType.DataAdmin, 2);
+        var role = AddUserWithRole("targetRole", RoleType.Analyst,30);
         // Act
-        var result = _sut.DeleteRole(new User(), null);
+        var result = await _sut.DeleteRole(user.User, role.Role);
         // Assert
-        Assert.Equal(ApiResponse.Unauthorized, result.Result.Type);
+        Assert.Equal(ApiResponse.NotFound, result.Type);
+    }
+    [Fact]
+    public async Task DeleteRole_ShouldReturnSuccess_WhenUserRoleExistsAndUserIsAdmin()
+    {
+        // Arrange
+        FixTheReturnOfCookies("admin");
+        AddUserWithRole("admin", RoleType.SystemAdmin, 1);
+        var user = AddUserWithRole("target", RoleType.DataAdmin, 2);
+        // Act
+        var result = await _sut.DeleteRole(user.User, user.Role);
+        // Assert
+        Assert.Equal(ApiResponse.Success, result.Type);
     }
 
-    [Fact]
-    public void DeletRole_ShouldReturnBadRequest_WhenTheCookiesDataAreNotCorrect()
-    {
-        // Arrange
-        FixTheReturnOfCookies("1");
-        // Act
-        var result = _sut.DeleteRole(new User(), null);
-        // Assert
-        Assert.Equal(ApiResponse.BadRequest, result.Result.Type);
-    }
-
-    [Fact]
-    public void DeletRole_ShouldReturnForbiden_WhenTheCommenderIsNotAdmin()
-    {
-        // Arrange
-        FixTheReturnOfCookies("1");
-        User fakeAdmin = new User()
-        {
-            PasswordHash = Array.Empty<byte>(),
-            Salt = Array.Empty<byte>(),
-            UserId = 1
-        };
-        UserRole userRole = new UserRole()
-        {
-            UserId = 1,
-            User = fakeAdmin,
-            Role = new Role() { RoleType = RoleType.Analyst }
-        };
-        _mockContext.UserRoles.Add(userRole);
-        _mockContext.SaveChanges();
-        // Act
-        var result = _sut.DeleteRole(new User(), null);
-        // Assert
-        Assert.Equal(ApiResponse.Forbidden, result.Result.Type);
-    }
-
-    [Fact]
-    public void DeletRole_ShouldReturnNotFound_WhenTheCommenderUSerNotFound()
-    {
-        // Arrange
-        User admin = new User()
-        {
-            PasswordHash = Array.Empty<byte>(),
-            Salt = Array.Empty<byte>(),
-            UserId = 1
-        };
-        UserRole userRole = new UserRole()
-        {
-            Role = new Role() { RoleType = RoleType.SystemAdmin },
-            UserId = 1,
-            User = admin
-        };
-        FixTheReturnOfCookies("1");
-        _mockContext.UserRoles.Add(userRole);
-        _mockContext.SaveChanges();
-        // Act
-        var result = _sut.DeleteRole(new User(), null);
-        // Assert
-        Assert.Equal(ApiResponse.NotFound, result.Result.Type);
-    }
-
-    [Fact]
-    public void DeletRole_ShouldReturnSuccess_WhenTheCommenderUserIsValid()
-    {
-        // Arrange
-        UserRole user = new UserRole()
-        {
-            User = new User() { UserId = 2 },
-            Role = new Role() { RoleId = 2, RoleType = RoleType.Analyst }
-        };
-        User admin = new User()
-        {
-            PasswordHash = Array.Empty<byte>(),
-            Salt = Array.Empty<byte>(),
-            UserId = 1
-        };
-        UserRole AdminUserRole = new UserRole()
-        {
-            Role = new Role() { RoleType = RoleType.SystemAdmin },
-            UserId = 1,
-            User = admin
-        };
-        FixTheReturnOfCookies("1");
-        _mockContext.UserRoles.Add(user);
-        _mockContext.UserRoles.Add(AdminUserRole);
-        _mockContext.SaveChanges();
-        // Act
-        var result = _sut.DeleteRole(user.User, user.Role);
-        // Assert
-        Assert.Equal(ApiResponse.Success, result.Result.Type);
-    }
 
     private void FixTheReturnOfCookies(string returnThis)
     {
         var mockHttpContext = Substitute.For<HttpContext>();
         var mockRequest = Substitute.For<HttpRequest>();
         var mockCookies = Substitute.For<IRequestCookieCollection>();
-        mockCookies["userId"].Returns(returnThis);
+        mockCookies["login"].Returns(returnThis);
         mockRequest.Cookies.Returns(mockCookies);
         mockHttpContext.Request.Returns(mockRequest);
         _mockHttpContextAccessor.HttpContext.Returns(mockHttpContext);
+    }
+
+    private UserRole AddUserWithRole(string UserName, RoleType roleType, long id)
+    {
+        User user = new User()
+            { Salt = Array.Empty<byte>(), PasswordHash = Array.Empty<byte>(), Username = UserName, UserId = id };
+        Role role = new Role() { RoleType = roleType, RoleId = id };
+        UserRole userRole = new UserRole() { UserId = user.UserId, RoleId = role.RoleId };
+        _mockContext.Users.Add(user);
+        _mockContext.Roles.Add(role);
+        _mockContext.UserRoles.Add(userRole);
+        _mockContext.SaveChanges();
+        return new UserRole() { Role = role, User = user };
     }
 }

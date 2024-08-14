@@ -6,21 +6,21 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using mohaymen_codestar_Team02.Data;
 using mohaymen_codestar_Team02.Models;
+using mohaymen_codestar_Team02.Services.CookieService;
 
 namespace mohaymen_codestar_Team02.Services.Authenticatoin;
 
 public class AuthenticationService : IAuthenticationService
 {
     private readonly DataContext _context;
-    private readonly IConfiguration _configuration;
-    private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly ICookieService _cookieService;
+    private readonly ITokenService _tokenService;
 
-
-    public AuthenticationService( IHttpContextAccessor httpContextAccessor,DataContext context, IConfiguration configuration)
+    public AuthenticationService(DataContext context, ICookieService cookieService, ITokenService tokenService)
     {
         _context = context;
-        _configuration = configuration;
-        _httpContextAccessor = httpContextAccessor;
+        _cookieService = cookieService;
+        _tokenService = tokenService;
     }
 
     public async Task<ServiceResponse<string>> Login(string username, string password)
@@ -42,53 +42,16 @@ public class AuthenticationService : IAuthenticationService
         }
         else
         {
-            CreateCookie(user.UserId.ToString()); 
-           
+            _cookieService.CreateCookie(_tokenService.CreateToken(user));
+            
             response.Type = ApiResponse.Success;
             response.Message = Resources.LoginSuccessfulMessage;
         }
 
         return response;
     }
-
-    private void CreateCookie(string data) //
-    {
-        var cookieOptions = new CookieOptions
-        {
-            HttpOnly = true,
-            Secure = true,
-            Expires = DateTime.Now.AddDays(1)
-        };
-
-        _httpContextAccessor.HttpContext?.Response.Cookies.Append("login", data, cookieOptions);
-    }
-
-    private string CreateToken(User user)
-    {
-        List<Claim> claims = new List<Claim>
-        {
-            new Claim(ClaimTypes.NameIdentifier, user.UserId.ToString()), // role
-            new Claim(ClaimTypes.Name, user.Username)
-        };
-
-        SymmetricSecurityKey key =
-            new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration.GetSection("AppSettings:Token").Value));
-
-        SigningCredentials creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
-
-        SecurityTokenDescriptor tokenDescriptor = new SecurityTokenDescriptor
-        {
-            Subject = new ClaimsIdentity(claims),
-            Expires = DateTime.Now.AddDays(1),
-            SigningCredentials = creds
-        };
-
-        JwtSecurityTokenHandler tokenHandler = new JwtSecurityTokenHandler();
-        SecurityToken token = tokenHandler.CreateToken(tokenDescriptor);
-
-        return tokenHandler.WriteToken(token);
-
-    }
+    
+    
 
     private async Task<User?> GetUser(string username)
     {

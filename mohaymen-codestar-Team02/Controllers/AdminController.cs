@@ -20,24 +20,41 @@ public class AdminController : ControllerBase
     [HttpPost("register")]
     public async Task<IActionResult> Register(UserRegisterDto request)
     {
+        var user = new User
+        {
+            Username = request.Username,
+            FirstName = request.FirstName,
+            LastName = request.LastName,
+            Email = request.Email,
+        };
+        
         ServiceResponse<int> response =
-            await _adminService.Register(new User {Username = request.Username}, request.Password);
+            await _adminService.Register(user, request.Password);
+        
         return StatusCode((int)response.Type, response.Message);
     }
     
     [HttpPut("addRole")]
-    public async Task<IActionResult> AddRole(UserAddRoleDto request)
+    public async Task<IActionResult> AddRole(AddUserRoleDto request)
     {
-        ServiceResponse<string> response =
-            await _adminService.AddRole(new User {Username = request.Username}, new Role() { RoleId = request.RoleId});
+        ServiceResponse<string> response = 
+            await _adminService.AddRole(
+                new User {Username = request.Username}, 
+                new Role() { RoleId = request.RoleId}
+                );
+        
         return StatusCode((int)response.Type, response.Message);
     }
     
     [HttpPut("deleteRole")]
-    public async Task<IActionResult> DeleteRole(UserDeleteRoleDto request)
+    public async Task<IActionResult> DeleteRole(DeleteUserRoleDto request)
     {
         ServiceResponse<string> response =
-            await _adminService.DeleteRole(new User {Username = request.Username}, new Role() { RoleId = request.RoleId});
+            await _adminService.DeleteRole(
+                new User {Username = request.Username}, 
+                new Role() { RoleId = request.RoleId}
+                );
+        
         return StatusCode((int)response.Type, response.Message);
     }
     
@@ -47,7 +64,11 @@ public class AdminController : ControllerBase
     public async Task<IActionResult> Register2(UserRegisterDto request)
     {
         ServiceResponse<string> response =
-            await _adminService.RegisterRoleTest(new User {Username = request.Username}, request.Password);
+            await _adminService.RegisterRoleTest(
+                new User {Username = request.Username}, 
+                request.Password
+                );
+        
         return StatusCode((int)response.Type, response.Message);
     }
     

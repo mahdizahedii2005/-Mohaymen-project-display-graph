@@ -15,7 +15,7 @@ public class ProfileController : ControllerBase
     }
     
     [HttpPut("changePassword")]
-    public async Task<IActionResult> ChangePassword(UserChangePasswordDto request)
+    public async Task<IActionResult> ChangePassword(ChangePasswordUserDto request)
     {
         ServiceResponse<string> response = await _profileService.ChangePassword(request.Username, request.NewPassword);
         return StatusCode((int)response.Type, response.Message);
