@@ -9,18 +9,18 @@ public class CookieService : ICookieService
         _httpContextAccessor = httpContextAccessor;
     }
 
-    public void CreateCookie(string data) 
+    public void CreateCookie(string data)
     {
         var cookieOptions = new CookieOptions
         {
             HttpOnly = true,
             Secure = true,
-            Expires = DateTime.Now.AddDays(1)
+            SameSite = SameSiteMode.Strict,
+            Expires = DateTime.Now.AddMinutes(30)
         };
-
         _httpContextAccessor.HttpContext?.Response.Cookies.Append("login", data, cookieOptions);
     }
-    
+
     public string? GetCookieValue()
     {
         return _httpContextAccessor.HttpContext?.Request.Cookies["login"];

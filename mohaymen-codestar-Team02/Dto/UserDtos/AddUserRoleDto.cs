@@ -2,6 +2,6 @@ namespace mohaymen_codestar_Team02.Dto.UserDtos;
 
 public class AddUserRoleDto
 {
-    public int RoleId { get; set; }
+    public string RoleType { get; set; }
     public string Username { get; set; }
 }

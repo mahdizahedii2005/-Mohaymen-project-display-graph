@@ -8,10 +8,7 @@ public interface IAdminService
 
     Task<ServiceResponse<int>> Register(User user, string password);
     Task<ServiceResponse<string>> AddRole(User user, Role role);
-    Task<ServiceResponse<string>> DeleteRole(User user,Role role);
+    Task<ServiceResponse<string>> DeleteRole(User user, Role role);
     Task<ServiceResponse<string>> RegisterRoleTest(User user, string password);
     public Task<ServiceResponse<string>> AddRoleTest();
-
-
-
 }

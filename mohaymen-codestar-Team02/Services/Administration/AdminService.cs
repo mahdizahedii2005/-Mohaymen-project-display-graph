@@ -9,26 +9,30 @@ namespace mohaymen_codestar_Team02.Services.Administration;
 public class AdminService : IAdminService
 {
     private readonly DataContext _context;
+    private readonly ITokenService _tokenService;
     private readonly ICookieService _cookieService;
-    public AdminService(DataContext context, ICookieService cookieService)
+
+    public AdminService(DataContext context, ICookieService cookieService, ITokenService tokenService)
     {
         _context = context;
         _cookieService = cookieService;
+        _tokenService = tokenService;
     }
-    
-    
+
+
     public async Task<ServiceResponse<int>> Register(User user, string password)
     {
         ServiceResponse<int> response = new ServiceResponse<int>();
-        
-        var adminId = _cookieService.GetCookieValue();
-        if (string.IsNullOrEmpty(adminId))
+
+        var token = _cookieService.GetCookieValue();
+        if (string.IsNullOrEmpty(token))
         {
             response.Type = ApiResponse.Unauthorized;
             response.Message = Resources.UnauthorizedMessage;
             return response;
         }
 
+        var adminId = _tokenService.GetUserNameFromToken();
         var admin = await GetUser(adminId);
         if (admin is null)
         {
@@ -62,20 +66,21 @@ public class AdminService : IAdminService
         response.Message = Resources.UserCreatedSuccessfullyMessage;
         return response;
     }
-    
-    
+
+
     public async Task<ServiceResponse<string>> AddRole(User user, Role role)
     {
         ServiceResponse<string> response = new ServiceResponse<string>();
-        
-        var adminId = _cookieService.GetCookieValue();
-        if (string.IsNullOrEmpty(adminId))
+
+        var token = _cookieService.GetCookieValue();
+        if (string.IsNullOrEmpty(token))
         {
             response.Type = ApiResponse.Unauthorized;
             response.Message = Resources.UnauthorizedMessage;
             return response;
         }
-        
+
+        var adminId = _tokenService.GetUserNameFromToken();
         var admin = await GetUser(adminId);
         if (admin is null)
         {
@@ -98,7 +103,7 @@ public class AdminService : IAdminService
             response.Message = Resources.UserNotFoundMessage;
             return response;
         }
-        
+
         var foundRole = await GetRole(role);
         if (foundRole is null)
         {
@@ -106,7 +111,7 @@ public class AdminService : IAdminService
             response.Message = Resources.RoleNotFoundMessage;
             return response;
         }
-        
+
         if (await GetUserRole(foundRole, foundUser) is not null)
         {
             response.Type = ApiResponse.BadRequest;
@@ -127,22 +132,23 @@ public class AdminService : IAdminService
 
         response.Type = ApiResponse.Success;
         response.Message = Resources.RoleAddedSuccessfulyMassage;
-        
+
         return response;
     }
 
     public async Task<ServiceResponse<string>> DeleteRole(User user, Role role)
     {
         ServiceResponse<string> response = new ServiceResponse<string>();
-        
-        var adminId = _cookieService.GetCookieValue();
-        if (string.IsNullOrEmpty(adminId))
+
+        var token = _cookieService.GetCookieValue();
+        if (string.IsNullOrEmpty(token))
         {
             response.Type = ApiResponse.Unauthorized;
             response.Message = Resources.UnauthorizedMessage;
             return response;
         }
-        
+
+        var adminId = _tokenService.GetUserNameFromToken();
         var admin = await GetUser(adminId);
         if (admin is null)
         {
@@ -165,7 +171,7 @@ public class AdminService : IAdminService
             response.Message = Resources.UserNotFoundMessage;
             return response;
         }
-        
+
         var foundRole = await GetRole(role);
         if (foundRole is null)
         {
@@ -173,15 +179,15 @@ public class AdminService : IAdminService
             response.Message = Resources.RoleNotFoundMessage;
             return response;
         }
-        
+
 
         var userRole = await GetUserRole(foundRole, foundUser);
         if (userRole is null)
         {
-            response.Type = ApiResponse.NotFound;
-            response.Message = Resources.dontHaveThisRole; 
+            response.Type = ApiResponse.BadRequest;
+            response.Message = Resources.dontHaveThisRole;
         }
-        
+
         else
         {
             _context.UserRoles.Remove(userRole);
@@ -198,7 +204,7 @@ public class AdminService : IAdminService
     {
         return await _context.Users.FirstOrDefaultAsync(x => x.Username.ToLower().Equals(username.ToLower()));
     }
-    
+
     private async Task<bool> IsAdmin(User? user)
     {
         return await _context.UserRoles.AnyAsync(x => user != null && x.UserId == user.UserId && x.RoleId == 2);
@@ -206,12 +212,13 @@ public class AdminService : IAdminService
 
     private async Task<Role?> GetRole(Role role)
     {
-        return await _context.Roles.FirstOrDefaultAsync(x => x.RoleId == role.RoleId);
+        return await _context.Roles.FirstOrDefaultAsync(x => x.RoleType == role.RoleType);
     }
 
     private async Task<UserRole?> GetUserRole(Role foundRole, User foundUser)
     {
-        return await _context.UserRoles.FirstOrDefaultAsync(x => x.RoleId == foundRole.RoleId && x.User.Username == foundUser.Username);
+        return await _context.UserRoles.FirstOrDefaultAsync(x =>
+            x.RoleId == foundRole.RoleId && x.User.Username == foundUser.Username);
     }
 
     private async Task<bool> UserExists(string username)
@@ -220,6 +227,7 @@ public class AdminService : IAdminService
         {
             return true;
         }
+
         return false;
     }
 
@@ -231,11 +239,8 @@ public class AdminService : IAdminService
             passwordHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password.ToString()));
         }
     }
-    
-    
-    
-    
-    
+
+
     public async Task<ServiceResponse<int>> RegisterUser(User user, string password)
     {
         ServiceResponse<int> response = new ServiceResponse<int>();
@@ -251,21 +256,21 @@ public class AdminService : IAdminService
         response.Type = ApiResponse.Success;
         return response;
     }
-    
+
     public async Task<ServiceResponse<string>> RegisterRoleTest(User user, string password)
     {
         ServiceResponse<string> response = new ServiceResponse<string>();
-        
-        Role role = new Role() {RoleType = RoleType.SystemAdmin, RoleId = 2};
+
+        Role role = new Role() { RoleType = RoleType.SystemAdmin, RoleId = 2 };
         _context.Roles.Add(role);
         await _context.SaveChangesAsync();
-        
+
         CreatePasswordHash(password, out byte[] passwordHash, out byte[] passwordSalt);
 
         user.PasswordHash = passwordHash;
         user.Salt = passwordSalt;
 
-        UserRole userRole = new UserRole() {RoleId = role.RoleId, UserId = user.UserId, Role = role, User = user};
+        UserRole userRole = new UserRole() { RoleId = role.RoleId, UserId = user.UserId, Role = role, User = user };
         _context.UserRoles.Add(userRole);
         user.UserRoles.Add(userRole);
 
@@ -275,18 +280,15 @@ public class AdminService : IAdminService
         response.Type = ApiResponse.Success;
         return response;
     }
-    
+
     public async Task<ServiceResponse<string>> AddRoleTest()
     {
         ServiceResponse<string> response = new ServiceResponse<string>();
-        Role role = new Role() {RoleType = RoleType.SystemAdmin, RoleId = 3};
+        Role role = new Role() { RoleType = RoleType.SystemAdmin, RoleId = 3 };
         _context.Roles.Add(role);
         await _context.SaveChangesAsync();
-       
+
         response.Type = ApiResponse.Success;
         return response;
     }
-
-    
-    
 }

@@ -4,5 +4,4 @@ public interface ICookieService
 {
     void CreateCookie(string data);
     string? GetCookieValue();
-
 }

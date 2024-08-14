@@ -2,51 +2,39 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using Microsoft.IdentityModel.Tokens;
-using mohaymen_codestar_Team02.Models;
 
 namespace mohaymen_codestar_Team02.Services.TokenService;
 
 public class TokenService : ITokenService
 {
-    
     private readonly IConfiguration _configuration;
+    private readonly IHttpContextAccessor _httpContextAccessor;
 
-    public TokenService(IConfiguration configuration)
+    public TokenService(IConfiguration configuration, IHttpContextAccessor httpContextAccessor)
     {
         _configuration = configuration;
+        _httpContextAccessor = httpContextAccessor;
     }
 
-    public string CreateToken(User user)
+
+    public string CreateToken(Claim[] claims)
     {
-        List<Claim> claims = new List<Claim>
-        {
-            //new Claim(ClaimTypes.NameIdentifier, user.UserId.ToString()), // role
-            new Claim(ClaimTypes.Name, user.Username)
-        };
+        var key = new SymmetricSecurityKey(
+            Encoding.UTF8.GetBytes(_configuration.GetSection("AppSettings:Token").Value));
+        var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
-        SymmetricSecurityKey key =
-            new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration.GetSection("AppSettings:Token").Value));
+        var token = new JwtSecurityToken(
+            claims: claims,
+            expires: DateTime.Now.AddMinutes(30),
+            signingCredentials: creds);
 
-        SigningCredentials creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
-
-        SecurityTokenDescriptor tokenDescriptor = new SecurityTokenDescriptor
-        {
-            Subject = new ClaimsIdentity(claims),
-            Expires = DateTime.Now.AddDays(1),
-            SigningCredentials = creds
-        };
-
-        JwtSecurityTokenHandler tokenHandler = new JwtSecurityTokenHandler();
-        SecurityToken token = tokenHandler.CreateToken(tokenDescriptor);
-
-        return tokenHandler.WriteToken(token);
+        return new JwtSecurityTokenHandler().WriteToken(token);
     }
-    
-    // list Claims
-    public string CheckAccess(string token)
+
+    public string GetUserNameFromToken()
     {
-        var handler = new JwtSecurityTokenHandler();
-        var jsonToken = handler.ReadToken(token) as JwtSecurityToken;
-        return jsonToken?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
+        var user = _httpContextAccessor.HttpContext?.User;
+        var usernameClaim = user.FindFirst(ClaimTypes.Name);
+        return usernameClaim?.Value;
     }
 }
