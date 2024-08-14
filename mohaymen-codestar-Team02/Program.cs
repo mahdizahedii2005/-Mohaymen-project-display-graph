@@ -16,8 +16,8 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddControllers();
 
 
-var connectionString = Environment.GetEnvironmentVariable("CONNECTION_STRING");
-Console.WriteLine(connectionString);
+//var connectionString = Environment.GetEnvironmentVariable("CONNECTION_STRING");
+//Console.WriteLine(connectionString);
 //var connectionString = "Host=localhost;Port=5432;Database=mohaymen_group02_project;Username=postgres;Password=@Simpleuser01;";
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddDbContext<DataContext>(options =>

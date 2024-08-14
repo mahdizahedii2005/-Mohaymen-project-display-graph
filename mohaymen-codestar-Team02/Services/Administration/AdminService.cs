@@ -104,7 +104,7 @@ public class AdminService : IAdminService
             return response;
         }
 
-        var foundRole = await GetRole(role);
+        var foundRole = await GetRole(role.RoleType);
         if (foundRole is null)
         {
             response.Type = ApiResponse.BadRequest;
@@ -172,7 +172,7 @@ public class AdminService : IAdminService
             return response;
         }
 
-        var foundRole = await GetRole(role);
+        var foundRole = await GetRole(role.RoleType);
         if (foundRole is null)
         {
             response.Type = ApiResponse.BadRequest;
@@ -207,12 +207,13 @@ public class AdminService : IAdminService
 
     private async Task<bool> IsAdmin(User? user)
     {
-        return await _context.UserRoles.AnyAsync(x => user != null && x.UserId == user.UserId && x.RoleId == 2);
+        var role = GetRole(RoleType.SystemAdmin);
+        return await _context.UserRoles.AnyAsync(x => user != null && x.UserId == user.UserId && x.RoleId == role.Id);
     }
-
-    private async Task<Role?> GetRole(Role role)
+    
+    private async Task<Role?> GetRole(RoleType roleType)
     {
-        return await _context.Roles.FirstOrDefaultAsync(x => x.RoleType == role.RoleType);
+        return await _context.Roles.FirstOrDefaultAsync(x => x.RoleType == roleType);
     }
 
     private async Task<UserRole?> GetUserRole(Role foundRole, User foundUser)
