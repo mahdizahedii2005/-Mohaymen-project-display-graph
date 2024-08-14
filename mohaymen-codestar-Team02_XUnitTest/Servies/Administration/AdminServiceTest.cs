@@ -16,11 +16,9 @@ public class AdminServiceTests
     public AdminServiceTests()
     {
         _mockHttpContextAccessor = Substitute.For<IHttpContextAccessor>();
-
         var options = new DbContextOptionsBuilder<DataContext>()
             .UseInMemoryDatabase(databaseName: "TestDatabase")
             .Options;
-
         _mockContext = new DataContext(options);
         _sut = new AdminService(_mockHttpContextAccessor, _mockContext);
     }
@@ -42,7 +40,7 @@ public class AdminServiceTests
     }
 
     [Fact]
-    public void AddRole_ShouldReturnForbidden_WhenAdminIsNotSystemAdmin()
+    public void AddRole_ShouldReturnForbidden_WhenCommenderIsNotSystemAdmin()
     {
         // Arrange
         var user = new User
@@ -50,9 +48,11 @@ public class AdminServiceTests
             PasswordHash = Array.Empty<byte>(),
             Salt = Array.Empty<byte>(),
             UserId = 1,
-            UserRoles = new HashSet<UserRole> { new UserRole { Role = new Role { RoleType = RoleType.Analyst } } }
         };
-        _mockContext.Add(user);
+        var UserRoles = new UserRole
+            { User = user, Role = new Role { RoleId = 1, RoleType = RoleType.Analyst } };
+        _mockContext.UserRoles.Add(UserRoles);
+        _mockContext.Users.Add(user);
         _mockContext.SaveChanges();
         FixTheReturnOfCookies("1");
         // Act
@@ -77,22 +77,30 @@ public class AdminServiceTests
     {
         // Arrange
         FixTheReturnOfCookies("1");
-        UserRole userRole = new UserRole()
-        {
-            Role = new Role() { RoleType = RoleType.SystemAdmin },
-            User = new User() { UserId = 1 }
-        };
+
         User admin = new User()
         {
             PasswordHash = Array.Empty<byte>(),
             Salt = Array.Empty<byte>(),
-            UserRoles = new HashSet<UserRole>() { userRole },
             UserId = 1
         };
+        User targetUser = new User()
+        {
+            PasswordHash = Array.Empty<byte>(),
+            Salt = Array.Empty<byte>(),
+            UserId = 4
+        };
+        UserRole userRole = new UserRole()
+        {
+            Role = new Role() { RoleId = 2, RoleType = RoleType.SystemAdmin },
+            User = admin
+        };
         _mockContext.Users.Add(admin);
+        _mockContext.Users.Add(targetUser);
+        _mockContext.UserRoles.Add(userRole);
         _mockContext.SaveChanges();
         // Act
-        var result = _sut.AddRole(new User(), null);
+        var result = _sut.AddRole(targetUser, new Role() { RoleId = 0 });
         // Assert
         Assert.Equal(ApiResponse.Success, result.Result.Type);
     }
@@ -174,8 +182,8 @@ public class AdminServiceTests
         // Arrange
         UserRole user = new UserRole()
         {
-            User = new User(){UserId = 2},
-            Role = new Role(){RoleId = 2,RoleType = RoleType.Analyst}
+            User = new User() { UserId = 2 },
+            Role = new Role() { RoleId = 2, RoleType = RoleType.Analyst }
         };
         User admin = new User()
         {
@@ -208,5 +216,5 @@ public class AdminServiceTests
         mockRequest.Cookies.Returns(mockCookies);
         mockHttpContext.Request.Returns(mockRequest);
         _mockHttpContextAccessor.HttpContext.Returns(mockHttpContext);
-    } 
+    }
 }
