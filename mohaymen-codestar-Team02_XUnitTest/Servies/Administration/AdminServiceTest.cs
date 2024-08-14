@@ -21,7 +21,7 @@ public class AdminServiceTests
             .UseInMemoryDatabase(databaseName: "TestDatabase")
             .Options;
         _mockContext = new DataContext(options);
-        _sut = new AdminService( _mockContext,_cookieService);
+        _sut = new AdminService(_mockContext, _cookieService);
     }
 
     [Fact]
@@ -144,6 +144,19 @@ public class AdminServiceTests
         Assert.Equal(ApiResponse.Success, result.Type);
     }
 
+    [Fact]
+    public async Task DeleteRole_ShouldRollBeNullIfLoockingForIt_WhenUserRoleExistsAndUserIsAdmin()
+    {
+        // Arrange
+        FixTheReturnOfCookies("admin");
+        AddUserWithRole("admin", RoleType.SystemAdmin, 1);
+        var user = AddUserWithRole("target", RoleType.DataAdmin, 2);
+        // Act
+        await _sut.DeleteRole(user.User, user.Role);
+        // Assert
+        var result = _mockContext.UserRoles.SingleOrDefault(ur => ur.UserId == user.User.UserId && ur.RoleId == user.Role.RoleId);
+        Assert.Null(result);
+    }
 
     private void FixTheReturnOfCookies(string returnThis)
     {
