@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using System.Text;
 using Microsoft.EntityFrameworkCore;
 using mohaymen_codestar_Team02.Data;
@@ -5,8 +6,7 @@ using mohaymen_codestar_Team02.Models;
 using mohaymen_codestar_Team02.Services.Authenticatoin;
 using mohaymen_codestar_Team02.Services.CookieService;
 using NSubstitute;
-using System.Threading.Tasks;
-using mohaymen_codestar_Team02.Services;
+ using mohaymen_codestar_Team02.Services;
 
 public class AuthenticationServiceTests
 {
@@ -91,7 +91,7 @@ public class AuthenticationServiceTests
         AddUserToDatabase(username, password);
 
         string fakeToken = "fakeToken";
-        _tokenService.CreateToken(Arg.Any<User>()).Returns(fakeToken);
+        _tokenService.CreateToken(Arg.Any<Claim[]>()).Returns(fakeToken);
 
         // Act
         var result = await _sut.Login(username, password);

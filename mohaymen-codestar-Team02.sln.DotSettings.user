@@ -4,6 +4,11 @@
     &lt;TestId&gt;xUnit::DBCC3406-305C-4B21-AF94-8BF8B78D1040::net8.0::AdminServiceTests.DeletRole_ShouldReturnUnauthorized_WhenCookiesIsEmpty&lt;/TestId&gt;&#xD;
   &lt;/TestAncestor&gt;&#xD;
 &lt;/SessionState&gt;</s:String>
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=1bce1bf6_002D4611_002D4b5b_002D9a80_002D015bafe68d02/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="CreateCookie_ShouldAppendCookie_WithCorrectOptions" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
+  &lt;TestAncestor&gt;&#xD;
+    &lt;TestId&gt;xUnit::DBCC3406-305C-4B21-AF94-8BF8B78D1040::net8.0::mohaymen_codestar_Team02_XUnitTest.Servies.CookieService.CookieServiceTests&lt;/TestId&gt;&#xD;
+  &lt;/TestAncestor&gt;&#xD;
+&lt;/SessionState&gt;</s:String>
 	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=34469ffd_002Dd73e_002D41f2_002Db426_002Dcfbb54c7c7c1/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="DeletRole_ShouldReturnUnauthorized_WhenCookiesIsEmpty #3" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
   &lt;TestAncestor&gt;&#xD;
     &lt;TestId&gt;xUnit::DBCC3406-305C-4B21-AF94-8BF8B78D1040::net8.0::AdminServiceTests.DeletRole_ShouldReturnUnauthorized_WhenCookiesIsEmpty&lt;/TestId&gt;&#xD;
@@ -71,15 +76,11 @@
 	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=fb0c7198_002D905b_002D4b6e_002Dbf68_002Dfc68e6cfa331/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="AddRole_ShouldReturnSuccess_WhenCommenderIsAdmin #3" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
   &lt;TestAncestor&gt;&#xD;
     &lt;TestId&gt;xUnit::DBCC3406-305C-4B21-AF94-8BF8B78D1040::net8.0::mohaymen_codestar_Team02_XUnitTest.Servies.Administration.AdminServiceTests.AddRole_ShouldReturnSuccess_WhenCommenderIsAdmin&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;xUnit::DBCC3406-305C-4B21-AF94-8BF8B78D1040::net8.0::mohaymen_codestar_Team02_XUnitTest.Servies.CookieService.CookieServiceTestTests&lt;/TestId&gt;&#xD;
   &lt;/TestAncestor&gt;&#xD;
 &lt;/SessionState&gt;</s:String>
-	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=fced91d1_002D2327_002D439b_002Db976_002Ddfa7acddce54/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="AddRole_ShouldReturnSuccess_WhenCommenderIsAdmin #4" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
-  &lt;TestAncestor&gt;&#xD;
-    &lt;TestId&gt;xUnit::DBCC3406-305C-4B21-AF94-8BF8B78D1040::net8.0::mohaymen_codestar_Team02_XUnitTest.Servies.Administration.AdminServiceTests.AddRole_ShouldReturnSuccess_WhenCommenderIsAdmin&lt;/TestId&gt;&#xD;
-    &lt;TestId&gt;xUnit::DBCC3406-305C-4B21-AF94-8BF8B78D1040::net8.0::mohaymen_codestar_Team02_XUnitTest.Servies.Administration.AdminServiceTests.DeleteRole_ShouldReturnUnauthorized_WhenCookiesIsEmpty&lt;/TestId&gt;&#xD;
-    &lt;TestId&gt;xUnit::DBCC3406-305C-4B21-AF94-8BF8B78D1040::net8.0::mohaymen_codestar_Team02_XUnitTest.Servies.Administration.AdminServiceTests.DeleteRole_ShouldReturnBadRequest_WhenAdminNotFound&lt;/TestId&gt;&#xD;
-    &lt;TestId&gt;xUnit::DBCC3406-305C-4B21-AF94-8BF8B78D1040::net8.0::ProfileServiceTests.Logout_ShouldClearLoginCookie_WhenCookieExists&lt;/TestId&gt;&#xD;
-  &lt;/TestAncestor&gt;&#xD;
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=fced91d1_002D2327_002D439b_002Db976_002Ddfa7acddce54/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="AddRole_ShouldReturnSuccess_WhenCommenderIsAdmin #4" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
+  &lt;Project Location="D:\Desktop\programing\C#\ mohaymen project\Summer1403-Project-Group02-Backend\mohaymen-codestar-Team02_XUnitTest" Presentation="&amp;lt;mohaymen-codestar-Team02_XUnitTest&amp;gt;" /&gt;&#xD;
 &lt;/SessionState&gt;</s:String>
 	<s:Boolean x:Key="/Default/ResxEditorPersonal/CheckedGroups/=mohaymen_002Dcodestar_002DTeam02_002FData_002FResources/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/ResxEditorPersonal/Initialized/@EntryValue">True</s:Boolean></wpf:ResourceDictionary>

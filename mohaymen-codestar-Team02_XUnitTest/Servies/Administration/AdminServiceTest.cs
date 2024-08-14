@@ -1,7 +1,7 @@
-using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using mohaymen_codestar_Team02.Data;
 using mohaymen_codestar_Team02.Models;
+using mohaymen_codestar_Team02.Services;
 using mohaymen_codestar_Team02.Services.Administration;
 using mohaymen_codestar_Team02.Services.CookieService;
 using NSubstitute;
@@ -13,15 +13,17 @@ public class AdminServiceTests
     private readonly AdminService _sut;
     private readonly ICookieService _cookieService;
     private readonly DataContext _mockContext;
+    private readonly ITokenService _tokenService;
 
     public AdminServiceTests()
     {
         _cookieService = Substitute.For<ICookieService>();
+        _tokenService = Substitute.For<ITokenService>();
         var options = new DbContextOptionsBuilder<DataContext>()
             .UseInMemoryDatabase(databaseName: "TestDatabase")
             .Options;
         _mockContext = new DataContext(options);
-        _sut = new AdminService(_mockContext, _cookieService);
+        _sut = new AdminService(_mockContext, _cookieService, _tokenService);
     }
 
     [Fact]
@@ -154,7 +156,9 @@ public class AdminServiceTests
         // Act
         await _sut.DeleteRole(user.User, user.Role);
         // Assert
-        var result = _mockContext.UserRoles.SingleOrDefault(ur => ur.UserId == user.User.UserId && ur.RoleId == user.Role.RoleId);
+        var result =
+            _mockContext.UserRoles.SingleOrDefault(ur =>
+                ur.UserId == user.User.UserId && ur.RoleId == user.Role.RoleId);
         Assert.Null(result);
     }
 
