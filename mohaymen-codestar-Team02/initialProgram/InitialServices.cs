@@ -11,8 +11,8 @@ public class InitialServices
     /*
     public static void Init(WebApplicationBuilder builder)
     {
- 
-        
+
+
         // var connectionString = Environment.GetEnvironmentVariable("connectionStringForDb");
         var connectionString = "Host=localhost;Database=mohaymen_group02_project;Username=postgres;Password=1274542332Mz;";
         builder.Services.AddHttpContextAccessor();

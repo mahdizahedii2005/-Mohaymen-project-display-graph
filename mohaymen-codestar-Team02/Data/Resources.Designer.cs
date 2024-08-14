@@ -60,7 +60,7 @@ namespace mohaymen_codestar_Team02.Data {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to access denied.
+        ///   Looks up a localized string similar to Access Denied.
         /// </summary>
         internal static string accessDeniedMessage {
             get {
@@ -69,11 +69,74 @@ namespace mohaymen_codestar_Team02.Data {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Login successful..
+        ///   Looks up a localized string similar to This User Doesn&apos;t Have This Role.
+        /// </summary>
+        internal static string dontHaveThisRole {
+            get {
+                return ResourceManager.GetString("dontHaveThisRole", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Login Successfuly.
         /// </summary>
         internal static string LoginSuccessfulMessage {
             get {
                 return ResourceManager.GetString("LoginSuccessfulMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Logout Successfuly.
+        /// </summary>
+        internal static string LogoutSuccessfuly {
+            get {
+                return ResourceManager.GetString("LogoutSuccessfuly", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Password Changed Successfuly.
+        /// </summary>
+        internal static string PasswordChangedSuccessfulyMessage {
+            get {
+                return ResourceManager.GetString("PasswordChangedSuccessfulyMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Role Added Successfuly.
+        /// </summary>
+        internal static string RoleAddedSuccessfulyMassage {
+            get {
+                return ResourceManager.GetString("RoleAddedSuccessfulyMassage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This Role Is Already Assigned To The User.
+        /// </summary>
+        internal static string RoleAlreadyAssigned {
+            get {
+                return ResourceManager.GetString("RoleAlreadyAssigned", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Role Not Found.
+        /// </summary>
+        internal static string RoleNotFoundMessage {
+            get {
+                return ResourceManager.GetString("RoleNotFoundMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Role Removed Successfuly.
+        /// </summary>
+        internal static string RoleRemovedSuccessfullyMessage {
+            get {
+                return ResourceManager.GetString("RoleRemovedSuccessfullyMessage", resourceCulture);
             }
         }
         
@@ -87,7 +150,7 @@ namespace mohaymen_codestar_Team02.Data {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to User already exists.
+        ///   Looks up a localized string similar to User Already Exists.
         /// </summary>
         internal static string UserAlreadyExistsMessage {
             get {
@@ -96,7 +159,16 @@ namespace mohaymen_codestar_Team02.Data {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to User not found.
+        ///   Looks up a localized string similar to User Created Successfuly.
+        /// </summary>
+        internal static string UserCreatedSuccessfullyMessage {
+            get {
+                return ResourceManager.GetString("UserCreatedSuccessfullyMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to User Not Found.
         /// </summary>
         internal static string UserNotFoundMessage {
             get {

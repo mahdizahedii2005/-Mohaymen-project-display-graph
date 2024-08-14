@@ -5,24 +5,23 @@
         <value>Unauthorized</value>
     </data>
     <data name="UserNotFoundMessage">
-        <value>User not found</value>
+        <value>User Not Found</value>
     </data>
     <data name="accessDeniedMessage">
-        <value>access denied</value>
+        <value>Access Denied</value>
     </data>
     <data name="WrongPasswordMessage">
         <value>Wrong Password</value>
     </data>
     <data name="LoginSuccessfulMessage">
-        <value>Login successful.</value>
+        <value>Login Successfuly</value>
     </data>
     <data name="UserAlreadyExistsMessage">
-        <value>User already exists</value>
+        <value>User Already Exists</value>
     </data>
     <data name="dontHaveThisRole">
-        <value>This user doesn't have this role</value>
+        <value>This User Doesn't Have This Role</value>
     </data>
-
 
 
     <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema"
@@ -47,4 +46,25 @@
             PublicKeyToken=b77a5c561934e089
         </value>
     </resheader>
+    <data name="RoleRemovedSuccessfullyMessage" xml:space="preserve">
+        <value>Role Removed Successfuly</value>
+    </data>
+    <data name="RoleNotFoundMessage" xml:space="preserve">
+        <value>Role Not Found</value>
+    </data>
+    <data name="RoleAddedSuccessfulyMassage" xml:space="preserve">
+        <value>Role Added Successfuly</value>
+    </data>
+    <data name="RoleAlreadyAssigned" xml:space="preserve">
+        <value>This Role Is Already Assigned To The User</value>
+    </data>
+    <data name="UserCreatedSuccessfullyMessage" xml:space="preserve">
+        <value>User Created Successfuly</value>
+    </data>
+    <data name="PasswordChangedSuccessfulyMessage" xml:space="preserve">
+        <value>Password Changed Successfuly</value>
+    </data>
+    <data name="LogoutSuccessfuly" xml:space="preserve">
+        <value>Logout Successfuly</value>
+    </data>
 </root>

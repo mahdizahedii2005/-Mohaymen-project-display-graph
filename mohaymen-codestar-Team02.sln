@@ -2,6 +2,8 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "mohaymen-codestar-Team02", "mohaymen-codestar-Team02\mohaymen-codestar-Team02.csproj", "{4D1C173E-6901-406B-AF51-8272236E98FA}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "mohaymen-codestar-Team02_XUnitTest", "mohaymen-codestar-Team02_XUnitTest\mohaymen-codestar-Team02_XUnitTest.csproj", "{DBCC3406-305C-4B21-AF94-8BF8B78D1040}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -12,5 +14,9 @@ Global
 		{4D1C173E-6901-406B-AF51-8272236E98FA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4D1C173E-6901-406B-AF51-8272236E98FA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4D1C173E-6901-406B-AF51-8272236E98FA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DBCC3406-305C-4B21-AF94-8BF8B78D1040}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DBCC3406-305C-4B21-AF94-8BF8B78D1040}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DBCC3406-305C-4B21-AF94-8BF8B78D1040}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DBCC3406-305C-4B21-AF94-8BF8B78D1040}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
