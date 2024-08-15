@@ -1,5 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
+using mohaymen_codestar_Team02.Dto.Role;
+using mohaymen_codestar_Team02.Dto.User;
 using mohaymen_codestar_Team02.Dto.UserDtos;
+using mohaymen_codestar_Team02.Dto.UserRole;
 using mohaymen_codestar_Team02.Models;
 using mohaymen_codestar_Team02.Services.Administration;
 
@@ -16,9 +19,24 @@ public class AdminController : ControllerBase
         _adminService = adminService;
     }
 
+    [HttpGet("GetAllUsers")]
+    public async Task<IActionResult> GetAllUsers()
+    {
+        ServiceResponse<List<GetUserDto>> response =
+            await _adminService.GetAllUsers();
+        return StatusCode((int)response.Type, response.Message);
+    }
+    
+    [HttpGet("GetUserByUsername{username}")]
+    public async Task<IActionResult> GetSingle(string username)
+    {
+        ServiceResponse<GetUserDto> response =
+            await _adminService.GetUserByUsername(username);
+        return StatusCode((int)response.Type, response.Message);
+    }
 
-    [HttpPost("register")]
-    public async Task<IActionResult> Register(UserRegisterDto request)
+    [HttpPost("Register")]
+    public async Task<IActionResult> Register(RegisterUserDto request)
     {
         var user = new User
         {
@@ -33,8 +51,16 @@ public class AdminController : ControllerBase
 
         return StatusCode((int)response.Type, response.Message);
     }
+    
+    [HttpGet("GetAllRoles")]
+    public async Task<IActionResult> GetAllRoles()
+    {
+        ServiceResponse<List<GetRoleDto>> response =
+            await _adminService.GetAllRoles();
+        return StatusCode((int)response.Type, response.Message);
+    }
 
-    [HttpPut("addRole")]
+    [HttpPut("AddRole")]
     public async Task<IActionResult> AddRole(AddUserRoleDto request)
     {
         ServiceResponse<User> response =
@@ -46,7 +72,7 @@ public class AdminController : ControllerBase
         return StatusCode((int)response.Type, response.Message);
     }
 
-    [HttpPut("deleteRole")]
+    [HttpPut("DeleteRole")]
     public async Task<IActionResult> DeleteRole(DeleteUserRoleDto request)
     {
         ServiceResponse<User> response =
@@ -57,11 +83,13 @@ public class AdminController : ControllerBase
 
         return StatusCode((int)response.Type, response.Message);
     }
-
+    
+    
+    
 
     // test
     [HttpPost("register2Test")]
-    public async Task<IActionResult> Register2(UserRegisterDto request)
+    public async Task<IActionResult> Register2(RegisterUserDto request)
     {
         ServiceResponse<string> response =
             await _adminService.RegisterRoleTest(
@@ -73,7 +101,7 @@ public class AdminController : ControllerBase
     }
 
     [HttpPost("register1Test")]
-    public async Task<IActionResult> Register1(UserRegisterDto request)
+    public async Task<IActionResult> Register1(RegisterUserDto request)
     {
         ServiceResponse<int> response =
             await _adminService.RegisterUser(new User { Username = request.Username }, request.Password);

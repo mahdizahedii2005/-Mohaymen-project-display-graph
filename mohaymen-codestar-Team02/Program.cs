@@ -29,6 +29,7 @@ builder.Services.AddDbContext<DataContext>(options =>
     .AddScoped<ITokenService, TokenService>()
     .AddScoped<ICookieService, CookieService>()
     .AddScoped<IPasswordService, PasswordService>();
+builder.Services.AddAutoMapper(typeof(Program));
 
 var app = builder.Build();
 

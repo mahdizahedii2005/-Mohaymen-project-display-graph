@@ -1,5 +1,9 @@
+using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using mohaymen_codestar_Team02.Data;
+using mohaymen_codestar_Team02.Dto.Role;
+using mohaymen_codestar_Team02.Dto.User;
+using mohaymen_codestar_Team02.Dto.UserDtos;
 using mohaymen_codestar_Team02.Models;
 using mohaymen_codestar_Team02.Services.CookieService;
 using mohaymen_codestar_Team02.Services.PasswordHandller;
@@ -13,15 +17,36 @@ public class AdminService : IAdminService
     private readonly ITokenService _tokenService;
     private readonly ICookieService _cookieService;
     private readonly IPasswordService _passwordService;
+    private readonly IMapper _mapper;
 
-    public AdminService(DataContext context, ICookieService cookieService, ITokenService tokenService, IPasswordService passwordService)
+    public AdminService(DataContext context, ICookieService cookieService, ITokenService tokenService, IPasswordService passwordService, IMapper mapper)
     {
         _context = context;
         _cookieService = cookieService;
         _tokenService = tokenService;
         _passwordService = passwordService;
+        _mapper = mapper;
     }
 
+    public async Task<ServiceResponse<GetUserDto>> GetUserByUsername(string username)
+    {
+        GetUserDto user = _mapper.Map<GetUserDto>(GetUser(username));
+        return new ServiceResponse<GetUserDto>(user, ApiResponseType.Success, "");
+    }
+    
+    public async Task<ServiceResponse<List<GetUserDto>>> GetAllUsers()
+    {
+        List<GetUserDto> users = await _context.Users.Select(u=>_mapper.Map<GetUserDto>(u)).ToListAsync();
+        return new ServiceResponse<List<GetUserDto>>(users, ApiResponseType.Success, "");
+    }
+    
+    public async Task<ServiceResponse<List<GetRoleDto>>> GetAllRoles()
+    {
+        List<GetRoleDto> roles = await _context.Roles.Select(r=>_mapper.Map<GetRoleDto>(r)).ToListAsync();
+        return new ServiceResponse<List<GetRoleDto>>(roles, ApiResponseType.Success, "");
+    }
+
+    
     public async Task<ServiceResponse<User>> Register(User user, string password)
     {
         var token = _cookieService.GetCookieValue();
