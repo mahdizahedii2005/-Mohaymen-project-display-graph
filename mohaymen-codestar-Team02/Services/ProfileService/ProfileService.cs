@@ -20,32 +20,16 @@ public class ProfileService : IProfileService
         _passwordService = passwordService;
         _httpContextAccessor = httpContextAccessor;
     }
-
-    private async Task<User?> GetUser(string username)
+    
+    public async Task<ServiceResponse<User>> ChangePassword(string newPassword)
     {
-        return await _context.Users.FirstOrDefaultAsync(x => x.Username.ToLower().Equals(username.ToLower()));
-    }
-
-
-    public async Task<ServiceResponse<string>> ChangePassword(string newPassword)
-    {
-        ServiceResponse<string> response = new ServiceResponse<string>();
-
         var username = _cookieService.GetCookieValue();
         if (string.IsNullOrEmpty(username))
-        {
-            response.Type = ApiResponse.Unauthorized;
-            response.Message = Resources.UnauthorizedMessage;
-            return response;
-        }
+            return new ServiceResponse<User>(null, ApiResponseType.Unauthorized, Resources.UnauthorizedMessage);
 
         var user = await GetUser(username);
         if (user is null)
-        {
-            response.Type = ApiResponse.BadRequest;
-            response.Message = Resources.UserNotFoundMessage;
-            return response;
-        }
+            return new ServiceResponse<User>(null, ApiResponseType.BadRequest, Resources.UserNotFoundMessage);
 
         _passwordService.CreatePasswordHash(newPassword, out byte[] passwordHash, out byte[] passwordSalt);
         user.PasswordHash = passwordHash;
@@ -54,16 +38,11 @@ public class ProfileService : IProfileService
         _context.Users.Update(user);
         await _context.SaveChangesAsync();
 
-        response.Type = ApiResponse.Success;
-        response.Message = Resources.PasswordChangedSuccessfulyMessage;
-
-        return response;
+        return new ServiceResponse<User>(user, ApiResponseType.Success, Resources.PasswordChangedSuccessfulyMessage);
     }
-
-    public ServiceResponse<string> Logout()
+    
+    public ServiceResponse<User> Logout()
     {
-        ServiceResponse<string> response = new ServiceResponse<string>();
-
         if (_httpContextAccessor.HttpContext?.Request.Cookies.ContainsKey("login") == true)
         {
             var cookieOptions = new CookieOptions
@@ -76,9 +55,9 @@ public class ProfileService : IProfileService
             _httpContextAccessor.HttpContext.Response.Cookies.Append("login", "", cookieOptions);
         }
 
-        response.Type = ApiResponse.Success;
-        response.Message = Resources.LogoutSuccessfuly;
-
-        return response;
+        return new ServiceResponse<User>(null, ApiResponseType.Success, Resources.LogoutSuccessfuly);
     }
+    
+    private Task<User?> GetUser(string username) =>
+        _context.Users.FirstOrDefaultAsync(x => x.Username.ToLower() == username.ToLower());
 }

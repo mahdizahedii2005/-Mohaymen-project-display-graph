@@ -1,9 +1,9 @@
-using System.Security.Claims;
 using Microsoft.EntityFrameworkCore;
 using mohaymen_codestar_Team02.Data;
 using mohaymen_codestar_Team02.Models;
 using mohaymen_codestar_Team02.Services.CookieService;
 using mohaymen_codestar_Team02.Services.PasswordHandller;
+using ApiResponseType = mohaymen_codestar_Team02.Models.ApiResponseType;
 
 namespace mohaymen_codestar_Team02.Services.Administration;
 
@@ -22,41 +22,24 @@ public class AdminService : IAdminService
         _passwordService = passwordService;
     }
 
-
-    public async Task<ServiceResponse<int>> Register(User user, string password)
+    public async Task<ServiceResponse<User>> Register(User user, string password)
     {
-        ServiceResponse<int> response = new ServiceResponse<int>();
-
         var token = _cookieService.GetCookieValue();
         if (string.IsNullOrEmpty(token))
         {
-            response.Type = ApiResponse.Unauthorized;
-            response.Message = Resources.UnauthorizedMessage;
-            return response;
+            return new ServiceResponse<User>(null, ApiResponseType.Unauthorized, Resources.UnauthorizedMessage);
         }
 
         var adminId = _tokenService.GetUserNameFromToken();
         var admin = await GetUser(adminId);
         if (admin is null)
-        {
-            response.Type = ApiResponse.BadRequest;
-            response.Message = Resources.UserNotFoundMessage;
-            return response;
-        }
+            return new ServiceResponse<User>(null, ApiResponseType.BadRequest, Resources.UserNotFoundMessage);
 
         if (!await IsAdmin(admin))
-        {
-            response.Type = ApiResponse.Forbidden;
-            response.Message = Resources.accessDeniedMessage;
-            return response;
-        }
+            return new ServiceResponse<User>(null, ApiResponseType.Forbidden, Resources.accessDeniedMessage);
 
         if (await UserExists(user.Username))
-        {
-            response.Type = ApiResponse.Conflict;
-            response.Message = Resources.UserAlreadyExistsMessage;
-            return response;
-        }
+            return new ServiceResponse<User>(null, ApiResponseType.Conflict, Resources.UserAlreadyExistsMessage);
 
         _passwordService.CreatePasswordHash(password, out byte[] passwordHash, out byte[] passwordSalt);
         user.PasswordHash = passwordHash;
@@ -65,62 +48,34 @@ public class AdminService : IAdminService
         await _context.Users.AddAsync(user);
         await _context.SaveChangesAsync();
 
-        response.Type = ApiResponse.Created;
-        response.Message = Resources.UserCreatedSuccessfullyMessage;
-        return response;
+        return new ServiceResponse<User>(user, ApiResponseType.Created, Resources.UserCreatedSuccessfullyMessage);
     }
 
 
-    public async Task<ServiceResponse<string>> AddRole(User user, Role role)
+    public async Task<ServiceResponse<User>> AddRole(User user, Role role)
     {
-        ServiceResponse<string> response = new ServiceResponse<string>();
-
         var token = _cookieService.GetCookieValue();
         if (string.IsNullOrEmpty(token))
-        {
-            response.Type = ApiResponse.Unauthorized;
-            response.Message = Resources.UnauthorizedMessage;
-            return response;
-        }
+            return new ServiceResponse<User>(null, ApiResponseType.Unauthorized, Resources.UnauthorizedMessage);
 
         var adminId = _tokenService.GetUserNameFromToken();
         var admin = await GetUser(adminId);
         if (admin is null)
-        {
-            response.Type = ApiResponse.BadRequest;
-            response.Message = Resources.UserNotFoundMessage;
-            return response;
-        }
+            return new ServiceResponse<User>(null, ApiResponseType.BadRequest, Resources.UserNotFoundMessage);
 
         if (!await IsAdmin(admin))
-        {
-            response.Type = ApiResponse.Forbidden;
-            response.Message = Resources.accessDeniedMessage;
-            return response;
-        }
+            return new ServiceResponse<User>(null, ApiResponseType.Forbidden, Resources.accessDeniedMessage);
 
         var foundUser = await GetUser(user.Username);
         if (foundUser is null)
-        {
-            response.Type = ApiResponse.NotFound;
-            response.Message = Resources.UserNotFoundMessage;
-            return response;
-        }
+            return new ServiceResponse<User>(null, ApiResponseType.NotFound, Resources.UserNotFoundMessage);
 
         var foundRole = await GetRole(role.RoleType);
         if (foundRole is null)
-        {
-            response.Type = ApiResponse.BadRequest;
-            response.Message = Resources.RoleNotFoundMessage;
-            return response;
-        }
+            return new ServiceResponse<User>(null, ApiResponseType.BadRequest, Resources.RoleNotFoundMessage);
 
         if (await GetUserRole(foundRole, foundUser) is not null)
-        {
-            response.Type = ApiResponse.BadRequest;
-            response.Message = Resources.RoleAlreadyAssigned;
-            return response;
-        }
+            return new ServiceResponse<User>(null, ApiResponseType.BadRequest, Resources.RoleAlreadyAssigned);
 
         UserRole userRole = new UserRole
         {
@@ -133,111 +88,62 @@ public class AdminService : IAdminService
         await _context.UserRoles.AddAsync(userRole);
         await _context.SaveChangesAsync();
 
-        response.Type = ApiResponse.Success;
-        response.Message = Resources.RoleAddedSuccessfulyMassage;
-
-        return response;
+        return new ServiceResponse<User>(user, ApiResponseType.Success, Resources.RoleAddedSuccessfulyMassage);
     }
 
-    public async Task<ServiceResponse<string>> DeleteRole(User user, Role role)
+    public async Task<ServiceResponse<User>> DeleteRole(User user, Role role)
     {
-        ServiceResponse<string> response = new ServiceResponse<string>();
-
         var token = _cookieService.GetCookieValue();
         if (string.IsNullOrEmpty(token))
-        {
-            response.Type = ApiResponse.Unauthorized;
-            response.Message = Resources.UnauthorizedMessage;
-            return response;
-        }
+            return new ServiceResponse<User>(null, ApiResponseType.Unauthorized, Resources.UnauthorizedMessage);
 
         var adminId = _tokenService.GetUserNameFromToken();
         var admin = await GetUser(adminId);
         if (admin is null)
-        {
-            response.Type = ApiResponse.BadRequest;
-            response.Message = Resources.UserNotFoundMessage;
-            return response;
-        }
+            return new ServiceResponse<User>(null, ApiResponseType.BadRequest, Resources.UserNotFoundMessage);
 
         if (!await IsAdmin(admin))
-        {
-            response.Type = ApiResponse.Forbidden;
-            response.Message = Resources.accessDeniedMessage;
-            return response;
-        }
+            return new ServiceResponse<User>(null, ApiResponseType.Forbidden, Resources.accessDeniedMessage);
 
         var foundUser = await GetUser(user.Username);
         if (foundUser is null)
-        {
-            response.Type = ApiResponse.NotFound;
-            response.Message = Resources.UserNotFoundMessage;
-            return response;
-        }
+            return new ServiceResponse<User>(null, ApiResponseType.NotFound, Resources.UserNotFoundMessage);
 
         var foundRole = await GetRole(role.RoleType);
         if (foundRole is null)
-        {
-            response.Type = ApiResponse.BadRequest;
-            response.Message = Resources.RoleNotFoundMessage;
-            return response;
-        }
+            return new ServiceResponse<User>(null, ApiResponseType.BadRequest, Resources.RoleNotFoundMessage);
 
 
         var userRole = await GetUserRole(foundRole, foundUser);
         if (userRole is null)
-        {
-            response.Type = ApiResponse.BadRequest;
-            response.Message = Resources.dontHaveThisRole;
-        }
+            return new ServiceResponse<User>(null, ApiResponseType.BadRequest, Resources.dontHaveThisRole);
 
-        else
-        {
-            _context.UserRoles.Remove(userRole);
-            await _context.SaveChangesAsync();
+        _context.UserRoles.Remove(userRole);
+        await _context.SaveChangesAsync();
 
-            response.Type = ApiResponse.Success;
-            response.Message = Resources.RoleRemovedSuccessfullyMessage;
-        }
-
-        return response;
+        return new ServiceResponse<User>(foundUser, ApiResponseType.Success, Resources.RoleRemovedSuccessfullyMessage);
     }
 
-    private async Task<User?> GetUser(string username)
-    {
-        return await _context.Users.FirstOrDefaultAsync(x => x.Username.ToLower().Equals(username.ToLower()));
-    }
+    private async Task<User?> GetUser(string username) =>
+        await _context.Users.FirstOrDefaultAsync(x => x.Username.ToLower().Equals(username.ToLower()));
 
-    private async Task<bool> IsAdmin(User? user)
-    {
-        var role = GetRole(RoleType.SystemAdmin.ToString());
-        return await _context.UserRoles.AnyAsync(x => user != null && x.UserId == user.UserId && x.RoleId == role.Id);
-    }
+    private async Task<bool> IsAdmin(User? user) =>
+        await _context.UserRoles.AnyAsync(x => user != null && x.UserId == user.UserId && x.RoleId == GetRole(RoleType.SystemAdmin.ToString()).Id);
     
-    private async Task<Role?> GetRole(string roleType)
-    {
-        return await _context.Roles.FirstOrDefaultAsync(x => x.RoleType.ToLower() == roleType.ToLower());
-    }
+    private async Task<Role?> GetRole(string roleType) =>
+        await _context.Roles.FirstOrDefaultAsync(x => x.RoleType.ToLower() == roleType.ToLower());
 
-    private async Task<UserRole?> GetUserRole(Role foundRole, User foundUser)
-    {
-        return await _context.UserRoles.FirstOrDefaultAsync(x =>
+    private async Task<UserRole?> GetUserRole(Role foundRole, User foundUser) =>
+        await _context.UserRoles.FirstOrDefaultAsync(x =>
             x.RoleId == foundRole.RoleId && x.User.Username.ToLower() == foundUser.Username.ToLower());
-    }
 
-    private async Task<bool> UserExists(string username)
-    {
-        return await _context.Users.AnyAsync(x => x.Username.ToLower() == username.ToLower());
-    }
-    
-    
-    
+    private async Task<bool> UserExists(string username) =>
+        await _context.Users.AnyAsync(x => x.Username.ToLower() == username.ToLower());
+
 
     // test
     public async Task<ServiceResponse<int>> RegisterUser(User user, string password)
     {
-        ServiceResponse<int> response = new ServiceResponse<int>();
-
         _passwordService.CreatePasswordHash(password, out byte[] passwordHash, out byte[] passwordSalt); //
 
         user.PasswordHash = passwordHash;
@@ -246,14 +152,11 @@ public class AdminService : IAdminService
         await _context.Users.AddAsync(user);
         await _context.SaveChangesAsync();
 
-        response.Type = ApiResponse.Success;
-        return response;
+        return new ServiceResponse<int>(1, ApiResponseType.Success, "");
     }
 
     public async Task<ServiceResponse<string>> RegisterRoleTest(User user, string password)
     {
-        ServiceResponse<string> response = new ServiceResponse<string>();
-
         Role role = new Role() { RoleType = RoleType.SystemAdmin.ToString(), RoleId = 2 };
         _context.Roles.Add(role);
         await _context.SaveChangesAsync();
@@ -270,18 +173,15 @@ public class AdminService : IAdminService
         await _context.Users.AddAsync(user);
         await _context.SaveChangesAsync();
 
-        response.Type = ApiResponse.Success;
-        return response;
+        return new ServiceResponse<string>("", ApiResponseType.Success, "");
     }
 
     public async Task<ServiceResponse<string>> AddRoleTest()
     {
-        ServiceResponse<string> response = new ServiceResponse<string>();
         Role role = new Role() { RoleType = RoleType.SystemAdmin.ToString() };
         _context.Roles.Add(role);
         await _context.SaveChangesAsync();
 
-        response.Type = ApiResponse.Success;
-        return response;
+        return new ServiceResponse<string>("", ApiResponseType.Success, "");
     }
 }

@@ -28,7 +28,7 @@ public class AdminController : ControllerBase
             Email = request.Email,
         };
 
-        ServiceResponse<int> response =
+        ServiceResponse<User> response =
             await _adminService.Register(user, request.Password);
 
         return StatusCode((int)response.Type, response.Message);
@@ -37,7 +37,7 @@ public class AdminController : ControllerBase
     [HttpPut("addRole")]
     public async Task<IActionResult> AddRole(AddUserRoleDto request)
     {
-        ServiceResponse<string> response =
+        ServiceResponse<User> response =
             await _adminService.AddRole(
                 new User { Username = request.Username },
                 new Role() { RoleType = request.RoleType }
@@ -49,7 +49,7 @@ public class AdminController : ControllerBase
     [HttpPut("deleteRole")]
     public async Task<IActionResult> DeleteRole(DeleteUserRoleDto request)
     {
-        ServiceResponse<string> response =
+        ServiceResponse<User> response =
             await _adminService.DeleteRole(
                 new User { Username = request.Username },
                 new Role() { RoleType = request.RoleType }

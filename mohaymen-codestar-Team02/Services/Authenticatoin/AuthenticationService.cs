@@ -22,44 +22,29 @@ public class AuthenticationService : IAuthenticationService
         _passwordService = passwordService;
     }
 
-    public async Task<ServiceResponse<string>> Login(string username, string password)
+    public async Task<ServiceResponse<User>> Login(string username, string password)
     {
-        ServiceResponse<string> response = new ServiceResponse<string>();
         var user = await GetUser(username);
 
         if (user is null)
-        {
-            response.Type = ApiResponse.BadRequest;
-            response.Message = Resources.UserNotFoundMessage;
-            response.Data = "Data";
-        }
-        else if (!_passwordService.VerifyPasswordHash(password, user.PasswordHash, user.Salt))
-        {
-            response.Type = ApiResponse.BadRequest;
-            response.Message = Resources.WrongPasswordMessage;
-            response.Data = "Data";
-        }
-        else
-        {
-            Claim[] claims = new[]
-            {
-                new Claim(ClaimTypes.Name, user.Username),
-                new Claim(ClaimTypes.Name, user.Username),
-                new Claim(ClaimTypes.Name, user.Username)
-            };
+            return new ServiceResponse<User>(null, ApiResponseType.BadRequest, Resources.UserNotFoundMessage);
 
-            _cookieService.CreateCookie(_tokenService.CreateToken(claims));
+        if (!_passwordService.VerifyPasswordHash(password, user.PasswordHash, user.Salt))
+            return new ServiceResponse<User>(null, ApiResponseType.BadRequest, Resources.WrongPasswordMessage);
 
-            response.Type = ApiResponse.Success;
-            response.Message = Resources.LoginSuccessfulMessage;
-        }
+        Claim[] claims = new[]
+        {
+            new Claim(ClaimTypes.Name, user.Username),
+            new Claim(ClaimTypes.Name, user.Username),
+            new Claim(ClaimTypes.Name, user.Username)
+        };
 
-        return response;
+        _cookieService.CreateCookie(_tokenService.CreateToken(claims));
+
+        return new ServiceResponse<User>(user, ApiResponseType.Success, Resources.LoginSuccessfulMessage);
     }
 
 
-    private async Task<User?> GetUser(string username)
-    {
-        return await _context.Users.FirstOrDefaultAsync(x => x.Username.ToLower().Equals(username.ToLower()));
-    }
+    private async Task<User?> GetUser(string username) =>
+        await _context.Users.FirstOrDefaultAsync(x => x.Username.ToLower().Equals(username.ToLower()));
 }
