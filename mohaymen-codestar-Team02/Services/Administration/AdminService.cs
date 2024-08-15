@@ -208,12 +208,28 @@ public class AdminService : IAdminService
     private async Task<bool> IsAdmin(User? user)
     {
         var role = GetRole(RoleType.SystemAdmin);
-        return await _context.UserRoles.AnyAsync(x => user != null && x.UserId == user.UserId && x.RoleId == role.Id);
+        if (user != null)
+        {
+            foreach (var userRole in _context.UserRoles)
+            {
+                if (userRole.UserId == user.UserId && userRole.RoleId == userRole.RoleId)
+                {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
-    
+
     private async Task<Role?> GetRole(RoleType roleType)
     {
-        return await _context.Roles.FirstOrDefaultAsync(x => x.RoleType == roleType);
+        var result = await _context.Roles.FirstOrDefaultAsync(x => x.RoleType == roleType);
+        if (result == null)
+        {
+            result = new Role() { RoleId = -1 };
+        }
+
+        return result;
     }
 
     private async Task<UserRole?> GetUserRole(Role foundRole, User foundUser)

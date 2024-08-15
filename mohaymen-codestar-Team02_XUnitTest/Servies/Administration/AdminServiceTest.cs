@@ -20,7 +20,7 @@ public class AdminServiceTests
         _cookieService = Substitute.For<ICookieService>();
         _tokenService = Substitute.For<ITokenService>();
         var options = new DbContextOptionsBuilder<DataContext>()
-            .UseInMemoryDatabase(databaseName: "TestDatabase")
+            .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
             .Options;
         _mockContext = new DataContext(options);
         _sut = new AdminService(_mockContext, _cookieService, _tokenService);
@@ -165,6 +165,7 @@ public class AdminServiceTests
     private void FixTheReturnOfCookies(string returnThis)
     {
         _cookieService.GetCookieValue().Returns(returnThis);
+        _tokenService.GetUserNameFromToken().Returns(returnThis);
     }
 
     private UserRole AddUserWithRole(string UserName, RoleType roleType, long id)
