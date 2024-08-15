@@ -1,8 +1,8 @@
-using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using mohaymen_codestar_Team02.Data;
 using mohaymen_codestar_Team02.Models;
 using mohaymen_codestar_Team02.Services.CookieService;
+using mohaymen_codestar_Team02.Services.PasswordHandller;
 
 namespace mohaymen_codestar_Team02.Services.ProfileService;
 
@@ -11,20 +11,14 @@ public class ProfileService : IProfileService
     private readonly DataContext _context;
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly ICookieService _cookieService;
-    private readonly ITokenService _tokenService;
+    private readonly IPasswordService _passwordService;
 
-    public ProfileService(IHttpContextAccessor httpContextAccessor, DataContext context, ICookieService cookieService,
-        ITokenService tokenService)
+    public ProfileService(IHttpContextAccessor httpContextAccessor, DataContext context, ICookieService cookieService, IPasswordService passwordService)
     {
         _context = context;
         _cookieService = cookieService;
-        _tokenService = tokenService;
+        _passwordService = passwordService;
         _httpContextAccessor = httpContextAccessor;
-    }
-
-    private async Task<User?> GetUserById(long? userId)
-    {
-        return await _context.Users.FirstOrDefaultAsync(x => x.UserId == userId);
     }
 
     private async Task<User?> GetUser(string username)
@@ -53,7 +47,7 @@ public class ProfileService : IProfileService
             return response;
         }
 
-        CreatePasswordHash(newPassword, out byte[] passwordHash, out byte[] passwordSalt);
+        _passwordService.CreatePasswordHash(newPassword, out byte[] passwordHash, out byte[] passwordSalt);
         user.PasswordHash = passwordHash;
         user.Salt = passwordSalt;
 
@@ -86,14 +80,5 @@ public class ProfileService : IProfileService
         response.Message = Resources.LogoutSuccessfuly;
 
         return response;
-    }
-
-    private void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
-    {
-        using (var hmac = new System.Security.Cryptography.HMACSHA512()) //
-        {
-            passwordSalt = hmac.Key;
-            passwordHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password.ToString()));
-        }
     }
 }

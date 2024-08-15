@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using mohaymen_codestar_Team02.Data;
 using mohaymen_codestar_Team02.Models;
 using mohaymen_codestar_Team02.Services.CookieService;
+using mohaymen_codestar_Team02.Services.PasswordHandller;
 
 namespace mohaymen_codestar_Team02.Services.Administration;
 
@@ -11,12 +12,14 @@ public class AdminService : IAdminService
     private readonly DataContext _context;
     private readonly ITokenService _tokenService;
     private readonly ICookieService _cookieService;
+    private readonly IPasswordService _passwordService;
 
-    public AdminService(DataContext context, ICookieService cookieService, ITokenService tokenService)
+    public AdminService(DataContext context, ICookieService cookieService, ITokenService tokenService, IPasswordService passwordService)
     {
         _context = context;
         _cookieService = cookieService;
         _tokenService = tokenService;
+        _passwordService = passwordService;
     }
 
 
@@ -55,8 +58,8 @@ public class AdminService : IAdminService
             return response;
         }
 
-        CreatePasswordHash(password, out byte[] passwordHash, out byte[] passwordSalt);
-        user.PasswordHash = passwordHash; // pass to function
+        _passwordService.CreatePasswordHash(password, out byte[] passwordHash, out byte[] passwordSalt);
+        user.PasswordHash = passwordHash;
         user.Salt = passwordSalt;
 
         await _context.Users.AddAsync(user);
@@ -207,46 +210,35 @@ public class AdminService : IAdminService
 
     private async Task<bool> IsAdmin(User? user)
     {
-        var role = GetRole(RoleType.SystemAdmin);
+        var role = GetRole(RoleType.SystemAdmin.ToString());
         return await _context.UserRoles.AnyAsync(x => user != null && x.UserId == user.UserId && x.RoleId == role.Id);
     }
     
-    private async Task<Role?> GetRole(RoleType roleType)
+    private async Task<Role?> GetRole(string roleType)
     {
-        return await _context.Roles.FirstOrDefaultAsync(x => x.RoleType == roleType);
+        return await _context.Roles.FirstOrDefaultAsync(x => x.RoleType.ToLower() == roleType.ToLower());
     }
 
     private async Task<UserRole?> GetUserRole(Role foundRole, User foundUser)
     {
         return await _context.UserRoles.FirstOrDefaultAsync(x =>
-            x.RoleId == foundRole.RoleId && x.User.Username == foundUser.Username);
+            x.RoleId == foundRole.RoleId && x.User.Username.ToLower() == foundUser.Username.ToLower());
     }
 
     private async Task<bool> UserExists(string username)
     {
-        if (await _context.Users.AnyAsync(x => x.Username.ToLower() == username.ToLower()))
-        {
-            return true;
-        }
-
-        return false;
+        return await _context.Users.AnyAsync(x => x.Username.ToLower() == username.ToLower());
     }
+    
+    
+    
 
-    private void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
-    {
-        using (var hmac = new System.Security.Cryptography.HMACSHA512())
-        {
-            passwordSalt = hmac.Key;
-            passwordHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password.ToString()));
-        }
-    }
-
-
+    // test
     public async Task<ServiceResponse<int>> RegisterUser(User user, string password)
     {
         ServiceResponse<int> response = new ServiceResponse<int>();
 
-        CreatePasswordHash(password, out byte[] passwordHash, out byte[] passwordSalt); //
+        _passwordService.CreatePasswordHash(password, out byte[] passwordHash, out byte[] passwordSalt); //
 
         user.PasswordHash = passwordHash;
         user.Salt = passwordSalt;
@@ -262,11 +254,11 @@ public class AdminService : IAdminService
     {
         ServiceResponse<string> response = new ServiceResponse<string>();
 
-        Role role = new Role() { RoleType = RoleType.SystemAdmin, RoleId = 2 };
+        Role role = new Role() { RoleType = RoleType.SystemAdmin.ToString(), RoleId = 2 };
         _context.Roles.Add(role);
         await _context.SaveChangesAsync();
 
-        CreatePasswordHash(password, out byte[] passwordHash, out byte[] passwordSalt);
+        _passwordService.CreatePasswordHash(password, out byte[] passwordHash, out byte[] passwordSalt);
 
         user.PasswordHash = passwordHash;
         user.Salt = passwordSalt;
@@ -285,7 +277,7 @@ public class AdminService : IAdminService
     public async Task<ServiceResponse<string>> AddRoleTest()
     {
         ServiceResponse<string> response = new ServiceResponse<string>();
-        Role role = new Role() { RoleType = RoleType.SystemAdmin, RoleId = 3 };
+        Role role = new Role() { RoleType = RoleType.SystemAdmin.ToString() };
         _context.Roles.Add(role);
         await _context.SaveChangesAsync();
 

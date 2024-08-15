@@ -40,7 +40,7 @@ public class AdminController : ControllerBase
         ServiceResponse<string> response =
             await _adminService.AddRole(
                 new User { Username = request.Username },
-                new Role() { RoleType = (RoleType)Enum.Parse(typeof(RoleType), request.RoleType) }
+                new Role() { RoleType = request.RoleType }
             );
 
         return StatusCode((int)response.Type, response.Message);
@@ -52,7 +52,7 @@ public class AdminController : ControllerBase
         ServiceResponse<string> response =
             await _adminService.DeleteRole(
                 new User { Username = request.Username },
-                new Role() { RoleType = (RoleType)Enum.Parse(typeof(RoleType), request.RoleType) }
+                new Role() { RoleType = request.RoleType }
             );
 
         return StatusCode((int)response.Type, response.Message);

@@ -4,6 +4,7 @@ using mohaymen_codestar_Team02.Data;
 using mohaymen_codestar_Team02.Services;
 using mohaymen_codestar_Team02.Services.Administration;
 using mohaymen_codestar_Team02.Services.CookieService;
+using mohaymen_codestar_Team02.Services.PasswordHandller;
 using mohaymen_codestar_Team02.Services.ProfileService;
 using mohaymen_codestar_Team02.Services.TokenService;
 using AuthenticationService = mohaymen_codestar_Team02.Services.Authenticatoin.AuthenticationService;
@@ -26,7 +27,8 @@ builder.Services.AddDbContext<DataContext>(options =>
     .AddScoped<IAdminService, AdminService>()
     .AddScoped<IProfileService, ProfileService>()
     .AddScoped<ITokenService, TokenService>()
-    .AddScoped<ICookieService, CookieService>();
+    .AddScoped<ICookieService, CookieService>()
+    .AddScoped<IPasswordService, PasswordService>();
 
 var app = builder.Build();
 
