@@ -13,7 +13,7 @@ RUN dotnet publish -c Release -o output
 # <Run>
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 as runtime
 
-LABEL org.opencontainers.image.source = "https://github.com/Star-Academy/Summer1403-Project-Group02-Backend/"
+LABEL org.opencontainers.image.source="https://github.com/Star-Academy/Summer1403-Project-Group02-Backend/"
 
 USER app
 
