@@ -1,9 +1,10 @@
-make password string
-add jwt 
 add identity
-check key auto set
-change cookie name
 prog.cs into app initialize
 code migration
 handdle excptio
 regex for password
+permissions
+get permisions get users
+data for response
+function for if elses
+additional

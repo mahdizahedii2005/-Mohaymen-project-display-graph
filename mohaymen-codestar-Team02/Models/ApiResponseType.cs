@@ -1,6 +1,6 @@
 namespace mohaymen_codestar_Team02.Models;
 
-public enum ApiResponse
+public enum ApiResponseType
 {
     Success = 200,
     Created = 201,
