@@ -23,7 +23,7 @@ public class ProfileController : ControllerBase
     }
 
     [HttpPost("logout")]
-    [ValidateAntiForgeryToken]
+    //[ValidateAntiForgeryToken]
     public IActionResult Logout()
     {
         ServiceResponse<User> response = _profileService.Logout();

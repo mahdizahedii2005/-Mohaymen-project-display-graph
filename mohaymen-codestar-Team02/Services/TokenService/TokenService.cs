@@ -34,7 +34,7 @@ public class TokenService : ITokenService
     public string GetUserNameFromToken()
     {
         var user = _httpContextAccessor.HttpContext?.User;
-        var usernameClaim = user.FindFirst(ClaimTypes.Name);
+        var usernameClaim = user?.FindFirst(ClaimTypes.Name);
         return usernameClaim?.Value;
     }
 }

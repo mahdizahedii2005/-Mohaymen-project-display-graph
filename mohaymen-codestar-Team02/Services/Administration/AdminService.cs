@@ -18,7 +18,8 @@ public class AdminService : IAdminService
     private readonly IPasswordService _passwordService;
     private readonly IMapper _mapper;
 
-    public AdminService(DataContext context, ICookieService cookieService, ITokenService tokenService, IPasswordService passwordService, IMapper mapper)
+    public AdminService(DataContext context, ICookieService cookieService, ITokenService tokenService,
+        IPasswordService passwordService, IMapper mapper)
     {
         _context = context;
         _cookieService = cookieService;
@@ -33,17 +34,17 @@ public class AdminService : IAdminService
         GetUserDto userDto = _mapper.Map<GetUserDto>(user);
         return new ServiceResponse<GetUserDto>(userDto, ApiResponseType.Success, "");
     }
-    
+
     public async Task<ServiceResponse<List<GetUserDto>>> GetAllUsers()
-    { 
-        List<User> users = await _context.Users.Include(u=>u.UserRoles).ThenInclude(ur=>ur.Role).ToListAsync();
+    {
+        List<User> users = await _context.Users.Include(u => u.UserRoles).ThenInclude(ur => ur.Role).ToListAsync();
         List<GetUserDto> userDtos = users.Select(u => _mapper.Map<GetUserDto>(u)).ToList();
         return new ServiceResponse<List<GetUserDto>>(userDtos, ApiResponseType.Success, "");
     }
-    
+
     public async Task<ServiceResponse<List<GetRoleDto>>> GetAllRoles()
     {
-        List<GetRoleDto> roles = await _context.Roles.Select(r=>_mapper.Map<GetRoleDto>(r)).ToListAsync();
+        List<GetRoleDto> roles = await _context.Roles.Select(r => _mapper.Map<GetRoleDto>(r)).ToListAsync();
         return new ServiceResponse<List<GetRoleDto>>(roles, ApiResponseType.Success, "");
     }
 
@@ -149,19 +150,24 @@ public class AdminService : IAdminService
         return new ServiceResponse<User>(foundUser, ApiResponseType.Success, Resources.RoleRemovedSuccessfullyMessage);
     }
 
-    private async Task<User?> GetUser(string username) =>
-        await _context.Users.FirstOrDefaultAsync(x => x.Username.ToLower().Equals(username.ToLower()));
+    private async Task<User?> GetUser(string username)
+    {
+        var user = await _context.Users.FirstOrDefaultAsync(x => x.Username.ToLower().Equals(username.ToLower()));
+        var roles = user.UserRoles;
+        return user;
+    }
 
     private async Task<bool> IsAdmin(User? user)
     {
         var role = await GetRole(RoleType.SystemAdmin.ToString());
-        return await _context.UserRoles.AnyAsync(x => user != null && x.UserId == user.UserId && x.RoleId == role.RoleId);
+        return await _context.UserRoles.AnyAsync(
+            x => user != null && x.UserId == user.UserId && x.RoleId == role.RoleId);
     }
-    
+
     private async Task<Role?> GetRole(string roleType) =>
         await _context.Roles.FirstOrDefaultAsync(x => x.RoleType.ToLower() == roleType.ToLower());
 
-    
+
     private async Task<UserRole?> GetUserRole(Role foundRole, User foundUser) =>
         await _context.UserRoles.FirstOrDefaultAsync(x =>
             x.RoleId == foundRole.RoleId && x.User.Username.ToLower() == foundUser.Username.ToLower());
