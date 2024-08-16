@@ -6,6 +6,7 @@ using mohaymen_codestar_Team02.Services.Administration;
 using mohaymen_codestar_Team02.Services.CookieService;
 using mohaymen_codestar_Team02.Services.PasswordHandller;
 using NSubstitute;
+using AutoMapper;
 
 namespace mohaymen_codestar_Team02_XUnitTest.Servies.Administration;
 
@@ -16,17 +17,19 @@ public class AdminServiceTest
     private readonly DataContext _mockContext;
     private readonly ITokenService _tokenService;
     private readonly IPasswordService _passwordService;
+    private readonly IMapper _mapper;
 
     public AdminServiceTest()
     {
         _cookieService = Substitute.For<ICookieService>();
         _tokenService = Substitute.For<ITokenService>();
         _passwordService = Substitute.For<IPasswordService>();
+        _mapper = Substitute.For<IMapper>(); 
         var options = new DbContextOptionsBuilder<DataContext>()
             .UseInMemoryDatabase(databaseName: new Random().NextInt64() + Guid.NewGuid().ToString())
             .Options;
         _mockContext = new DataContext(options);
-        _sut = new AdminService(_mockContext, _cookieService, _tokenService, _passwordService);
+        _sut = new AdminService(_mockContext, _cookieService, _tokenService, _passwordService, _mapper); // پاس دادن Mapper به کلاس AdminService
     }
 
     [Fact]
