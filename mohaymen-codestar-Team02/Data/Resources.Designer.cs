@@ -114,6 +114,15 @@ namespace mohaymen_codestar_Team02.Data {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Your Profile Info Changed Successfuly.
+        /// </summary>
+        internal static string ProfileInfoUpdateSuccessfulyMessage {
+            get {
+                return ResourceManager.GetString("ProfileInfoUpdateSuccessfulyMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Role Added Successfuly.
         /// </summary>
         internal static string RoleAddedSuccessfulyMassage {

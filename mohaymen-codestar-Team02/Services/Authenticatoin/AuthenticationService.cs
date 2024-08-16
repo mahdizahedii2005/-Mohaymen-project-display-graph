@@ -13,8 +13,9 @@ public class AuthenticationService : IAuthenticationService
     private readonly ITokenService _tokenService;
     private readonly ICookieService _cookieService;
     private readonly IPasswordService _passwordService;
-    
-    public AuthenticationService(DataContext context, ICookieService cookieService, ITokenService tokenService, IPasswordService passwordService)
+
+    public AuthenticationService(DataContext context, ICookieService cookieService, ITokenService tokenService,
+        IPasswordService passwordService)
     {
         _context = context;
         _cookieService = cookieService;
@@ -39,8 +40,6 @@ public class AuthenticationService : IAuthenticationService
         Claim[] claims = new[]
         {
             new Claim(ClaimTypes.Name, user.Username),
-            new Claim(ClaimTypes.Name, user.Username),
-            new Claim(ClaimTypes.Name, user.Username)
         };
 
         _cookieService.CreateCookie(_tokenService.CreateToken(claims));

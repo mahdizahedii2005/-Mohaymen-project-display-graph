@@ -1,5 +1,8 @@
+using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using mohaymen_codestar_Team02.Data;
+using mohaymen_codestar_Team02.Dto.Role;
+using mohaymen_codestar_Team02.Dto.User;
 using mohaymen_codestar_Team02.Models;
 using mohaymen_codestar_Team02.Services.CookieService;
 using mohaymen_codestar_Team02.Services.PasswordHandller;
@@ -13,14 +16,38 @@ public class AdminService : IAdminService
     private readonly ITokenService _tokenService;
     private readonly ICookieService _cookieService;
     private readonly IPasswordService _passwordService;
+    private readonly IMapper _mapper;
 
     public AdminService(DataContext context, ICookieService cookieService, ITokenService tokenService,
-        IPasswordService passwordService)
+        IPasswordService passwordService, IMapper mapper)
     {
         _context = context;
         _cookieService = cookieService;
         _tokenService = tokenService;
         _passwordService = passwordService;
+        _mapper = mapper;
+    }
+
+    public async Task<ServiceResponse<GetUserDto>> GetUserByUsername(string username)
+    {
+        var user = await GetUser(username);
+        GetUserDto userDto = _mapper.Map<GetUserDto>(user);
+        return new ServiceResponse<GetUserDto>(userDto, ApiResponseType.Success, "");
+    }
+
+    public async Task<ServiceResponse<List<GetUserDto>>> GetAllUsers()
+    {
+        List<User> users1 = await _context.Users.ToListAsync();
+        users1.Select(u => u.UserRoles.Select(ur => ur.Role));
+        List<User> users = await _context.Users.Include(u => u.UserRoles).ThenInclude(ur => ur.Role).ToListAsync();
+        List<GetUserDto> userDtos = users.Select(u => _mapper.Map<GetUserDto>(u)).ToList();
+        return new ServiceResponse<List<GetUserDto>>(userDtos, ApiResponseType.Success, "");
+    }
+
+    public async Task<ServiceResponse<List<GetRoleDto>>> GetAllRoles()
+    {
+        List<GetRoleDto> roles = await _context.Roles.Select(r => _mapper.Map<GetRoleDto>(r)).ToListAsync();
+        return new ServiceResponse<List<GetRoleDto>>(roles, ApiResponseType.Success, "");
     }
 
     public async Task<ServiceResponse<User>> Register(User user, string password)
@@ -31,8 +58,8 @@ public class AdminService : IAdminService
             return new ServiceResponse<User>(null, ApiResponseType.Unauthorized, Resources.UnauthorizedMessage);
         }
 
-        var adminId = _tokenService.GetUserNameFromToken();
-        var admin = await GetUser(adminId);
+        var adminUsername = _tokenService.GetUserNameFromToken();
+        var admin = await GetUser(adminUsername);
         if (admin is null)
             return new ServiceResponse<User>(null, ApiResponseType.BadRequest, Resources.UserNotFoundMessage);
 
@@ -140,6 +167,7 @@ public class AdminService : IAdminService
         if (roleType == null) return null;
         return await _context.Roles.FirstOrDefaultAsync(x => x.RoleType.ToLower() == roleType.ToLower());
     }
+
 
     private async Task<UserRole?> GetUserRole(Role foundRole, User foundUser) =>
         await _context.UserRoles.FirstOrDefaultAsync(x =>
