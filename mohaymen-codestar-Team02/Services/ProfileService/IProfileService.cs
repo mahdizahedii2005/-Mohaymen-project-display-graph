@@ -6,4 +6,5 @@ public interface IProfileService
 {
     Task<ServiceResponse<User>> ChangePassword(string password);
     ServiceResponse<User> Logout();
+    Task<ServiceResponse<User>> UpdateUser(User newUser);
 }
