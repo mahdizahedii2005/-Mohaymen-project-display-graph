@@ -35,8 +35,6 @@ public class AuthenticationService : IAuthenticationService
         Claim[] claims = new[]
         {
             new Claim(ClaimTypes.Name, user.Username),
-            new Claim(ClaimTypes.Name, user.Username),
-            new Claim(ClaimTypes.Name, user.Username)
         };
 
         _cookieService.CreateCookie(_tokenService.CreateToken(claims));

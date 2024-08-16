@@ -24,15 +24,15 @@ public class AdminController : ControllerBase
     {
         ServiceResponse<List<GetUserDto>> response =
             await _adminService.GetAllUsers();
-        return StatusCode((int)response.Type, response.Message);
+        return StatusCode((int)response.Type, response);
     }
     
     [HttpGet("GetUserByUsername{username}")]
-    public async Task<IActionResult> GetSingle(string username)
+    public async Task<IActionResult> GetSingleUser(string username)
     {
         ServiceResponse<GetUserDto> response =
             await _adminService.GetUserByUsername(username);
-        return StatusCode((int)response.Type, response.Message);
+        return StatusCode((int)response.Type, response);
     }
 
     [HttpPost("Register")]
@@ -57,7 +57,7 @@ public class AdminController : ControllerBase
     {
         ServiceResponse<List<GetRoleDto>> response =
             await _adminService.GetAllRoles();
-        return StatusCode((int)response.Type, response.Message);
+        return StatusCode((int)response.Type, response);
     }
 
     [HttpPut("AddRole")]

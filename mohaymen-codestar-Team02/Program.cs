@@ -1,6 +1,10 @@
+using System.Text;
 using DotNetEnv;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using mohaymen_codestar_Team02.Data;
+using mohaymen_codestar_Team02.Mapper;
 using mohaymen_codestar_Team02.Services;
 using mohaymen_codestar_Team02.Services.Administration;
 using mohaymen_codestar_Team02.Services.CookieService;
@@ -29,7 +33,44 @@ builder.Services.AddDbContext<DataContext>(options =>
     .AddScoped<ITokenService, TokenService>()
     .AddScoped<ICookieService, CookieService>()
     .AddScoped<IPasswordService, PasswordService>();
-builder.Services.AddAutoMapper(typeof(Program));
+builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
+
+
+builder.Services.AddAuthentication(options =>
+    {
+        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    })
+    .AddJwtBearer(options =>
+    {
+        options.Events = new JwtBearerEvents
+        {
+            OnMessageReceived = context =>
+            {
+                var token = context.HttpContext.Request.Cookies["login"];
+                if (!string.IsNullOrEmpty(token))
+                {
+                    context.Token = token;
+                }
+
+                return Task.CompletedTask;
+            }
+        };
+
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = false,
+            ValidateAudience = false,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey =
+                new SymmetricSecurityKey(Encoding.UTF8.GetBytes(
+                    "my top secret key is right here hehe jkjkjkj yguguygugyuguyguuygggyuguyuygu    jhj"))
+        };
+    });
+
+builder.Services.AddAuthorization();
+
 
 var app = builder.Build();
 
@@ -41,6 +82,10 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseAuthentication();
+app.UseAuthorization();
+
 app.MapControllers();
 
 
