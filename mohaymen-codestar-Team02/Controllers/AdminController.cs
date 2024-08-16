@@ -26,7 +26,7 @@ public class AdminController : ControllerBase
             await _adminService.GetAllUsers();
         return StatusCode((int)response.Type, response);
     }
-    
+
     [HttpGet("GetUserByUsername{username}")]
     public async Task<IActionResult> GetSingleUser(string username)
     {
@@ -51,7 +51,7 @@ public class AdminController : ControllerBase
 
         return StatusCode((int)response.Type, response.Message);
     }
-    
+
     [HttpGet("GetAllRoles")]
     public async Task<IActionResult> GetAllRoles()
     {
@@ -83,9 +83,7 @@ public class AdminController : ControllerBase
 
         return StatusCode((int)response.Type, response.Message);
     }
-    
-    
-    
+
 
     // test
     [HttpPost("register2Test")]

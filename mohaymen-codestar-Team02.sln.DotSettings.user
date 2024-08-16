@@ -64,5 +64,6 @@
     &lt;TestId&gt;xUnit::DBCC3406-305C-4B21-AF94-8BF8B78D1040::net8.0::mohaymen_codestar_Team02_XUnitTest.Servies.Administration.AdminServiceTests.DeleteRole_ShouldReturnBadRequest_WhenAdminNotFound&lt;/TestId&gt;&#xD;
   &lt;/TestAncestor&gt;&#xD;
 &lt;/SessionState&gt;</s:String>
+	
 	<s:Boolean x:Key="/Default/ResxEditorPersonal/CheckedGroups/=mohaymen_002Dcodestar_002DTeam02_002FData_002FResources/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/ResxEditorPersonal/Initialized/@EntryValue">True</s:Boolean></wpf:ResourceDictionary>

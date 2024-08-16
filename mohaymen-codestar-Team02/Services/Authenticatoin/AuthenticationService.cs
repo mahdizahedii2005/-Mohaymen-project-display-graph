@@ -13,8 +13,9 @@ public class AuthenticationService : IAuthenticationService
     private readonly ITokenService _tokenService;
     private readonly ICookieService _cookieService;
     private readonly IPasswordService _passwordService;
-    
-    public AuthenticationService(DataContext context, ICookieService cookieService, ITokenService tokenService, IPasswordService passwordService)
+
+    public AuthenticationService(DataContext context, ICookieService cookieService, ITokenService tokenService,
+        IPasswordService passwordService)
     {
         _context = context;
         _cookieService = cookieService;

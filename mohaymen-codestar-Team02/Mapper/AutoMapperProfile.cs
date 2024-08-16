@@ -12,7 +12,8 @@ public class AutoMapperProfile : Profile
     public AutoMapperProfile()
     {
         CreateMap<User, GetUserDto>()
-            .ForMember(dto => dto.Roles, c => c.MapFrom(u => u.UserRoles.Select(ur => ur.Role)));
+            .ForMember(dto => dto.Roles, c =>
+                c.MapFrom(u => u.UserRoles.Select(ur => ur.Role)));
         CreateMap<Role, GetRoleDto>();
         CreateMap<User, RegisterUserDto>();
     }
