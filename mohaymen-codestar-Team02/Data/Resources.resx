@@ -67,4 +67,7 @@
     <data name="LogoutSuccessfuly" xml:space="preserve">
         <value>Logout Successfuly</value>
     </data>
+    <data name="ProfileInfoUpdateSuccessfulyMessage" xml:space="preserve">
+        <value>Your Profile Info Changed Successfuly</value>
+    </data>
 </root>
