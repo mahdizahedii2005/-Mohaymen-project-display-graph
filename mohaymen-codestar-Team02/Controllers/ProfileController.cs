@@ -18,7 +18,7 @@ public class ProfileController : ControllerBase
     [HttpPut("changePassword")]
     public async Task<IActionResult> ChangePassword(ChangePasswordUserDto request)
     {
-        ServiceResponse<User> response = await _profileService.ChangePassword(request.NewPassword);
+        ServiceResponse<User> response = await _profileService.ChangePassword(request.PreviousPassword , request.NewPassword);
         return StatusCode((int)response.Type, response.Message);
     }
 
@@ -33,14 +33,7 @@ public class ProfileController : ControllerBase
     [HttpPost("UpdateUser")]
     public async Task<IActionResult> UpdateUser(UpdateUserDto request)
     {
-        var user = new User()
-        {
-            FirstName = request.FirstName,
-            LastName = request.LastName,
-            Email = request.Email
-        };
-
-        ServiceResponse<User> response = await _profileService.UpdateUser(user);
+        ServiceResponse<User> response = await _profileService.UpdateUser(request);
         return StatusCode((int)response.Type, response.Message);
     }
 }
