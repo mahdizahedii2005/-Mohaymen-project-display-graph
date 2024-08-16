@@ -16,5 +16,6 @@ public class AutoMapperProfile : Profile
                 c.MapFrom(u => u.UserRoles.Select(ur => ur.Role)));
         CreateMap<Role, GetRoleDto>();
         CreateMap<User, RegisterUserDto>();
+        CreateMap<User, UpdateUserDto>();
     }
 }
