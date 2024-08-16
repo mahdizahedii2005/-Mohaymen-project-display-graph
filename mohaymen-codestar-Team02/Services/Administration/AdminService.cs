@@ -37,6 +37,8 @@ public class AdminService : IAdminService
 
     public async Task<ServiceResponse<List<GetUserDto>>> GetAllUsers()
     {
+        List<User> users1 = await _context.Users.ToListAsync();
+        users1.Select(u => u.UserRoles.Select(ur => ur.Role));
         List<User> users = await _context.Users.Include(u => u.UserRoles).ThenInclude(ur => ur.Role).ToListAsync();
         List<GetUserDto> userDtos = users.Select(u => _mapper.Map<GetUserDto>(u)).ToList();
         return new ServiceResponse<List<GetUserDto>>(userDtos, ApiResponseType.Success, "");
