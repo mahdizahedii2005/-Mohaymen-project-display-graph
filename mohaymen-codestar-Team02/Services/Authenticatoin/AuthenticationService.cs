@@ -24,6 +24,10 @@ public class AuthenticationService : IAuthenticationService
 
     public async Task<ServiceResponse<User>> Login(string username, string password)
     {
+        if (string.IsNullOrEmpty(username)||string.IsNullOrEmpty(password))
+        {
+            return new ServiceResponse<User>(null,ApiResponseType.BadRequest,Resources.InvalidInpute);
+        }
         var user = await GetUser(username);
 
         if (user is null)

@@ -4,6 +4,9 @@
     <data name="UnauthorizedMessage">
         <value>Unauthorized</value>
     </data>
+    <data name="InvalidInpute">
+        <value>InvalidInput</value>
+    </data>
     <data name="UserNotFoundMessage">
         <value>User Not Found</value>
     </data>

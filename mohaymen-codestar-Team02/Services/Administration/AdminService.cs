@@ -14,7 +14,8 @@ public class AdminService : IAdminService
     private readonly ICookieService _cookieService;
     private readonly IPasswordService _passwordService;
 
-    public AdminService(DataContext context, ICookieService cookieService, ITokenService tokenService, IPasswordService passwordService)
+    public AdminService(DataContext context, ICookieService cookieService, ITokenService tokenService,
+        IPasswordService passwordService)
     {
         _context = context;
         _cookieService = cookieService;
@@ -127,11 +128,18 @@ public class AdminService : IAdminService
     private async Task<User?> GetUser(string username) =>
         await _context.Users.FirstOrDefaultAsync(x => x.Username.ToLower().Equals(username.ToLower()));
 
-    private async Task<bool> IsAdmin(User? user) =>
-        await _context.UserRoles.AnyAsync(x => user != null && x.UserId == user.UserId && x.RoleId == GetRole(RoleType.SystemAdmin.ToString()).Id);
-    
-    private async Task<Role?> GetRole(string roleType) =>
-        await _context.Roles.FirstOrDefaultAsync(x => x.RoleType.ToLower() == roleType.ToLower());
+    private async Task<bool> IsAdmin(User? user)
+    {
+        if (user == null) return false;
+        return await _context.UserRoles.AnyAsync(x =>
+            user != null && x.UserId == user.UserId && x.RoleId == GetRole(RoleType.SystemAdmin.ToString()).Id);
+    }
+
+    private async Task<Role?> GetRole(string? roleType)
+    {
+        if (roleType == null) return null;
+        return await _context.Roles.FirstOrDefaultAsync(x => x.RoleType.ToLower() == roleType.ToLower());
+    }
 
     private async Task<UserRole?> GetUserRole(Role foundRole, User foundUser) =>
         await _context.UserRoles.FirstOrDefaultAsync(x =>

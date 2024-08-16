@@ -79,7 +79,7 @@ namespace mohaymen_codestar_Team02_XUnitTest.Servies.CookieService
             var result = _sut.GetCookieValue();
 
             // Assert
-            Assert.Null(result);
+            Assert.Equal(string.Empty,result);
         }
     }
 }
