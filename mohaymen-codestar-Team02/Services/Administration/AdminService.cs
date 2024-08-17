@@ -158,8 +158,10 @@ public class AdminService : IAdminService
     private async Task<bool> IsAdmin(User? user)
     {
         if (user == null) return false;
-        return await _context.UserRoles.AnyAsync(x =>
-            user != null && x.UserId == user.UserId && x.RoleId == GetRole(RoleType.SystemAdmin.ToString()).Id);
+        var targetUSer = _context.Users.SingleOrDefault(a => a.Username == user.Username);
+        var result = targetUSer.UserRoles.Any(Userrole =>
+            Userrole.Role.RoleType.ToLower() == RoleType.SystemAdmin.ToString().ToLower());
+        return result;
     }
 
     private async Task<Role?> GetRole(string? roleType)
