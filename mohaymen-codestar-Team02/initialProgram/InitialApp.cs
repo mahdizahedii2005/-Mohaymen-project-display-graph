@@ -1,9 +1,26 @@
+using Microsoft.EntityFrameworkCore;
+using mohaymen_codestar_Team02.Data;
+
 namespace mohaymen_codestar_Team02.initialProgram;
 
 public class InitialApp
 {
     public static void ConfigureApp(WebApplication app)
     {
+        // Apply pending migrations (uncomment if needed)
+        using (var scope = app.Services.CreateScope())
+        {
+            var services = scope.ServiceProvider;
+
+            var context = services.GetRequiredService<DataContext>();
+            context.Database.EnsureCreated();
+
+            if (context.Database.GetPendingMigrations().Any())
+            {
+                context.Database.Migrate();
+            }
+        }
+
         // Initialize services
         using (var scope = app.Services.CreateScope())
         {
@@ -25,15 +42,6 @@ public class InitialApp
         app.UseAuthorization();
         app.MapControllers();
 
-        // Apply pending migrations (uncomment if needed)
-        // using (var scope = app.Services.CreateScope())
-        // {
-        //     var services = scope.ServiceProvider;
-        //     var context = services.GetRequiredService<DataContext>();
-        //     if (context.Database.GetPendingMigrations().Any())
-        //     {
-        //         context.Database.Migrate();
-        //     }
-        // }
+
     }
 }

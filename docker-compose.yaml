@@ -1,0 +1,23 @@
+services:
+  api:
+    restart: always
+    build:
+      context: mohaymen-codestar-Team02
+    ports:
+      - 127.0.0.1:8080:8080
+    env_file:
+      - ./mohaymen-codestar-Team02/prod.env
+    depends_on:
+      - postgres
+
+  postgres:
+    restart: always
+    image: postgres:16-bookworm
+    env_file:
+      - ./postgres/prod.env
+
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
