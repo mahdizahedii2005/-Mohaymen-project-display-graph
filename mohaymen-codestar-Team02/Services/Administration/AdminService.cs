@@ -156,8 +156,10 @@ public class AdminService : IAdminService
     private async Task<bool> IsAdmin(User? user)
     {
         if (user == null) return false;
-        return await _context.UserRoles.AnyAsync(x =>
-            user != null && x.UserId == user.UserId && x.RoleId == GetRole(RoleType.SystemAdmin.ToString()).Id);
+        var targetUSer = _context.Users.SingleOrDefault(a => a.Username == user.Username);
+        var result = targetUSer.UserRoles.Any(Userrole =>
+            Userrole.Role.RoleType.ToLower() == RoleType.SystemAdmin.ToString().ToLower());
+        return result;
     }
 
     private async Task<Role?> GetRole(string? roleType)
@@ -173,49 +175,4 @@ public class AdminService : IAdminService
 
     private async Task<bool> UserExists(string username) =>
         await _context.Users.AnyAsync(x => x.Username.ToLower() == username.ToLower());
-
-
-    // test
-    public async Task<ServiceResponse<int>> RegisterUser(User user, string password)
-    {
-        _passwordService.CreatePasswordHash(password, out byte[] passwordHash, out byte[] passwordSalt); //
-
-        user.PasswordHash = passwordHash;
-        user.Salt = passwordSalt;
-
-        await _context.Users.AddAsync(user);
-        await _context.SaveChangesAsync();
-
-        return new ServiceResponse<int>(1, ApiResponseType.Success, "");
-    }
-
-    public async Task<ServiceResponse<string>> RegisterRoleTest(User user, string password)
-    {
-        Role role = new Role() { RoleType = RoleType.SystemAdmin.ToString(), RoleId = 2 };
-        _context.Roles.Add(role);
-        await _context.SaveChangesAsync();
-
-        _passwordService.CreatePasswordHash(password, out byte[] passwordHash, out byte[] passwordSalt);
-
-        user.PasswordHash = passwordHash;
-        user.Salt = passwordSalt;
-
-        UserRole userRole = new UserRole() { RoleId = role.RoleId, UserId = user.UserId, Role = role, User = user };
-        _context.UserRoles.Add(userRole);
-        user.UserRoles.Add(userRole);
-
-        await _context.Users.AddAsync(user);
-        await _context.SaveChangesAsync();
-
-        return new ServiceResponse<string>("", ApiResponseType.Success, "");
-    }
-
-    public async Task<ServiceResponse<string>> AddRoleTest()
-    {
-        Role role = new Role() { RoleType = RoleType.SystemAdmin.ToString() };
-        _context.Roles.Add(role);
-        await _context.SaveChangesAsync();
-
-        return new ServiceResponse<string>("", ApiResponseType.Success, "");
-    }
 }

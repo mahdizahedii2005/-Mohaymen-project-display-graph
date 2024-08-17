@@ -20,6 +20,7 @@ public class ProfileService : IProfileService
     public ProfileService(IHttpContextAccessor httpContextAccessor, DataContext context, ICookieService cookieService,
         IPasswordService passwordService, ITokenService tokenService, IMapper mapper)
     {
+        _mapper = mapper;
         _context = context;
         _cookieService = cookieService;
         _passwordService = passwordService;
@@ -28,7 +29,7 @@ public class ProfileService : IProfileService
         _httpContextAccessor = httpContextAccessor;
     }
 
-    public async Task<ServiceResponse<User>> ChangePassword(string previousPassword , string newPassword)
+    public async Task<ServiceResponse<User>> ChangePassword(string previousPassword, string newPassword)
     {
         var token = _cookieService.GetCookieValue();
         if (string.IsNullOrEmpty(token))
@@ -38,13 +39,13 @@ public class ProfileService : IProfileService
 
         var username = _tokenService.GetUserNameFromToken();
         var user = await GetUser(username);
-        
+
         if (user is null)
             return new ServiceResponse<User>(null, ApiResponseType.BadRequest, Resources.UserNotFoundMessage);
 
         if (!_passwordService.VerifyPasswordHash(newPassword, user.PasswordHash, user.Salt))
             return new ServiceResponse<User>(null, ApiResponseType.BadRequest, Resources.WrongPasswordMessage);
-        
+
         _passwordService.CreatePasswordHash(newPassword, out byte[] passwordHash, out byte[] passwordSalt);
         user.PasswordHash = passwordHash;
         user.Salt = passwordSalt;
@@ -75,7 +76,7 @@ public class ProfileService : IProfileService
     public async Task<ServiceResponse<User>> UpdateUser(UpdateUserDto updateUserDto)
     {
         var newUser = _mapper.Map<UpdateUserDto>(updateUserDto);
-        
+
         var token = _cookieService.GetCookieValue();
         if (string.IsNullOrEmpty(token))
         {
@@ -86,11 +87,11 @@ public class ProfileService : IProfileService
         var user = await GetUser(username);
         if (user is null)
             return new ServiceResponse<User>(null, ApiResponseType.BadRequest, Resources.UserNotFoundMessage);
-        
+
         user.FirstName = newUser.FirstName;
         user.LastName = newUser.LastName;
         user.Email = newUser.Email;
-        
+
         _context.Users.Update(user);
         await _context.SaveChangesAsync();
 

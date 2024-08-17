@@ -1,25 +1,36 @@
 using Microsoft.EntityFrameworkCore;
-using Microsoft.OpenApi.Models;
 using mohaymen_codestar_Team02.Data;
 
 namespace mohaymen_codestar_Team02.initialProgram;
 
 public class InitialApp
 {
-    public static void Init(WebApplicationBuilder builder)
+    public static void ConfigureApp(WebApplication app)
     {
-        builder.Services.AddSwaggerGen();
-        /*
-        builder.Services.AddSwaggerGen(c =>
-            c.SwaggerDoc("v1", new OpenApiInfo() { Title = "Mohaymen_Project_Group02", Version = "v1" })
-        );*/
+        // Apply pending migrations (uncomment if needed)
+        using (var scope = app.Services.CreateScope())
+        {
+            var services = scope.ServiceProvider;
 
-        builder.Services.AddEndpointsApiExplorer();
-        builder.Services.AddControllers();
-        var app = builder.Build();
-        //app.UseSwagger();
-        //app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "mohaymen-codestar-Team02.csproj"));
+            var context = services.GetRequiredService<DataContext>();
+            context.Database.EnsureCreated();
 
+            if (context.Database.GetPendingMigrations().Any())
+            {
+                context.Database.Migrate();
+            }
+        }
+
+        // Initialize services
+        using (var scope = app.Services.CreateScope())
+        {
+            var services = scope.ServiceProvider;
+            var initialServices = services.GetRequiredService<InitialServices>();
+            initialServices.SeadRole();
+            initialServices.SeadAdmin();
+        }
+
+        // Configure middleware
         if (app.Environment.IsDevelopment())
         {
             app.UseSwagger();
@@ -27,11 +38,10 @@ public class InitialApp
         }
 
         app.UseHttpsRedirection();
-        app.UseStaticFiles();
-        app.UseDeveloperExceptionPage();
-        app.UseRouting();
+        app.UseAuthentication();
         app.UseAuthorization();
         app.MapControllers();
-        app.Run();
+
+
     }
 }
