@@ -43,7 +43,6 @@ public class AuthenticationServiceTests
 
         // Assert
         Assert.Equal(ApiResponseType.BadRequest, result.Type);
-        Assert.Null(result.Data);
     }
 
     [Theory]

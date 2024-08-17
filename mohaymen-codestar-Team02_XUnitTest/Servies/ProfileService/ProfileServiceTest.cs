@@ -39,7 +39,7 @@ namespace mohaymen_codestar_Team02_XUnitTest.Servies.ProfileService
             _mockContext = new DataContext(options);
 
             _sut = new mohaymen_codestar_Team02.Services.ProfileService.ProfileService(
-                _httpContextAccessor, _mockContext, _cookieService, _passwordService, _tokenService);
+                _httpContextAccessor, _mockContext, _cookieService, _passwordService, _tokenService, _mapper);
         }
 
         [Fact]
@@ -141,7 +141,7 @@ namespace mohaymen_codestar_Team02_XUnitTest.Servies.ProfileService
             // Arrange
             var updateUserDto = new UpdateUserDto
                 { FirstName = "NewFirstName", LastName = "NewLastName", Email = "newemail@example.com" };
-            _cookieService.GetCookieValue().Returns((string)null);
+            _cookieService.GetCookieValue().Returns(string.Empty);
 
             // Act
             var result = await _sut.UpdateUser(updateUserDto);
