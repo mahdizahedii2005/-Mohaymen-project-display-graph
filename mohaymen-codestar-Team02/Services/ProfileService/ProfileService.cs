@@ -18,12 +18,13 @@ public class ProfileService : IProfileService
     private readonly IMapper _mapper;
 
     public ProfileService(IHttpContextAccessor httpContextAccessor, DataContext context, ICookieService cookieService,
-        IPasswordService passwordService, ITokenService tokenService)
+        IPasswordService passwordService, ITokenService tokenService, IMapper mapper)
     {
         _context = context;
         _cookieService = cookieService;
         _passwordService = passwordService;
         _tokenService = tokenService;
+        _mapper = mapper;
         _httpContextAccessor = httpContextAccessor;
     }
 
