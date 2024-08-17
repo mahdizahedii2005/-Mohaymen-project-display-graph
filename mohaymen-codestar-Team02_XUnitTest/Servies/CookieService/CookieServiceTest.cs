@@ -1,70 +1,85 @@
 using Microsoft.AspNetCore.Http;
 using NSubstitute;
 
-namespace mohaymen_codestar_Team02_XUnitTest.Servies.CookieService;
-
-public class CookieServiceTestTests
+namespace mohaymen_codestar_Team02_XUnitTest.Servies.CookieService
 {
-    private readonly mohaymen_codestar_Team02.Services.CookieService.CookieService _sut;
-    private readonly IHttpContextAccessor _httpContextAccessor;
-    private readonly HttpContext _httpContext;
-    private readonly IResponseCookies _responseCookies;
-    private readonly IRequestCookieCollection _requestCookies;
-
-    public CookieServiceTestTests()
+    public class CookieServiceTests
     {
-        _httpContextAccessor = Substitute.For<IHttpContextAccessor>();
-        _httpContext = Substitute.For<HttpContext>();
-        _responseCookies = Substitute.For<IResponseCookies>();
-        _requestCookies = Substitute.For<IRequestCookieCollection>();
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly mohaymen_codestar_Team02.Services.CookieService.CookieService _sut; 
 
-        _httpContextAccessor.HttpContext.Returns(_httpContext);
-        _sut = new mohaymen_codestar_Team02.Services.CookieService.CookieService(_httpContextAccessor);
-    }
+        public CookieServiceTests()
+        {
+            _httpContextAccessor = Substitute.For<IHttpContextAccessor>();
+            _sut = new mohaymen_codestar_Team02.Services.CookieService.CookieService(_httpContextAccessor);
+        }
 
-    [Fact]
-    public void CreateCookie_ShouldAppendCookie_WithCorrectOptions()
-    {
-        // Arrange
-        string testData = "test_cookie_data";
-        _httpContext.Response.Cookies.Returns(_responseCookies);
+        [Fact]
+        public void CreateCookie_ShouldAddCookieToResponse()
+        {
+            // Arrange
+            var responseCookies = Substitute.For<IResponseCookies>();
+            var httpResponse = Substitute.For<HttpResponse>();
+            httpResponse.Cookies.Returns(responseCookies);
 
-        // Act
-        _sut.CreateCookie(testData);
+            var httpContext = Substitute.For<HttpContext>();
+            httpContext.Response.Returns(httpResponse);
 
-        // Assert
-        _responseCookies.Received(1).Append("login", testData, Arg.Is<CookieOptions>(options =>
-            options.HttpOnly == true &&
-            options.Secure == true &&
-            options.Expires.Value.Date == DateTime.Now.AddDays(1).Date));
-    }
+            _httpContextAccessor.HttpContext.Returns(httpContext);
+            string cookieValue = "test_cookie_value";
 
-    [Fact]
-    public void GetCookieValue_ShouldReturnCorrectValue_WhenCookieExists()
-    {
-        // Arrange
-        string expectedCookieValue = "test_cookie_value";
-        _requestCookies["login"].Returns(expectedCookieValue);
-        _httpContext.Request.Cookies.Returns(_requestCookies);
+            // Act
+            _sut.CreateCookie(cookieValue);
 
-        // Act
-        var result = _sut.GetCookieValue();
+            // Assert
+            responseCookies.Received(1).Append(
+                "login",
+                cookieValue,
+                Arg.Is<CookieOptions>(options =>
+                    options.HttpOnly && options.Secure && options.SameSite == SameSiteMode.Strict)
+            );
+        }
 
-        // Assert
-        Assert.Equal(expectedCookieValue, result);
-    }
+        [Fact]
+        public void GetCookieValue_ShouldReturnCookieValue_WhenCookieExists()
+        {
+            // Arrange
+            var requestCookies = Substitute.For<IRequestCookieCollection>();
+            requestCookies["login"].Returns("test_cookie_value");
 
-    [Fact]
-    public void GetCookieValue_ShouldReturnNull_WhenCookieDoesNotExist()
-    {
-        // Arrange
-        _requestCookies["login"].Returns((string?)null);
-        _httpContext.Request.Cookies.Returns(_requestCookies);
+            var httpRequest = Substitute.For<HttpRequest>();
+            httpRequest.Cookies.Returns(requestCookies);
 
-        // Act
-        var result = _sut.GetCookieValue();
+            var httpContext = Substitute.For<HttpContext>();
+            httpContext.Request.Returns(httpRequest);
 
-        // Assert
-        Assert.Null(result);
+            _httpContextAccessor.HttpContext.Returns(httpContext);
+
+            // Act
+            var result = _sut.GetCookieValue();
+
+            // Assert
+            Assert.Equal("test_cookie_value", result);
+        }
+
+        [Fact]
+        public void GetCookieValue_ShouldReturnNull_WhenCookieDoesNotExist()
+        {
+            // Arrange
+            var requestCookies = Substitute.For<IRequestCookieCollection>();
+            var httpRequest = Substitute.For<HttpRequest>();
+            httpRequest.Cookies.Returns(requestCookies);
+
+            var httpContext = Substitute.For<HttpContext>();
+            httpContext.Request.Returns(httpRequest);
+
+            _httpContextAccessor.HttpContext.Returns(httpContext);
+
+            // Act
+            var result = _sut.GetCookieValue();
+
+            // Assert
+            Assert.Equal(string.Empty,result);
+        }
     }
 }

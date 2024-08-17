@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using mohaymen_codestar_Team02.Dto.User;
 using mohaymen_codestar_Team02.Dto.UserDtos;
 using mohaymen_codestar_Team02.Models;
 using mohaymen_codestar_Team02.Services.ProfileService;
@@ -17,14 +18,22 @@ public class ProfileController : ControllerBase
     [HttpPut("changePassword")]
     public async Task<IActionResult> ChangePassword(ChangePasswordUserDto request)
     {
-        ServiceResponse<string> response = await _profileService.ChangePassword(request.NewPassword);
+        ServiceResponse<User> response = await _profileService.ChangePassword(request.PreviousPassword , request.NewPassword);
         return StatusCode((int)response.Type, response.Message);
     }
 
-    [HttpGet("logout")]
-    public async Task<IActionResult> Logout()
+    [HttpPost("logout")]
+    //[ValidateAntiForgeryToken]
+    public IActionResult Logout()
     {
-        ServiceResponse<string> response = _profileService.Logout();
+        ServiceResponse<User> response = _profileService.Logout();
+        return StatusCode((int)response.Type, response.Message);
+    }
+
+    [HttpPost("UpdateUser")]
+    public async Task<IActionResult> UpdateUser(UpdateUserDto request)
+    {
+        ServiceResponse<User> response = await _profileService.UpdateUser(request);
         return StatusCode((int)response.Type, response.Message);
     }
 }

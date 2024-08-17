@@ -78,6 +78,15 @@ namespace mohaymen_codestar_Team02.Data {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to InvalidInput.
+        /// </summary>
+        internal static string InvalidInpute {
+            get {
+                return ResourceManager.GetString("InvalidInpute", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Login Successfuly.
         /// </summary>
         internal static string LoginSuccessfulMessage {
@@ -101,6 +110,15 @@ namespace mohaymen_codestar_Team02.Data {
         internal static string PasswordChangedSuccessfulyMessage {
             get {
                 return ResourceManager.GetString("PasswordChangedSuccessfulyMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Your Profile Info Changed Successfuly.
+        /// </summary>
+        internal static string ProfileInfoUpdateSuccessfulyMessage {
+            get {
+                return ResourceManager.GetString("ProfileInfoUpdateSuccessfulyMessage", resourceCulture);
             }
         }
         

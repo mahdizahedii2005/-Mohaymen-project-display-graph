@@ -4,6 +4,9 @@
     <data name="UnauthorizedMessage">
         <value>Unauthorized</value>
     </data>
+    <data name="InvalidInpute">
+        <value>InvalidInput</value>
+    </data>
     <data name="UserNotFoundMessage">
         <value>User Not Found</value>
     </data>
@@ -66,5 +69,8 @@
     </data>
     <data name="LogoutSuccessfuly" xml:space="preserve">
         <value>Logout Successfuly</value>
+    </data>
+    <data name="ProfileInfoUpdateSuccessfulyMessage" xml:space="preserve">
+        <value>Your Profile Info Changed Successfuly</value>
     </data>
 </root>
