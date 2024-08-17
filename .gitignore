@@ -7,3 +7,6 @@ mohaymen-codestar-Team02_XUnitTest/obj
 mohaymen-codestar-Team02_XUnitTest/appsettings.Development.json
 mohaymen-codestar-Team02.sln.DotSettings.user
 mohaymen-codestar-Team02/.Env
+
+*.env
+docker-compose.override.*
