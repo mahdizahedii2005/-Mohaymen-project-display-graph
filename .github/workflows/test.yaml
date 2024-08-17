@@ -11,7 +11,8 @@ jobs:
     test:
         runs-on: ubuntu-latest
         steps:
-            - uses: actions/checkout@v2
+            - uses: actions/checkout@v4
+
             - uses: actions/setup-dotnet@v3
               with:
                   dotnet-version: 8.0.x
@@ -19,5 +20,19 @@ jobs:
             - name: Install dependencies
               run: dotnet restore
 
+            - name: Build
+              run: dotnet build --no-restore --configuration Release
+
             - name: Run tests
               run: dotnet test
+                  --no-build
+                  --configuration Release
+                  --verbosity normal
+                  /p:CollectCoverage=true
+                  /p:CoverletOutputFormat=opencover
+                  /p:CoverletOutput=./TestResults/
+
+            - name: Upload test results
+              uses: codecov/codecov-action@v4
+              with:
+                  token: ${{ secrets.CODECOV_TOKEN }}
