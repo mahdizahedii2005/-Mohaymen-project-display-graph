@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using mohaymen_codestar_Team02.Data;
+using mohaymen_codestar_Team02.initialProgram;
 using mohaymen_codestar_Team02.Mapper;
 using mohaymen_codestar_Team02.Services;
 using mohaymen_codestar_Team02.Services.Administration;
@@ -32,9 +33,9 @@ builder.Services.AddDbContext<DataContext>(options =>
     .AddScoped<IProfileService, ProfileService>()
     .AddScoped<ITokenService, TokenService>()
     .AddScoped<ICookieService, CookieService>()
-    .AddScoped<IPasswordService, PasswordService>();
+    .AddScoped<IPasswordService, PasswordService>()
+    .AddScoped<InitialServices>();
 builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
-
 
 builder.Services.AddAuthentication(options =>
     {
@@ -73,6 +74,16 @@ builder.Services.AddAuthorization();
 
 
 var app = builder.Build();
+
+
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+
+    var initialServices = services.GetRequiredService<InitialServices>();
+    initialServices.SeadRole();
+    initialServices.SeadAdmin();
+}
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

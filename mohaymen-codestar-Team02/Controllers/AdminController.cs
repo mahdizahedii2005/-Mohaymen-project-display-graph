@@ -83,34 +83,4 @@ public class AdminController : ControllerBase
 
         return StatusCode((int)response.Type, response.Message);
     }
-
-
-    // test
-    [HttpPost("register2Test")]
-    public async Task<IActionResult> Register2(RegisterUserDto request)
-    {
-        ServiceResponse<string> response =
-            await _adminService.RegisterRoleTest(
-                new User { Username = request.Username },
-                request.Password
-            );
-
-        return StatusCode((int)response.Type, response.Message);
-    }
-
-    [HttpPost("register1Test")]
-    public async Task<IActionResult> Register1(RegisterUserDto request)
-    {
-        ServiceResponse<int> response =
-            await _adminService.RegisterUser(new User { Username = request.Username }, request.Password);
-        return StatusCode((int)response.Type, response.Message);
-    }
-
-    [HttpGet("addRole1Test")]
-    public async Task<IActionResult> AddRole1()
-    {
-        ServiceResponse<string> response =
-            await _adminService.AddRoleTest();
-        return StatusCode((int)response.Type, response.Message);
-    }
 }
