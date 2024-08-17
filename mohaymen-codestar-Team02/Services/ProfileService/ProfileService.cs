@@ -25,6 +25,7 @@ public class ProfileService : IProfileService
         _cookieService = cookieService;
         _passwordService = passwordService;
         _tokenService = tokenService;
+        _mapper = mapper;
         _httpContextAccessor = httpContextAccessor;
     }
 
