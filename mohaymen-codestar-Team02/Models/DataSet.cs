@@ -8,15 +8,15 @@ namespace mohaymen_codestar_Team02.Models;
 public class DataSet
 {
     [Key] public int Id { get; set; }
-    public string Name { get; set; }
-    public DateTime CreateAt { get; set; }
-    public DateTime UpdateAt { get; set; }
+    public string Name { get; set; } = string.Empty;
+    public DateTime CreateAt;
+    public DateTime UpdateAt;
 
-    public Entity Edge { get; set; }
-    public Entity Vertex { get; set; }
+    public virtual EdgeEntity Edge { get; set; }
+    public virtual EdgeEntity Vertex { get; set; }
 
     public int CreatorId { get; set; }
-    [ForeignKey("UserId")] public User Creator { get; set; }
+    [ForeignKey("UserId")] public virtual User Creator { get; set; }
 
     // todo
 }
