@@ -61,8 +61,7 @@ jobs:
                   tags: |
                       type=raw,value=${{ needs.tag.outputs.new_tag }}
                       type=raw,value=${{ needs.tag.outputs.new_version }}
-                      ref=branch,value=${{ github.ref }}
-                      ref=sha,value=${{ github.sha }}
+                      type=sha
                       latest
 
             - name: Set up Docker Buildx
