@@ -24,4 +24,12 @@ public class AuthenticationController : ControllerBase
         ServiceResponse<GetUserDto?> response = await _authenticationService.Login(request.Username, request.Password);
         return StatusCode((int)response.Type, response);
     }
+
+    [HttpPost("logout")]
+    //[ValidateAntiForgeryToken]
+    public IActionResult Logout()
+    {
+        ServiceResponse<string?> response = _authenticationService.Logout();
+        return StatusCode((int)response.Type, response);
+    }
 }

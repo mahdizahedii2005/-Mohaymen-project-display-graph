@@ -25,4 +25,16 @@ public class CookieService : ICookieService
     {
         return _httpContextAccessor.HttpContext?.Request.Cookies["login"];
     }
+
+    public void GetExpiredCookie()
+    {
+        var cookieOptions = new CookieOptions
+        {
+            HttpOnly = true,
+            Secure = true,
+            Expires = DateTime.Now.AddDays(-1)
+        };
+
+        _httpContextAccessor.HttpContext?.Response.Cookies.Append("login", "", cookieOptions);
+    }
 }

@@ -6,4 +6,5 @@ namespace mohaymen_codestar_Team02.Services.Authenticatoin;
 public interface IAuthenticationService
 {
     Task<ServiceResponse<GetUserDto?>> Login(string username, string password);
+    ServiceResponse<string?> Logout();
 }

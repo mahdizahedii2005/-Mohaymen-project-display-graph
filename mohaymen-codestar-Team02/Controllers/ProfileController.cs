@@ -15,26 +15,18 @@ public class ProfileController : ControllerBase
         _profileService = profileService;
     }
 
-    [HttpPut("changePassword")]
-    public async Task<IActionResult> ChangePassword(ChangePasswordUserDto request)
+    [HttpPatch("users/{username}/password")]
+    public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordUserDto request)
     {
-        ServiceResponse<User?> response =
+        ServiceResponse<GetUserDto?> response =
             await _profileService.ChangePassword(request.PreviousPassword, request.NewPassword);
-        return StatusCode((int)response.Type, response.Message);
+        return StatusCode((int)response.Type, response);
     }
 
-    [HttpPost("logout")]
-    //[ValidateAntiForgeryToken]
-    public IActionResult Logout()
+    [HttpPut("users/{username}")]
+    public async Task<IActionResult> UpdateUser([FromBody] UpdateUserDto request)
     {
-        ServiceResponse<User?> response = _profileService.Logout();
-        return StatusCode((int)response.Type, response.Message);
-    }
-
-    [HttpPost("UpdateUser")]
-    public async Task<IActionResult> UpdateUser(UpdateUserDto request)
-    {
-        ServiceResponse<User?> response = await _profileService.UpdateUser(request);
-        return StatusCode((int)response.Type, response.Message);
+        ServiceResponse<GetUserDto?> response = await _profileService.UpdateUser(request);
+        return StatusCode((int)response.Type, response);
     }
 }

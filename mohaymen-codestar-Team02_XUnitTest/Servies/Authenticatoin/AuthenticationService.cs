@@ -2,6 +2,7 @@ using System.Security.Claims;
 using System.Text;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Resources;
 using mohaymen_codestar_Team02.Data;
 using mohaymen_codestar_Team02.Dto.User;
 using mohaymen_codestar_Team02.Models;
@@ -28,8 +29,10 @@ public class AuthenticationServiceTests
         _cookieService = Substitute.For<ICookieService>();
         _tokenService = Substitute.For<ITokenService>();
 
-        var config = new MapperConfiguration(c => { c.CreateMap<User, GetUserDto>(); });
-
+        var config = new MapperConfiguration(cfg =>
+        {
+            cfg.CreateMap<User, GetUserDto>();
+        });
         _mapper = config.CreateMapper();
 
         var options = new DbContextOptionsBuilder<DataContext>()
@@ -139,5 +142,35 @@ public class AuthenticationServiceTests
 
         _mockContext.Users.Add(user);
         _mockContext.SaveChanges();
+    }
+
+    [Fact]
+    public void Logout_ShouldCallGetExpiredCookie_WhenCookieIsPresent()
+    {
+        // Arrange
+        _cookieService.GetCookieValue().Returns("someCookieValue");
+
+        // Act
+        var result = _sut.Logout();
+
+        // Assert
+        _cookieService.Received(1).GetExpiredCookie();
+        Assert.Equal(ApiResponseType.Success, result.Type);
+        Assert.Null(result.Data);
+    }
+
+    [Fact]
+    public void Logout_ShouldNotCallGetExpiredCookie_WhenCookieIsNotPresent()
+    {
+        // Arrange
+        _cookieService.GetCookieValue().Returns((string?)null);
+
+        // Act
+        var result = _sut.Logout();
+
+        // Assert
+        _cookieService.DidNotReceive().GetExpiredCookie();
+        Assert.Equal(ApiResponseType.Success, result.Type);
+        Assert.Null(result.Data);
     }
 }

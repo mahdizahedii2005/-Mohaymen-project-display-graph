@@ -54,7 +54,18 @@ public class AuthenticationService : IAuthenticationService
         return new ServiceResponse<GetUserDto?>(userDto, ApiResponseType.Success, Resources.LoginSuccessfulMessage);
     }
 
+    public ServiceResponse<string?> Logout()
+    {
+        if (_cookieService.GetCookieValue() != null)
+        {
+            _cookieService.GetExpiredCookie();
+        }
+
+        return new ServiceResponse<string?>(null, ApiResponseType.Success,
+            Resources.LogoutSuccessfuly);
+    }
 
     private async Task<User?> GetUser(string username) =>
-        await _context.Users.FirstOrDefaultAsync(x => x.Username.ToLower().Equals(username.ToLower()));
+        await _context.Users.FirstOrDefaultAsync(x =>
+            x.Username != null && x.Username.ToLower().Equals(username.ToLower()));
 }
