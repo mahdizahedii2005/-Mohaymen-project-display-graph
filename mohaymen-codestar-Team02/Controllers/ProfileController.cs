@@ -18,7 +18,8 @@ public class ProfileController : ControllerBase
     [HttpPut("changePassword")]
     public async Task<IActionResult> ChangePassword(ChangePasswordUserDto request)
     {
-        ServiceResponse<User> response = await _profileService.ChangePassword(request.PreviousPassword , request.NewPassword);
+        ServiceResponse<User?> response =
+            await _profileService.ChangePassword(request.PreviousPassword, request.NewPassword);
         return StatusCode((int)response.Type, response.Message);
     }
 
@@ -26,14 +27,14 @@ public class ProfileController : ControllerBase
     //[ValidateAntiForgeryToken]
     public IActionResult Logout()
     {
-        ServiceResponse<User> response = _profileService.Logout();
+        ServiceResponse<User?> response = _profileService.Logout();
         return StatusCode((int)response.Type, response.Message);
     }
 
     [HttpPost("UpdateUser")]
     public async Task<IActionResult> UpdateUser(UpdateUserDto request)
     {
-        ServiceResponse<User> response = await _profileService.UpdateUser(request);
+        ServiceResponse<User?> response = await _profileService.UpdateUser(request);
         return StatusCode((int)response.Type, response.Message);
     }
 }

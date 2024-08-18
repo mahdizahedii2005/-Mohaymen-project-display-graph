@@ -7,5 +7,5 @@ public interface ITokenService
 {
     public string CreateToken(Claim[] claims);
 
-    public string GetUserNameFromToken();
+    public string? GetUserNameFromToken();
 }

@@ -6,7 +6,7 @@ public class User
 {
     [Key] public long UserId { get; init; }
 
-    [Required] [StringLength(64)] public string Username { get; set; } = string.Empty;
+    [Required] [StringLength(64)] public string? Username { get; set; } = string.Empty;
 
     [Required] [StringLength(64)] public string FirstName { get; set; } = string.Empty;
 

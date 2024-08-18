@@ -34,6 +34,7 @@ public class AdminServiceTest
         _sut = new AdminService(_mockContext, _cookieService, _tokenService, _passwordService,
             _mapper);
     }
+
     [Fact]
     public async Task Register_ShouldReturnUnauthorized_WhenTokenIsEmpty()
     {
@@ -105,10 +106,10 @@ public class AdminServiceTest
                 x[1] = fakePasswordHash;
                 x[2] = fakePasswordSalt;
             });
-        
+
         // Act
         var result = await _sut.Register(
-            new User(){UserId = 8,Username = "mamad"}, "password");
+            new User() { UserId = 8, Username = "mamad" }, "password");
 
         // Assert
         Assert.Equal(ApiResponseType.Created, result.Type);
@@ -136,7 +137,6 @@ public class AdminServiceTest
     [Fact]
     public async Task GetUserByUsername_ShouldReturnNotFound_WhenUserDoesNotExist()
     {
-        
         // Act
         var result = await _sut.GetUserByUsername("nonExistentUser");
 
@@ -149,10 +149,10 @@ public class AdminServiceTest
     {
         // Arrange
         FixTheReturnOfCookies("admin");
-        var adminUser = AddUserWithRole("admin", "SystemAdmin", 1); 
+        var adminUser = AddUserWithRole("admin", "SystemAdmin", 1);
         AddUserWithRole("user1", "User", 2);
         AddUserWithRole("user2", "User", 3);
-        
+
         _mapper.Map<GetUserDto>(Arg.Any<User>()).Returns(new GetUserDto());
 
         // Act
@@ -182,7 +182,7 @@ public class AdminServiceTest
         Assert.Equal(2, result.Data.Count);
     }
 
-    private void FixTheReturnOfCookies(string returnThis)
+    private void FixTheReturnOfCookies(string? returnThis)
     {
         _cookieService.GetCookieValue().Returns(returnThis);
         _tokenService.GetUserNameFromToken().Returns(returnThis);

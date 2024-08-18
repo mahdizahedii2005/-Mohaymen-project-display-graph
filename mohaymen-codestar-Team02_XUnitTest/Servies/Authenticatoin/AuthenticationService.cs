@@ -27,19 +27,16 @@ public class AuthenticationServiceTests
         _passwordService = Substitute.For<IPasswordService>();
         _cookieService = Substitute.For<ICookieService>();
         _tokenService = Substitute.For<ITokenService>();
-        
-        var config = new MapperConfiguration(c =>
-        {
-            c.CreateMap<User, GetUserDto>();
-        });
+
+        var config = new MapperConfiguration(c => { c.CreateMap<User, GetUserDto>(); });
 
         _mapper = config.CreateMapper();
-        
+
         var options = new DbContextOptionsBuilder<DataContext>()
             .UseInMemoryDatabase(databaseName: "TestDatabase")
             .Options;
         _mockContext = new DataContext(options);
-        _sut = new AuthenticationService(_mockContext, _cookieService, _tokenService, _passwordService , _mapper);
+        _sut = new AuthenticationService(_mockContext, _cookieService, _tokenService, _passwordService, _mapper);
     }
 
     [Theory]
@@ -83,7 +80,8 @@ public class AuthenticationServiceTests
 
         // Assert
         Assert.Equal(ApiResponseType.BadRequest, result.Type);
-        Assert.Null(result.Data); }
+        Assert.Null(result.Data);
+    }
 
     [Fact]
     public async Task Login_ShouldReturnBadRequest_WhenPasswordIsIncorrect()

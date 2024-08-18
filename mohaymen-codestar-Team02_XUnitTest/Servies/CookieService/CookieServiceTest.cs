@@ -6,7 +6,7 @@ namespace mohaymen_codestar_Team02_XUnitTest.Servies.CookieService
     public class CookieServiceTests
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly mohaymen_codestar_Team02.Services.CookieService.CookieService _sut; 
+        private readonly mohaymen_codestar_Team02.Services.CookieService.CookieService _sut;
 
         public CookieServiceTests()
         {
@@ -79,7 +79,7 @@ namespace mohaymen_codestar_Team02_XUnitTest.Servies.CookieService
             var result = _sut.GetCookieValue();
 
             // Assert
-            Assert.Equal(string.Empty,result);
+            Assert.Equal(string.Empty, result);
         }
     }
 }

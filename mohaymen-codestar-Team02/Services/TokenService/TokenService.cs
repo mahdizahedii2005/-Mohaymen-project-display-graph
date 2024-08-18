@@ -20,7 +20,7 @@ public class TokenService : ITokenService
     public string CreateToken(Claim[] claims)
     {
         var key = new SymmetricSecurityKey(
-            Encoding.UTF8.GetBytes(_configuration.GetSection("AppSettings:Token").Value));
+            Encoding.UTF8.GetBytes(_configuration.GetSection("AppSettings:Token").Value ?? string.Empty));
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
         var token = new JwtSecurityToken(
@@ -31,7 +31,7 @@ public class TokenService : ITokenService
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
 
-    public string GetUserNameFromToken()
+    public string? GetUserNameFromToken()
     {
         var user = _httpContextAccessor.HttpContext?.User;
         var usernameClaim = user?.FindFirst(ClaimTypes.Name);

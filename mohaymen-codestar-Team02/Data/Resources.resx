@@ -22,7 +22,7 @@
     <data name="UserAlreadyExistsMessage">
         <value>User Already Exists</value>
     </data>
-    <data name="dontHaveThisRole">
+    <data name="DontHaveThisRole">
         <value>This User Doesn't Have This Role</value>
     </data>
 
@@ -78,5 +78,14 @@
     </data>
     <data name="CanNotDeleteYourself" xml:space="preserve">
         <value>Can Not Delete Yourself</value>
+    </data>
+    <data name="UserRetrievedMassage" xml:space="preserve">
+        <value>User Retrieved Successfully</value>
+    </data>
+    <data name="UsersRetrievedMassage" xml:space="preserve">
+        <value>Users Retrieved Successfully</value>
+    </data>
+    <data name="RolesRetrievedMassage" xml:space="preserve">
+        <value>Roles Retrieved Successfully</value>
     </data>
 </root>

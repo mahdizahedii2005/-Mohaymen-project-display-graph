@@ -27,30 +27,31 @@ public class AuthenticationService : IAuthenticationService
         _mapper = mapper;
     }
 
-    public async Task<ServiceResponse<GetUserDto>> Login(string username, string password)
+    public async Task<ServiceResponse<GetUserDto?>> Login(string username, string password)
     {
-        if (string.IsNullOrEmpty(username)||string.IsNullOrEmpty(password))
+        if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
         {
-            return new ServiceResponse<GetUserDto>(null,ApiResponseType.BadRequest,Resources.InvalidInpute);
+            return new ServiceResponse<GetUserDto?>(null, ApiResponseType.BadRequest, Resources.InvalidInpute);
         }
+
         var user = await GetUser(username);
 
         if (user is null)
-            return new ServiceResponse<GetUserDto>(null, ApiResponseType.BadRequest, Resources.UserNotFoundMessage);
+            return new ServiceResponse<GetUserDto?>(null, ApiResponseType.BadRequest, Resources.UserNotFoundMessage);
 
         if (!_passwordService.VerifyPasswordHash(password, user.PasswordHash, user.Salt))
-            return new ServiceResponse<GetUserDto>(null, ApiResponseType.BadRequest, Resources.WrongPasswordMessage);
+            return new ServiceResponse<GetUserDto?>(null, ApiResponseType.BadRequest, Resources.WrongPasswordMessage);
 
         Claim[] claims = new[]
         {
             new Claim(ClaimTypes.Name, user.Username),
         };
-        
+
         _cookieService.CreateCookie(_tokenService.CreateToken(claims));
 
         GetUserDto userDto = _mapper.Map<GetUserDto>(user);
-        
-        return new ServiceResponse<GetUserDto>(userDto, ApiResponseType.Success, Resources.LoginSuccessfulMessage);
+
+        return new ServiceResponse<GetUserDto?>(userDto, ApiResponseType.Success, Resources.LoginSuccessfulMessage);
     }
 
 
