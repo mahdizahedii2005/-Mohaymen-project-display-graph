@@ -32,7 +32,7 @@ public class AdminServiceTest
             .Options;
         _mockContext = new DataContext(options);
         _sut = new AdminService(_mockContext, _cookieService, _tokenService, _passwordService,
-            _mapper); // پاس دادن Mapper به کلاس AdminService
+            _mapper);
     }
     [Fact]
     public async Task Register_ShouldReturnUnauthorized_WhenTokenIsEmpty()
@@ -105,6 +105,7 @@ public class AdminServiceTest
                 x[1] = fakePasswordHash;
                 x[2] = fakePasswordSalt;
             });
+        
         // Act
         var result = await _sut.Register(
             new User(){UserId = 8,Username = "mamad"}, "password");
@@ -117,20 +118,25 @@ public class AdminServiceTest
     public async Task GetUserByUsername_ShouldReturnSuccess_WhenUserIsFound()
     {
         // Arrange
-        var user = AddUserWithRole("testUser", "SystemAdmin", 1);
-
-        _mapper.Map<GetUserDto>(Arg.Any<User>()).Returns(new GetUserDto());
+        FixTheReturnOfCookies("admin");
+        var adminUser = AddUserWithRole("admin", "SystemAdmin", 1);
+        var testUser = AddUserWithRole("testUser", "SystemAdmin", 2);
+        var userDto = new GetUserDto { Username = "testUser" };
+        _mapper.Map<GetUserDto>(Arg.Any<User>()).Returns(userDto);
 
         // Act
         var result = await _sut.GetUserByUsername("testUser");
 
         // Assert
         Assert.Equal(ApiResponseType.Success, result.Type);
+        Assert.NotNull(result.Data);
+        Assert.Equal("testUser", result.Data.Username);
     }
 
     [Fact]
     public async Task GetUserByUsername_ShouldReturnNotFound_WhenUserDoesNotExist()
     {
+        
         // Act
         var result = await _sut.GetUserByUsername("nonExistentUser");
 
@@ -142,9 +148,11 @@ public class AdminServiceTest
     public async Task GetAllUsers_ShouldReturnAllUsersSuccessfully()
     {
         // Arrange
-        AddUserWithRole("admin1", "SystemAdmin", 1);
-        AddUserWithRole("admin2", "SystemAdmin", 2);
-
+        FixTheReturnOfCookies("admin");
+        var adminUser = AddUserWithRole("admin", "SystemAdmin", 1); 
+        AddUserWithRole("user1", "User", 2);
+        AddUserWithRole("user2", "User", 3);
+        
         _mapper.Map<GetUserDto>(Arg.Any<User>()).Returns(new GetUserDto());
 
         // Act
@@ -152,8 +160,9 @@ public class AdminServiceTest
 
         // Assert
         Assert.Equal(ApiResponseType.Success, result.Type);
-        Assert.Equal(2, result.Data.Count);
+        Assert.Equal(3, result.Data.Count);
     }
+
 
     [Fact]
     public async Task GetAllRoles_ShouldReturnAllRolesSuccessfully()
