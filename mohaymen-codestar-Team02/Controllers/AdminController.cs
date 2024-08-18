@@ -46,8 +46,22 @@ public class AdminController : ControllerBase
             Email = request.Email,
         };
 
-        ServiceResponse<User> response =
+        ServiceResponse<GetUserDto> response =
             await _adminService.Register(user, request.Password);
+
+        return StatusCode((int)response.Type, response);
+    }
+    
+    [HttpDelete("DeleteUser")]
+    public async Task<IActionResult> Delete(DeleteUserDto request)
+    {
+        var user = new User
+        {
+            Username = request.Username,
+        };
+
+        ServiceResponse<GetUserDto> response =
+            await _adminService.DeleteUser(user);
 
         return StatusCode((int)response.Type, response.Message);
     }
@@ -72,7 +86,7 @@ public class AdminController : ControllerBase
         return StatusCode((int)response.Type, response.Message);
     }
 
-    [HttpPut("DeleteRole")]
+    [HttpDelete("DeleteRole")]
     public async Task<IActionResult> DeleteRole(DeleteUserRoleDto request)
     {
         ServiceResponse<User> response =

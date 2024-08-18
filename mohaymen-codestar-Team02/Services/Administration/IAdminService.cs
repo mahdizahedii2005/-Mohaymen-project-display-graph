@@ -8,7 +8,8 @@ public interface IAdminService
 {
     Task<ServiceResponse<List<GetUserDto>>> GetAllUsers();
     Task<ServiceResponse<GetUserDto>> GetUserByUsername(string username);
-    Task<ServiceResponse<User>> Register(User user, string password);
+    Task<ServiceResponse<GetUserDto>> Register(User user, string password);
+    Task<ServiceResponse<GetUserDto>> DeleteUser(User user);
     Task<ServiceResponse<List<GetRoleDto>>> GetAllRoles();
     Task<ServiceResponse<User>> AddRole(User user, Role role);
     Task<ServiceResponse<User>> DeleteRole(User user, Role role);

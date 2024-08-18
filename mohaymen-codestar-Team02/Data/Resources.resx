@@ -73,4 +73,10 @@
     <data name="ProfileInfoUpdateSuccessfulyMessage" xml:space="preserve">
         <value>Your Profile Info Changed Successfuly</value>
     </data>
+    <data name="UserDeletionSuccessful" xml:space="preserve">
+        <value>User Deleted Successfuly</value>
+    </data>
+    <data name="CanNotDeleteYourself" xml:space="preserve">
+        <value>Can Not Delete Yourself</value>
+    </data>
 </root>

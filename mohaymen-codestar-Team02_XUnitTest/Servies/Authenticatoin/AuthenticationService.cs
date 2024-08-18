@@ -1,7 +1,9 @@
 using System.Security.Claims;
 using System.Text;
+using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using mohaymen_codestar_Team02.Data;
+using mohaymen_codestar_Team02.Dto.User;
 using mohaymen_codestar_Team02.Models;
 using mohaymen_codestar_Team02.Services;
 using mohaymen_codestar_Team02.Services.Authenticatoin;
@@ -14,21 +16,30 @@ namespace mohaymen_codestar_Team02_XUnitTest.Servies.Authenticatoin;
 public class AuthenticationServiceTests
 {
     private readonly AuthenticationService _sut;
-    private readonly ICookieService _cookieService;
     private readonly ITokenService _tokenService;
+    private readonly ICookieService _cookieService;
     private readonly DataContext _mockContext;
     private readonly IPasswordService _passwordService;
+    private readonly IMapper _mapper;
 
     public AuthenticationServiceTests()
     {
+        _passwordService = Substitute.For<IPasswordService>();
         _cookieService = Substitute.For<ICookieService>();
         _tokenService = Substitute.For<ITokenService>();
-        _passwordService = Substitute.For<IPasswordService>();
+        
+        var config = new MapperConfiguration(c =>
+        {
+            c.CreateMap<User, GetUserDto>();
+        });
+
+        _mapper = config.CreateMapper();
+        
         var options = new DbContextOptionsBuilder<DataContext>()
             .UseInMemoryDatabase(databaseName: "TestDatabase")
             .Options;
         _mockContext = new DataContext(options);
-        _sut = new AuthenticationService(_mockContext, _cookieService, _tokenService, _passwordService);
+        _sut = new AuthenticationService(_mockContext, _cookieService, _tokenService, _passwordService , _mapper);
     }
 
     [Theory]

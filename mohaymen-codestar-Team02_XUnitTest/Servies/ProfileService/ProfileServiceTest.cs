@@ -29,7 +29,6 @@ namespace mohaymen_codestar_Team02_XUnitTest.Servies.ProfileService
             _httpContextAccessor = Substitute.For<IHttpContextAccessor>();
             _tokenService = Substitute.For<ITokenService>();
 
-            // تنظیم Mapper
             var config = new MapperConfiguration(cfg => { cfg.CreateMap<UpdateUserDto, User>(); });
             _mapper = config.CreateMapper();
 

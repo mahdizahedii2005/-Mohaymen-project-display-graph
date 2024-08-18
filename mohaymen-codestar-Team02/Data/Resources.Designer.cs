@@ -69,6 +69,15 @@ namespace mohaymen_codestar_Team02.Data {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Can Not Delete Yourself.
+        /// </summary>
+        internal static string CanNotDeleteYourselfMassage {
+            get {
+                return ResourceManager.GetString("CanNotDeleteYourself", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to This User Doesn&apos;t Have This Role.
         /// </summary>
         internal static string dontHaveThisRole {
@@ -182,6 +191,15 @@ namespace mohaymen_codestar_Team02.Data {
         internal static string UserCreatedSuccessfullyMessage {
             get {
                 return ResourceManager.GetString("UserCreatedSuccessfullyMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to User Deleted Successfuly.
+        /// </summary>
+        internal static string UserDeletionSuccessful {
+            get {
+                return ResourceManager.GetString("UserDeletionSuccessful", resourceCulture);
             }
         }
         
