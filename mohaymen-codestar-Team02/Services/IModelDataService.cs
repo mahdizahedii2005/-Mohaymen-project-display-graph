@@ -1,6 +1,10 @@
+using System.Dynamic;
+
 namespace WebApplication13.Services;
 
 public interface IModelDataService
 {
-    Type Model(string csv);
+    Type GetType(string EntityData);
+    IEnumerable<string> GetFields(string fieldData);
+    IEnumerable<ExpandoObject> GetRecords(string recordData);
 }
