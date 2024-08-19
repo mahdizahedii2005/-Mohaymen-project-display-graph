@@ -27,22 +27,22 @@ public class ProfileService : IProfileService
         _mapper = mapper;
     }
 
-    public async Task<ServiceResponse<GetUserDto?>> ChangePassword(string previousPassword, string newPassword)
+    public async Task<ServiceResponse<object>> ChangePassword(string previousPassword, string newPassword)
     {
         var token = _cookieService.GetCookieValue();
         if (string.IsNullOrEmpty(token))
         {
-            return new ServiceResponse<GetUserDto?>(null, ApiResponseType.Unauthorized, Resources.UnauthorizedMessage);
+            return new ServiceResponse<object>(new { }, ApiResponseType.Unauthorized, Resources.UnauthorizedMessage);
         }
 
         var username = _tokenService.GetUserNameFromToken();
         var user = await GetUser(username);
 
         if (user is null)
-            return new ServiceResponse<GetUserDto?>(null, ApiResponseType.BadRequest, Resources.UserNotFoundMessage);
+            return new ServiceResponse<object>(new { }, ApiResponseType.BadRequest, Resources.UserNotFoundMessage);
 
-        if (!_passwordService.VerifyPasswordHash(newPassword, user.PasswordHash, user.Salt))
-            return new ServiceResponse<GetUserDto?>(null, ApiResponseType.BadRequest, Resources.WrongPasswordMessage);
+        if (!_passwordService.VerifyPasswordHash(previousPassword, user.PasswordHash, user.Salt))
+            return new ServiceResponse<object>(new { }, ApiResponseType.BadRequest, Resources.WrongPasswordMessage);
 
         _passwordService.CreatePasswordHash(newPassword, out byte[] passwordHash, out byte[] passwordSalt);
         user.PasswordHash = passwordHash;
@@ -51,9 +51,7 @@ public class ProfileService : IProfileService
         _context.Users.Update(user);
         await _context.SaveChangesAsync();
 
-        var userDto = _mapper.Map<GetUserDto>(user);
-        return new ServiceResponse<GetUserDto?>(userDto, ApiResponseType.Success,
-            Resources.PasswordChangedSuccessfulyMessage);
+        return new ServiceResponse<object>(new { }, ApiResponseType.Success, Resources.PasswordChangedSuccessfulyMessage);
     }
 
     public async Task<ServiceResponse<GetUserDto?>> UpdateUser(UpdateUserDto updateUserDto)

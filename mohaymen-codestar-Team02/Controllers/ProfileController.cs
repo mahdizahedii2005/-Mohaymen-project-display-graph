@@ -20,7 +20,7 @@ public class ProfileController : ControllerBase
     [HttpPatch("password")]
     public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordUserDto request)
     {
-        ServiceResponse<GetUserDto?> response =
+        ServiceResponse<object> response =
             await _profileService.ChangePassword(request.PreviousPassword, request.NewPassword);
         return StatusCode((int)response.Type, response);
     }
