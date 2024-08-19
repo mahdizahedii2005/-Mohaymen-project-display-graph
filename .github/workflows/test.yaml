@@ -28,6 +28,7 @@ jobs:
               run: dotnet tool install --tool-path ${{ env.DOTNET_TOOL_PATH }} csharpier
 
             - name: Check formatting
+              id: lint
               continue-on-error: true
               run: dotnet csharpier --check .
 
@@ -50,3 +51,9 @@ jobs:
               uses: codecov/codecov-action@v4
               with:
                   token: ${{ secrets.CODECOV_TOKEN }}
+
+            - name: Fail if linting failed
+              if: steps.lint.outcome == 'failure'
+              run: |
+                echo "Linting failed. Failing the workflow."
+                exit 1
