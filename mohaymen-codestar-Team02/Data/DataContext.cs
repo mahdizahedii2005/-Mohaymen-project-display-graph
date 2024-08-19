@@ -20,7 +20,7 @@ public class DataContext : DbContext
     public DbSet<EdgeAttribute> EdgeAttributes { get; set; }
     public DbSet<VertexValue> VertexValues { get; set; }
     public DbSet<EdgeValue> EdgeValues { get; set; }
-    public DbSet<DataSet> DataSets { get; set; }
+    public DbSet<DataGroup> DataSets { get; set; }
     
     
 

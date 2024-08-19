@@ -1,6 +1,6 @@
 using mohaymen_codestar_Team02.Data;
+using mohaymen_codestar_Team02.Models;
 using mohaymen_codestar_Team02.Services.StoreData.Abstraction;
-using DataSet = mohaymen_codestar_Team02.Models.DataSet;
 
 namespace mohaymen_codestar_Team02.Services.StoreData;
 
@@ -9,10 +9,19 @@ public class StoreDataService(DataContext context, IEdageStorer edageStorer, IVe
     public IEdageStorer EdageStorer { get; set; } = edageStorer;
     public IVertexStorer VertexStorer { get; set; } = vertexStorer;
 
-    public bool StoreDataSet(string? nameData)
+    public bool StoreDataSet(string? nameData, int userId)
     {
-        var dateTime = DateTime.Now;
-        if (string.IsNullOrEmpty(nameData)) return false;
-        var setData = new DataSet();
+        try
+        {
+            if (string.IsNullOrEmpty(nameData)) return false;
+            var setData = new DataGroup(nameData, userId);
+            context.DataSets.Add(setData);
+            context.SaveChanges();
+            return true;
+        }
+        catch (ArgumentException e)
+        {
+            return false;
+        }
     }
 }

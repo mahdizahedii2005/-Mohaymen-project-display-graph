@@ -7,7 +7,7 @@ namespace mohaymen_codestar_Team02.Models.VertexEAV;
 
 public class VertexEntity
 {
-    public VertexEntity(string name, int dataSetId)
+    public VertexEntity(string name, long dataSetId)
     {
         if (!name.Contains("!"))
         {
@@ -20,7 +20,7 @@ public class VertexEntity
         }
     }
 
-    [Key] public int Id { get; set; }
+    [Key] public long Id { get; set; }
     private string _name;
 
     public string Name
@@ -45,7 +45,7 @@ public class VertexEntity
         }
     }
 
-    public int DataSetId { get; set; }
-    [ForeignKey("DataSetId")] public virtual DataSet DataSet { get; set; }
+    public long DataSetId { get; set; }
+    [ForeignKey("DataSetId")] public virtual DataGroup DataGroup { get; set; }
     public virtual ICollection<EdgeAttribute> Attributes { get; set; } = new List<EdgeAttribute>();
 }

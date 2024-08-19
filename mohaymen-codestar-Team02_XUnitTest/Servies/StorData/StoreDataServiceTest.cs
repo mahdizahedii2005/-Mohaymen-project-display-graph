@@ -29,22 +29,21 @@ public class StoreDataServiceTest
         var dateTime = DateTime.Now;
         var name = "mahdi";
         //Act
-        var bolResult = _sut.StoreDataSet(name);
+        var bolResult = _sut.StoreDataSet(name,3);
         var result = await _mockContext.DataSets.FirstOrDefaultAsync(x => x.Name == name);
         //Assert
         Assert.True(bolResult);
-        Assert.NotEqual(result.Name, name);
-        Assert.Contains(name, result.Name);
+        Assert.Equal(result.Name, name);
         Assert.Equal(result.CreateAt, dateTime);
         Assert.Equal(result.UpdateAt, dateTime);
     }
 
     [Fact]
-    public async Task StoreDataSet_ShouldReaturnFalse_NameDataIsNull()
+    public async Task StoreDataSet_ShouldReturnFalse_NameDataIsNull()
     {
         //Arrange
         //Act 
-        var result = _sut.StoreDataSet(null);
+        var result = _sut.StoreDataSet(null,3);
         //Assert
         Assert.False(result);
         Assert.Empty(_mockContext.DataSets);

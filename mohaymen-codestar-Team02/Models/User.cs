@@ -19,6 +19,6 @@ public class User
 
     [Required] [StringLength(256)] public byte[] PasswordHash { get; set; }
 
-    public virtual ICollection<UserRole> UserRoles { get; set; } = new List<UserRole>();
-    public virtual ICollection<DataSet> DataSets { get; set; } = new List<DataSet>();
+    public virtual ICollection<UserRole> UserRoles { get; set; } 
+    public virtual ICollection<DataGroup> DataSets { get; set; } 
 }
