@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using mohaymen_codestar_Team02.Models.EdgeEAV;
 
 namespace mohaymen_codestar_Team02.Models;
 

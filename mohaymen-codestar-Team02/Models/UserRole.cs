@@ -1,9 +1,9 @@
-using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using mohaymen_codestar_Team02.Models;
+
+namespace mohaymen_codestar_Team02.Models;
 
 public class UserRole
-{
+{ 
     public long UserId { get; set; }
 
     [ForeignKey("UserId")] public virtual User User { get; set; }
