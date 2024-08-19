@@ -25,21 +25,28 @@ public class StoreDataServiceTest
     [Fact]
     public async Task StoreDataSet_ShouldStoreTheData_whenDataIsVilid()
     {
-        //Arrange1
+        //Arrange
         var dateTime = DateTime.Now;
         var name = "mahdi";
         //Act
-        var bolResult = _sut.StoreDataSet(name, dateTime, dateTime);
+        var bolResult = _sut.StoreDataSet(name);
         var result = await _mockContext.DataSets.FirstOrDefaultAsync(x => x.Name == name);
         //Assert
-        Assert.Equal(bolResult, true);
-        Assert.Equal(result.Name, name);
+        Assert.True(bolResult);
+        Assert.NotEqual(result.Name, name);
+        Assert.Contains(name, result.Name);
         Assert.Equal(result.CreateAt, dateTime);
         Assert.Equal(result.UpdateAt, dateTime);
     }
 
-    public async Task StoreDataSet_ShouldReaturnFalse_whenDataIsNull()
+    [Fact]
+    public async Task StoreDataSet_ShouldReaturnFalse_NameDataIsNull()
     {
-        
+        //Arrange
+        //Act 
+        var result = _sut.StoreDataSet(null);
+        //Assert
+        Assert.False(result);
+        Assert.Empty(_mockContext.DataSets);
     }
 }
