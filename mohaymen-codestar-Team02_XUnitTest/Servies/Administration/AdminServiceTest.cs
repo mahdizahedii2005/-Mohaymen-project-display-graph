@@ -27,12 +27,13 @@ public class AdminServiceTest
         _tokenService = Substitute.For<ITokenService>();
         _passwordService = Substitute.For<IPasswordService>();
         _mapper = Substitute.For<IMapper>();
+
         var options = new DbContextOptionsBuilder<DataContext>()
-            .UseInMemoryDatabase(databaseName: new Random().NextInt64() + Guid.NewGuid().ToString())
+            .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
             .Options;
         _mockContext = new DataContext(options);
-        _sut = new AdminService(_mockContext, _cookieService, _tokenService, _passwordService,
-            _mapper);
+
+        _sut = new AdminService(_mockContext, _cookieService, _tokenService, _passwordService, _mapper);
     }
 
     [Fact]
@@ -114,6 +115,37 @@ public class AdminServiceTest
         // Assert
         Assert.Equal(ApiResponseType.Created, result.Type);
     }
+
+
+    [Fact]
+    public async Task Register_ShouldSetCorrectPasswordHashAndSalt_WhenUserIsSuccessfullyRegistered()
+    {
+        // Arrange
+        FixTheReturnOfCookies("admin");
+        AddUserWithRole("admin", "SystemAdmin", 1);
+
+        byte[] fakePasswordHash = new byte[] { 1, 2, 3, 4 };
+        byte[] fakePasswordSalt = new byte[] { 5, 6, 7, 8 };
+
+        _passwordService
+            .When(x => x.CreatePasswordHash(Arg.Any<string>(), out Arg.Any<byte[]>(), out Arg.Any<byte[]>()))
+            .Do(x =>
+            {
+                x[1] = fakePasswordHash;
+                x[2] = fakePasswordSalt;
+            });
+
+        var newUser = new User() { UserId = 8, Username = "mamad" };
+
+        // Act
+        var result = await _sut.Register(newUser, "password");
+
+        // Assert
+        Assert.Equal(ApiResponseType.Created, result.Type);
+        Assert.Equal(fakePasswordHash, newUser.PasswordHash);
+        Assert.Equal(fakePasswordSalt, newUser.Salt);
+    }
+
 
     [Fact]
     public async Task GetUserByUsername_ShouldReturnSuccess_WhenUserIsFound()

@@ -2,7 +2,6 @@ using System.Security.Claims;
 using System.Text;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Resources;
 using mohaymen_codestar_Team02.Data;
 using mohaymen_codestar_Team02.Dto.User;
 using mohaymen_codestar_Team02.Models;
@@ -21,7 +20,6 @@ public class AuthenticationServiceTests
     private readonly ICookieService _cookieService;
     private readonly DataContext _mockContext;
     private readonly IPasswordService _passwordService;
-    private readonly IMapper _mapper;
 
     public AuthenticationServiceTests()
     {
@@ -29,17 +27,14 @@ public class AuthenticationServiceTests
         _cookieService = Substitute.For<ICookieService>();
         _tokenService = Substitute.For<ITokenService>();
 
-        var config = new MapperConfiguration(cfg =>
-        {
-            cfg.CreateMap<User, GetUserDto>();
-        });
-        _mapper = config.CreateMapper();
+        var config = new MapperConfiguration(cfg => { cfg.CreateMap<User, GetUserDto>(); });
+        var mapper = config.CreateMapper();
 
         var options = new DbContextOptionsBuilder<DataContext>()
             .UseInMemoryDatabase(databaseName: "TestDatabase")
             .Options;
         _mockContext = new DataContext(options);
-        _sut = new AuthenticationService(_mockContext, _cookieService, _tokenService, _passwordService, _mapper);
+        _sut = new AuthenticationService(_mockContext, _cookieService, _tokenService, _passwordService, mapper);
     }
 
     [Theory]
@@ -132,8 +127,8 @@ public class AuthenticationServiceTests
         var user = new User
         {
             Username = username,
-            Salt = new byte[128], // Assuming 128-byte salt
-            PasswordHash = new byte[64], // Assuming 64-byte hash
+            Salt = new byte[128], 
+            PasswordHash = new byte[64], 
         };
         using (var hmac = new System.Security.Cryptography.HMACSHA512(user.Salt))
         {
