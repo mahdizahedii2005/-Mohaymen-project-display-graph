@@ -15,7 +15,7 @@ namespace mohaymen_codestar_Team02_XUnitTest.Servies.CookieService
         }
 
         [Fact]
-        public void CreateCookie_ShouldAddCookieToResponse()
+        public void CreateCookie_ShouldAddCookieToResponse_WhenCreateCookieIsCalled()
         {
             // Arrange
             var responseCookies = Substitute.For<IResponseCookies>();
@@ -80,6 +80,34 @@ namespace mohaymen_codestar_Team02_XUnitTest.Servies.CookieService
 
             // Assert
             Assert.Equal(string.Empty, result);
+        }
+        
+        [Fact]
+        public void GetExpiredCookie_ShouldReturnExpiredCookie_WhenGetExpiredCookieIsCalled()
+        {
+            // Arrange
+            var responseCookies = Substitute.For<IResponseCookies>();
+            var httpResponse = Substitute.For<HttpResponse>();
+            httpResponse.Cookies.Returns(responseCookies);
+
+            var httpContext = Substitute.For<HttpContext>();
+            httpContext.Response.Returns(httpResponse);
+
+            _httpContextAccessor.HttpContext.Returns(httpContext);
+
+            // Act
+            _sut.GetExpiredCookie();
+
+            // Assert
+            responseCookies.Received(1).Append(
+                "login",
+                "",
+                Arg.Is<CookieOptions>(options =>
+                    options.HttpOnly &&
+                    options.Secure &&
+                    options.Expires.HasValue &&
+                    options.Expires.Value < DateTime.Now)
+            );
         }
     }
 }

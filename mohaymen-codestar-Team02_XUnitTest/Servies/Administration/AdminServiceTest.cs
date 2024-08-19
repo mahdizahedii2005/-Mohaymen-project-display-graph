@@ -396,4 +396,90 @@ public class AdminServiceTest
             ur.UserId == user.User.UserId && ur.RoleId == user.Role.RoleId);
         Assert.Null(result);
     }
+
+    [Fact]
+    public async Task DeleteUser_ShouldReturnUnauthorized_WhenTokenIsEmpty()
+    {
+        // Arrange
+        _cookieService.GetCookieValue().Returns(string.Empty);
+
+        // Act
+        var result = await _sut.DeleteUser(null);
+
+        // Assert
+        Assert.Equal(ApiResponseType.Unauthorized, result.Type);
+    }
+
+    [Fact]
+    public async Task DeleteUser_ShouldReturnBadRequest_WhenAdminNotFound()
+    {
+        // Arrange
+        FixTheReturnOfCookies("admin");
+
+        // Act
+        var response = await _sut.DeleteUser(null);
+
+        // Assert
+        Assert.Equal(ApiResponseType.BadRequest, response.Type);
+    }
+
+    [Fact]
+    public async Task DeleteUser_ShouldReturnForbidden_WhenUserIsNotAdmin()
+    {
+        // Arrange
+        FixTheReturnOfCookies("fakeAdmin");
+        AddUserWithRole("fakeAdmin", "Analyst", 1);
+
+        // Act
+        var result = await _sut.DeleteUser(new User());
+
+        // Assert
+        Assert.Equal(ApiResponseType.Forbidden, result.Type);
+    }
+    
+    [Fact]
+    public async Task DeleteUser_ShouldReturnNotFound_WhenUserDoesNotExist()
+    {
+        // Arrange
+        FixTheReturnOfCookies("admin");
+        AddUserWithRole("admin", "SystemAdmin", 1);
+        var user = AddUserWithRole("target", "DataAdmin", 2);
+        var role = AddUserWithRole("fakeUser", "Analyst", 3);
+
+        // Act
+        var result = await _sut.DeleteUser(new User(){ Username = "testUser"});
+        // Assert
+        Assert.Equal(ApiResponseType.NotFound, result.Type);
+    }
+    
+    [Fact]
+    public async Task DeleteRole_ShouldReturnSuccess_WhenAdminAndUserExist()
+    {
+        // Arrange
+        FixTheReturnOfCookies("admin");
+        AddUserWithRole("admin", "SystemAdmin", 1);
+        var user = AddUserWithRole("target", "DataAdmin", 2);
+
+        // Act
+        var result = await _sut.DeleteUser(user.User);
+
+        // Assert
+        Assert.Equal(ApiResponseType.Success, result.Type);
+    }
+    
+    [Fact]
+    public async Task DeleteRole_ShouldReturnYouCanNotDeleteYourself_WhenAdminDeleteHimself()
+    {
+        // Arrange
+        FixTheReturnOfCookies("admin");
+        AddUserWithRole("admin", "SystemAdmin", 1);
+        var user = AddUserWithRole("target", "DataAdmin", 2);
+
+        // Act
+        var result = await _sut.DeleteUser(new User(){Username = "admin"});
+
+        // Assert
+        Assert.Equal(ApiResponseType.BadRequest, result.Type);
+    }
+    
 }
