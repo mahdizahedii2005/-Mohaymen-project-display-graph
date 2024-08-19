@@ -9,19 +9,19 @@ public class StoreDataService(DataContext context, IEdageStorer edageStorer, IVe
     public IEdageStorer EdageStorer { get; set; } = edageStorer;
     public IVertexStorer VertexStorer { get; set; } = vertexStorer;
 
-    public bool StoreDataSet(string? nameData, int userId)
+    public long StoreDataSet(string? nameData, long userId)
     {
         try
         {
-            if (string.IsNullOrEmpty(nameData)) return false;
+            if (string.IsNullOrEmpty(nameData)) return -1;
             var setData = new DataGroup(nameData, userId);
             context.DataSets.Add(setData);
             context.SaveChanges();
-            return true;
+            return setData.Id;
         }
         catch (ArgumentException e)
         {
-            return false;
+            return -1;
         }
     }
 }

@@ -28,7 +28,8 @@ public class AuthenticationServiceTests
             .UseInMemoryDatabase(databaseName: "TestDatabase")
             .Options;
         _mockContext = new DataContext(options);
-        _sut = new AuthenticationService(_mockContext, _cookieService, _tokenService, _passwordService);
+        _sut = new AuthenticationService(_mockContext,
+            _cookieService, _tokenService, _passwordService);
     }
 
     [Theory]
@@ -72,7 +73,8 @@ public class AuthenticationServiceTests
 
         // Assert
         Assert.Equal(ApiResponseType.BadRequest, result.Type);
-        Assert.Null(result.Data); }
+        Assert.Null(result.Data);
+    }
 
     [Fact]
     public async Task Login_ShouldReturnBadRequest_WhenPasswordIsIncorrect()
