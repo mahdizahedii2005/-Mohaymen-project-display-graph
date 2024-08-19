@@ -81,7 +81,7 @@ namespace mohaymen_codestar_Team02_XUnitTest.Servies.CookieService
             // Assert
             Assert.Equal(string.Empty, result);
         }
-        
+
         [Fact]
         public void GetExpiredCookie_ShouldReturnExpiredCookie_WhenGetExpiredCookieIsCalled()
         {

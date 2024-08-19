@@ -127,8 +127,8 @@ public class AuthenticationServiceTests
         var user = new User
         {
             Username = username,
-            Salt = new byte[128], 
-            PasswordHash = new byte[64], 
+            Salt = new byte[128],
+            PasswordHash = new byte[64],
         };
         using (var hmac = new System.Security.Cryptography.HMACSHA512(user.Salt))
         {

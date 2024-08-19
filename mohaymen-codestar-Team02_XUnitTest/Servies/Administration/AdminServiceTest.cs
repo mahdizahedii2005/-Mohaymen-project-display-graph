@@ -436,7 +436,7 @@ public class AdminServiceTest
         // Assert
         Assert.Equal(ApiResponseType.Forbidden, result.Type);
     }
-    
+
     [Fact]
     public async Task DeleteUser_ShouldReturnNotFound_WhenUserDoesNotExist()
     {
@@ -447,11 +447,11 @@ public class AdminServiceTest
         var role = AddUserWithRole("fakeUser", "Analyst", 3);
 
         // Act
-        var result = await _sut.DeleteUser(new User(){ Username = "testUser"});
+        var result = await _sut.DeleteUser(new User() { Username = "testUser" });
         // Assert
         Assert.Equal(ApiResponseType.NotFound, result.Type);
     }
-    
+
     [Fact]
     public async Task DeleteRole_ShouldReturnSuccess_WhenAdminAndUserExist()
     {
@@ -466,7 +466,7 @@ public class AdminServiceTest
         // Assert
         Assert.Equal(ApiResponseType.Success, result.Type);
     }
-    
+
     [Fact]
     public async Task DeleteRole_ShouldReturnYouCanNotDeleteYourself_WhenAdminDeleteHimself()
     {
@@ -476,10 +476,10 @@ public class AdminServiceTest
         var user = AddUserWithRole("target", "DataAdmin", 2);
 
         // Act
-        var result = await _sut.DeleteUser(new User(){Username = "admin"});
+        var result = await _sut.DeleteUser(new User() { Username = "admin" });
 
         // Assert
         Assert.Equal(ApiResponseType.BadRequest, result.Type);
     }
-    
+
 }
