@@ -11,9 +11,6 @@ jobs:
     test:
         runs-on: ubuntu-latest
 
-        env:
-          DOTNET_TOOL_PATH: ${{ github.workspace }}/.dotnet
-
         steps:
             - uses: actions/checkout@v4
 
@@ -21,16 +18,10 @@ jobs:
               with:
                   dotnet-version: 8.0.x
 
-            - name: Add dotnet tools to PATH
-              run: echo "${{ env.DOTNET_TOOL_PATH }}" >> $GITHUB_PATH
-
-            - name: Install csharpier
-              run: dotnet tool install --tool-path ${{ env.DOTNET_TOOL_PATH }} csharpier
-
             - name: Check formatting
               id: lint
               continue-on-error: true
-              run: dotnet csharpier --check .
+              run: dotnet format --verify-no-changes
 
             - name: Install dependencies
               run: dotnet restore
