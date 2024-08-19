@@ -6,6 +6,8 @@ using mohaymen_codestar_Team02.Services.ProfileService;
 
 namespace mohaymen_codestar_Team02.Controllers;
 
+[ApiController]
+[Route("user")]
 public class ProfileController : ControllerBase
 {
     private readonly IProfileService _profileService;
@@ -15,7 +17,7 @@ public class ProfileController : ControllerBase
         _profileService = profileService;
     }
 
-    [HttpPatch("users/{username}/password")]
+    [HttpPatch("password")]
     public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordUserDto request)
     {
         ServiceResponse<GetUserDto?> response =
@@ -23,7 +25,7 @@ public class ProfileController : ControllerBase
         return StatusCode((int)response.Type, response);
     }
 
-    [HttpPut("users/{username}")]
+    [HttpPut("update")]
     public async Task<IActionResult> UpdateUser([FromBody] UpdateUserDto request)
     {
         ServiceResponse<GetUserDto?> response = await _profileService.UpdateUser(request);
