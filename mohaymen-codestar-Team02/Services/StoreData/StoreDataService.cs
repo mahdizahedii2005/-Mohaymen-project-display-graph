@@ -8,20 +8,20 @@ public class StoreDataService(DataContext context, IEdageStorer edageStorer, IVe
 {
     public IEdageStorer EdageStorer { get; set; } = edageStorer;
     public IVertexStorer VertexStorer { get; set; } = vertexStorer;
-
-    public long StoreDataSet(string? nameData, long userId)
+    public string StoreDataSet(string? nameData, string userName)
     {
         try
         {
-            if (string.IsNullOrEmpty(nameData)) return -1;
-            var setData = new DataGroup(nameData, userId);
+            if (string.IsNullOrEmpty(nameData)) return null;
+            var setData = new DataGroup(nameData,
+                context.Users.SingleOrDefault(u => u.Username.ToLower() == userName.ToLower()).UserId);
             context.DataSets.Add(setData);
             context.SaveChanges();
             return setData.Id;
         }
         catch (ArgumentException e)
         {
-            return -1;
+            return null;
         }
     }
 }

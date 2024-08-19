@@ -20,7 +20,7 @@ public class VertexEntity
         }
     }
 
-    [Key] public long Id { get; set; }
+    [Key] public string Id { get; set; }= Guid.NewGuid().ToString();
     private string _name;
 
     public string Name
@@ -47,5 +47,5 @@ public class VertexEntity
 
     public long DataSetId { get; set; }
     [ForeignKey("DataSetId")] public virtual DataGroup DataGroup { get; set; }
-    public virtual ICollection<EdgeAttribute> Attributes { get; set; } = new List<EdgeAttribute>();
+    public virtual ICollection<VertexAttribute> Attributes { get; set; } = new List<VertexAttribute>();
 }

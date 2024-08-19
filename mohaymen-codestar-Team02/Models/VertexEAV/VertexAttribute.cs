@@ -4,11 +4,11 @@ using mohaymen_codestar_Team02.Models.EdgeEAV;
 
 namespace mohaymen_codestar_Team02.Models.VertexEAV;
 
-public class VertexAttribute
+public class VertexAttribute(string name, string entityId)
 {
-    [Key] public long Id { get; set; }
-    public string Name { get; set; } = string.Empty;
-    public long EntityId { get; set; }
-    [ForeignKey("EntityId")] public virtual EdgeEntity EdgeEntity { get; set; } 
-    public virtual ICollection<EdgeValue> Values { get; set; } = new List<EdgeValue>();
+    [Key] public string Id { get; set; }= Guid.NewGuid().ToString();
+    public string Name { get; set; } = name;
+    public string EntityId { get; set; } = entityId;
+    [ForeignKey("EntityId")] public virtual VertexEntity EdgeEntity { get; set; }
+    public virtual ICollection<VertexValue> Values { get; set; } 
 }

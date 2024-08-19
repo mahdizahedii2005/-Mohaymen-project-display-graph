@@ -6,13 +6,13 @@ namespace mohaymen_codestar_Team02.Models.EdgeEAV;
 
 public class EdgeEntity
 {
-    public EdgeEntity(string name, long dataSetId)
+    public EdgeEntity(string name, string dataSetId)
     {
         _name = name + "!Edge" + "!" + Guid.NewGuid() + "!";
         DataSetId = dataSetId;
     }
 
-    [Key] public long Id { get; set; }
+    [Key] public string Id { get; set; } = Guid.NewGuid().ToString();
     private string _name;
 
     public string Name
@@ -31,7 +31,7 @@ public class EdgeEntity
         set { _name = value + "!Edge" + "!" + Guid.NewGuid() + "!"; }
     }
 
-    public long DataSetId { get; set; }
-    [ForeignKey("DataSetId")] public virtual DataGroup DataGroup { get; set; }
+    public string DataSetId { get; set; }
+    [ForeignKey("DataSetId")] public virtual DataGroup? DataGroup { get; set; }
     public virtual ICollection<EdgeAttribute> Attributes { get; set; } = new List<EdgeAttribute>();
 }

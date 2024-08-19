@@ -4,5 +4,5 @@ public interface IStorHandler
 {
     public IEdageStorer EdageStorer { get; set; }
     public IVertexStorer VertexStorer { get; set; }
-    public long StoreDataSet(string? nameData, long userId);
+    public string StoreDataSet(string? nameData, string userId);
 }
