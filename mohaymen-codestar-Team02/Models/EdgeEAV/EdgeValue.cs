@@ -1,19 +1,16 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace mohaymen_codestar_Team02.Models;
+namespace mohaymen_codestar_Team02.Models.EdgeEAV;
 
-public class EdgeValue
+public class EdgeValue(string value, int attId, int entityId)
 {
     [Key] public int Id { get; set; }
-    public string StringValue { get; set; } = string.Empty;
+    public string StringValue { get; set; } = value;
 
-    public int AttributeId { get; set; }
+    public int AttributeId { get; set; } = attId;
     [ForeignKey("AttributeId")] public virtual EdgeAttribute EdgeAttribute { get; set; }
 
-    public int EntityId { get; set; }
+    public int EntityId { get; set; } = entityId;
     [ForeignKey("EntityId")] public virtual EdgeEntity EdgeEntity { get; set; }
-
-    public int DataSetId { get; set; }
-    [ForeignKey("DataSetId")] public virtual DataSet DataSet { get; set; }
 }
