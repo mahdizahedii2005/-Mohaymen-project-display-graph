@@ -122,7 +122,8 @@ public class InitialServices
             if (!_context.Roles.Any(r => r.RoleType == role.RoleType))
                 _context.Roles.Add(role);
 
-        _context.SaveChanges();
+            _context.SaveChanges();
+        }
     }
 
     public void SeadAdmin()
