@@ -8,7 +8,7 @@ public class VertexValue
 {
 
     public VertexValue(string stringValue, long vertexAttributeId, string objectId)
-    {
+    { 
         StringValue = stringValue;
         VertexAttributeId = vertexAttributeId;
         ObjectId = objectId;
