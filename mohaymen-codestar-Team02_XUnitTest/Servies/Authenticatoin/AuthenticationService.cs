@@ -1,7 +1,9 @@
 using System.Security.Claims;
 using System.Text;
+using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using mohaymen_codestar_Team02.Data;
+using mohaymen_codestar_Team02.Dto.User;
 using mohaymen_codestar_Team02.Models;
 using mohaymen_codestar_Team02.Services;
 using mohaymen_codestar_Team02.Services.Authenticatoin;
@@ -14,21 +16,25 @@ namespace mohaymen_codestar_Team02_XUnitTest.Servies.Authenticatoin;
 public class AuthenticationServiceTests
 {
     private readonly AuthenticationService _sut;
-    private readonly ICookieService _cookieService;
     private readonly ITokenService _tokenService;
+    private readonly ICookieService _cookieService;
     private readonly DataContext _mockContext;
     private readonly IPasswordService _passwordService;
 
     public AuthenticationServiceTests()
     {
+        _passwordService = Substitute.For<IPasswordService>();
         _cookieService = Substitute.For<ICookieService>();
         _tokenService = Substitute.For<ITokenService>();
-        _passwordService = Substitute.For<IPasswordService>();
+
+        var config = new MapperConfiguration(cfg => { cfg.CreateMap<User, GetUserDto>(); });
+        var mapper = config.CreateMapper();
+
         var options = new DbContextOptionsBuilder<DataContext>()
             .UseInMemoryDatabase(databaseName: "TestDatabase")
             .Options;
         _mockContext = new DataContext(options);
-        _sut = new AuthenticationService(_mockContext, _cookieService, _tokenService, _passwordService);
+        _sut = new AuthenticationService(_mockContext, _cookieService, _tokenService, _passwordService, mapper);
     }
 
     [Theory]
@@ -72,7 +78,8 @@ public class AuthenticationServiceTests
 
         // Assert
         Assert.Equal(ApiResponseType.BadRequest, result.Type);
-        Assert.Null(result.Data); }
+        Assert.Null(result.Data);
+    }
 
     [Fact]
     public async Task Login_ShouldReturnBadRequest_WhenPasswordIsIncorrect()
@@ -120,8 +127,8 @@ public class AuthenticationServiceTests
         var user = new User
         {
             Username = username,
-            Salt = new byte[128], // Assuming 128-byte salt
-            PasswordHash = new byte[64], // Assuming 64-byte hash
+            Salt = new byte[128],
+            PasswordHash = new byte[64],
         };
         using (var hmac = new System.Security.Cryptography.HMACSHA512(user.Salt))
         {
@@ -130,5 +137,35 @@ public class AuthenticationServiceTests
 
         _mockContext.Users.Add(user);
         _mockContext.SaveChanges();
+    }
+
+    [Fact]
+    public void Logout_ShouldCallGetExpiredCookie_WhenCookieIsPresent()
+    {
+        // Arrange
+        _cookieService.GetCookieValue().Returns("someCookieValue");
+
+        // Act
+        var result = _sut.Logout();
+
+        // Assert
+        _cookieService.Received(1).GetExpiredCookie();
+        Assert.Equal(ApiResponseType.Success, result.Type);
+        Assert.Null(result.Data);
+    }
+
+    [Fact]
+    public void Logout_ShouldNotCallGetExpiredCookie_WhenCookieIsNotPresent()
+    {
+        // Arrange
+        _cookieService.GetCookieValue().Returns((string?)null);
+
+        // Act
+        var result = _sut.Logout();
+
+        // Assert
+        _cookieService.DidNotReceive().GetExpiredCookie();
+        Assert.Equal(ApiResponseType.Success, result.Type);
+        Assert.Null(result.Data);
     }
 }

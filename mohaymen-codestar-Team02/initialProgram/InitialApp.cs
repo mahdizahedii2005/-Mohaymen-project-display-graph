@@ -41,7 +41,5 @@ public class InitialApp
         app.UseAuthentication();
         app.UseAuthorization();
         app.MapControllers();
-
-
     }
 }
