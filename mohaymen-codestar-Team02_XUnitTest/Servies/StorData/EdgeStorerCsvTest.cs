@@ -48,7 +48,7 @@ namespace mohaymen_codestar_Team02_XUnitTest.Servies.StorData
             Assert.True(result);
             Assert.Equal(1, await _dataContext.EdgeEntities.CountAsync());
             Assert.Equal(2, await _dataContext.EdgeAttributes.CountAsync());
-            Assert.Equal(4, await _dataContext.EdgeValues.CountAsync());
+            Assert.Equal(2, await _dataContext.EdgeValues.CountAsync());
         }
 
         [Fact]
