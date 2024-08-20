@@ -5,10 +5,10 @@ namespace mohaymen_codestar_Team02.Models.EdgeEAV;
 
 public class EdgeValue
 {
-    public EdgeValue(string stringValue, long attributeId, string objectId)
+    public EdgeValue(string stringValue, long edgeAttributeId, string objectId)
     {
         StringValue = stringValue;
-        EdgeAttributeId = attributeId;
+        EdgeAttributeId = edgeAttributeId;
         ObjectId = objectId;
     }
     [Key] public long Id { get; set; }

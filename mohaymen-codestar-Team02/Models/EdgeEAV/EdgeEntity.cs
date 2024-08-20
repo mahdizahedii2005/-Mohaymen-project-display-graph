@@ -6,10 +6,10 @@ namespace mohaymen_codestar_Team02.Models.EdgeEAV;
 
 public class EdgeEntity
 {
-    public EdgeEntity(string name, long dataSetId)
+    public EdgeEntity(string name, long dataGroupId)
     {
         _name = name + "!Edge" + "!" + Guid.NewGuid() + "!";
-        DataGroupId = dataSetId;
+        DataGroupId = dataGroupId;
     }
 
     [Key] public long Id { get; set; }

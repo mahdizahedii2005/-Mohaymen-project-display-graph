@@ -5,10 +5,10 @@ namespace mohaymen_codestar_Team02.Models.EdgeEAV;
 
 public class EdgeAttribute
 {
-    public EdgeAttribute(string name, long entityId)
+    public EdgeAttribute(string name, long edgeEntityId)
     {
-        this.Name = name;
-        this.EdgeEntityId = entityId;
+        Name = name;
+        EdgeEntityId = edgeEntityId;
     }
     [Key] public long Id { get; set; }
     public string Name { get; set; }

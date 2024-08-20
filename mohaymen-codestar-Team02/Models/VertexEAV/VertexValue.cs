@@ -7,11 +7,11 @@ namespace mohaymen_codestar_Team02.Models.VertexEAV;
 public class VertexValue
 {
 
-    public VertexValue(string stringValue, long attributeId, string objectId)
+    public VertexValue(string stringValue, long vertexAttributeId, string objectId)
     {
-        this.StringValue = stringValue;
-        this.VertexAttributeId = attributeId;
-        this.ObjectId = objectId;
+        StringValue = stringValue;
+        VertexAttributeId = vertexAttributeId;
+        ObjectId = objectId;
     }
     [Key] public long Id { get; set; }
     public string StringValue { get; set; }
