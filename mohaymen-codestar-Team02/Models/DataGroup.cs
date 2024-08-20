@@ -13,7 +13,7 @@ public class DataGroup
         Name = name;
         UserId = userId;
     }
-    [Key] public long Id { get; set; }
+    [Key] public long DataGroupId { get; set; }
 
     public string Name { get; set; }
     public DateTime CreateAt { get; set; } = DateTime.UtcNow;

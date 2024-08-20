@@ -16,8 +16,8 @@ public class EdgeStorerCsv : IEdageStorer
     {
         using var scope = _serviceProvider.CreateScope();
         var dataContext = scope.ServiceProvider.GetRequiredService<DataContext>();
-        try
-        {
+        // try
+        // {
             var edgeEntity = new EdgeEntity(entityName, dataGroupId);
             List<EdgeAttribute> edgeAttributes = new();
             List<EdgeValue> edgeValues = new();
@@ -51,10 +51,10 @@ public class EdgeStorerCsv : IEdageStorer
 
             await dataContext.SaveChangesAsync();
             return true;
-        }
-        catch (Exception e)
-        {
-            return false;
-        }
+        // }
+        // catch (Exception e)
+        // {
+        //     return false;
+        // }
     }
 }

@@ -8,14 +8,12 @@ public class StoreDataService
     : IStorHandler
 {
     private readonly IServiceProvider _serviceProvider;
-    private readonly IEdageStorer _edageStorer;
-    private readonly IVertexStorer _vertexStorer;
-
+   
     public StoreDataService(IServiceProvider serviceProvider, IEdageStorer edageStorer, IVertexStorer vertexStorer)
     {
         _serviceProvider = serviceProvider;
-        _edageStorer = edageStorer;
-        _vertexStorer = vertexStorer;
+        VertexStorer = vertexStorer;
+        EdageStorer = edageStorer;
     }
     public IEdageStorer EdageStorer { get; set; }
     public IVertexStorer VertexStorer { get; set; }
@@ -31,7 +29,7 @@ public class StoreDataService
                 context.Users.SingleOrDefault(u => u.Username.ToLower() == userName.ToLower()).UserId);
             await context.DataSets.AddAsync(setData);
             await context.SaveChangesAsync();
-            return setData.Id;
+            return setData.DataGroupId;
         }
         catch (ArgumentException e)
         {

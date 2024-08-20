@@ -52,7 +52,7 @@ public class InitialServices
             .AddScoped<InitialServices>()
             .AddSingleton<IEdageStorer, EdgeStorerCsv>()
             .AddSingleton<IVertexStorer, VertexStorerCsv>()
-            .AddSingleton<IStorHandler, StoreDataService>()
+            .AddTransient<IStorHandler, StoreDataService>()
             .AddSingleton<IFileReader, ReadCsvFile>()
             .AddSingleton<IDataAdminService, DataAdminService>();
 
