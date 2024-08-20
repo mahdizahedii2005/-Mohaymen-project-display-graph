@@ -7,7 +7,7 @@ public class EdgeAttribute(string name,string entityId)
 {
     [Key] public string Id { get; set; }= Guid.NewGuid().ToString();
     public string Name { get; set; } = name;
-    public long EntityId { get; set; } = entityId;
+    public string EntityId { get; set; } = entityId;
     [ForeignKey("EntityId")] public virtual EdgeEntity EdgeEntity { get; set; }
     public virtual ICollection<EdgeValue> Values { get; set; } = new List<EdgeValue>();
 }

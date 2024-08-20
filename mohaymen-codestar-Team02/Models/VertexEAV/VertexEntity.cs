@@ -7,7 +7,7 @@ namespace mohaymen_codestar_Team02.Models.VertexEAV;
 
 public class VertexEntity
 {
-    public VertexEntity(string name, long dataSetId)
+    public VertexEntity(string name, string dataSetId)
     {
         if (!name.Contains("!"))
         {
@@ -45,7 +45,7 @@ public class VertexEntity
         }
     }
 
-    public long DataSetId { get; set; }
+    public string DataSetId { get; set; }
     [ForeignKey("DataSetId")] public virtual DataGroup DataGroup { get; set; }
     public virtual ICollection<VertexAttribute> Attributes { get; set; } = new List<VertexAttribute>();
 }

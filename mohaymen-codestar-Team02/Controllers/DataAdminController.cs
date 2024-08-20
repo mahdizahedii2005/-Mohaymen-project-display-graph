@@ -4,17 +4,8 @@ using mohaymen_codestar_Team02.Services.DataAdminService;
 
 namespace mohaymen_codestar_Team02.Controllers;
 
-public class DataAdminController
+public class DataAdminController(IDataAdminService _dataAdminService)
 {
-    
-    private readonly IDataAdminService _storeService;
-
-    public DataAdminController(IDataAdminService storeService)
-    {
-        _storeService = storeService;
-    }
-
-
     [HttpPost("StoreNewDataSet")]
     public void StoreNewDataSet([FromBody] StoreDataDto storeDataDto)
     {
@@ -24,24 +15,20 @@ public class DataAdminController
     [HttpGet("GetDataSetsList")]
     public void GetDataSetsList()
     {
-           
     }
 
     [HttpGet("{dataSetName}")]
     public void DisplayDataSetAsGraph(string dataSetName)
     {
-        
     }
 
     [HttpGet("{datasetName, vertexId}")]
     public void DisplayVertexDetails(string datasetName, int vertexId)
     {
-        
     }
-    
+
     [HttpGet("{datasetName, edgeId}")]
     public void DisplayEdgeDetails(string datasetName, string edgeId)
     {
-        
     }
 }

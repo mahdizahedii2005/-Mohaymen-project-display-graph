@@ -28,10 +28,10 @@ public class StoreDataServiceTest
         //Arrange
         var name = "mahdi";
         //Act
-        var bolResult = _sut.StoreDataSet(name,3);
+        var bolResult = _sut.StoreDataSet(name,"3");
         var result = await _mockContext.DataSets.FirstOrDefaultAsync(x => x.Name == name);
         //Assert
-        Assert.True(bolResult!=-1);
+        Assert.NotEmpty(bolResult);
         Assert.Equal(result.Name, name);
     }
 
@@ -40,9 +40,9 @@ public class StoreDataServiceTest
     {
         //Arrange
         //Act 
-        var result = _sut.StoreDataSet(null,3);
+        var result = _sut.StoreDataSet(null,"3");
         //Assert
-        Assert.False(result!=-1);
+        Assert.Empty(result);
         Assert.Empty(_mockContext.DataSets);
     }
 }

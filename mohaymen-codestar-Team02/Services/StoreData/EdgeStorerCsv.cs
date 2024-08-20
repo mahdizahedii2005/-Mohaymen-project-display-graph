@@ -1,7 +1,6 @@
 using System.Dynamic;
 using mohaymen_codestar_Team02.Data;
 using mohaymen_codestar_Team02.Models.EdgeEAV;
-using mohaymen_codestar_Team02.Models.VertexEAV;
 using mohaymen_codestar_Team02.Services.StoreData.Abstraction;
 
 namespace mohaymen_codestar_Team02.Services.StoreData;
