@@ -16,6 +16,8 @@ public class EdgeStorerCsv(IServiceProvider? serviceProvider) : IEdageStorer
             EdgeEntity edgeEntity = new EdgeEntity(entityName, dataGroupId);
             List<EdgeAttribute> edgeAttributes = new List<EdgeAttribute>();
             List<EdgeValue> edgeValues = new List<EdgeValue>();
+            await dataContext.EdgeEntities.AddAsync(edgeEntity);
+            await dataContext.SaveChangesAsync();
             using (var reader = new StringReader(dataFile))
             {
                 string? headerLine = reader.ReadLine();
@@ -30,22 +32,25 @@ public class EdgeStorerCsv(IServiceProvider? serviceProvider) : IEdageStorer
                     edgeAttributes.Add(new EdgeAttribute(att, edgeEntity.Id));
                 }
 
+                foreach (var attribute in edgeAttributes)
+                {
+                    await dataContext.EdgeAttributes.AddAsync(attribute);
+                }
+
+                await dataContext.SaveChangesAsync();
                 string? line;
-                while ((line = reader.ReadLine()) != null)
+                while (!string.IsNullOrEmpty(line = reader.ReadLine()))
                 {
                     var objectId = Guid.NewGuid().ToString();
-                    var values = line.Split(',');
+                    var values = line.Split("\",\"");
+                    values[0] = values[0].Substring(1);
+                    var lastWord = values[values.Length - 1];
+                    values[values.Length - 1] = lastWord.Substring(0, lastWord.Length - 1);
                     for (int i = 0; i < values.Length; i++)
                     {
                         edgeValues.Add(new EdgeValue(values[i], edgeAttributes[i].Id, objectId));
                     }
                 }
-            }
-
-            await dataContext.EdgeEntities.AddAsync(edgeEntity);
-            foreach (var attribute in edgeAttributes)
-            {
-                await dataContext.EdgeAttributes.AddAsync(attribute);
             }
 
             foreach (var value in edgeValues)

@@ -8,7 +8,7 @@ namespace mohaymen_codestar_Team02.Controllers;
 public class DataAdminController(IDataAdminService _dataAdminService, IFileReader fileReader) : ControllerBase
 {
     [HttpPost("DataSets")]
-    public async Task<IActionResult> StoreNewDataSet([FromBody] StoreDataDto storeDataDto)
+    public async Task<IActionResult> StoreNewDataSet([FromForm] StoreDataDto storeDataDto)
     {
         var edgeFile = fileReader.Read(storeDataDto.EdgeFile);
         var vertexFile = fileReader.Read(storeDataDto.VertexFile);
@@ -34,12 +34,6 @@ public class DataAdminController(IDataAdminService _dataAdminService, IFileReade
     }
         [HttpGet("DataSets/{dataSetName}/Edges/{edgeId}")]
     public void DisplayEdgeDetails(string datasetName, int edgeId)
-    {
-    }
-
-
-    [HttpGet("Display3/{datasetName, edgeId}")]
-    public void DisplayEdgeDetails(string datasetName, string edgeId)
     {
     }
 }

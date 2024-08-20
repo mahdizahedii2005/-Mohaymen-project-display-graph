@@ -16,7 +16,7 @@ public class DataAdminService(IStorHandler storHandler)
             return new ServiceResponse<string>(string.Empty, ApiResponseType.BadRequest, Data.Resources.InvalidInpute);
         }
 
-        var dataGroupId = storHandler.StoreDataSet(graphName, userName);
+        var dataGroupId =await storHandler.StoreDataSet(graphName, userName);
         if (dataGroupId == -1)
         {
             return new ServiceResponse<string>(string.Empty, ApiResponseType.BadRequest, Data.Resources.InvalidInpute);

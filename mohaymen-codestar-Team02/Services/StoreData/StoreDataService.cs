@@ -4,11 +4,13 @@ using mohaymen_codestar_Team02.Services.StoreData.Abstraction;
 
 namespace mohaymen_codestar_Team02.Services.StoreData;
 
-public class StoreDataService(IServiceProvider serviceProvider, IEdageStorer edageStorer, IVertexStorer vertexStorer) : IStorHandler
+public class StoreDataService(IServiceProvider serviceProvider, IEdageStorer edageStorer, IVertexStorer vertexStorer)
+    : IStorHandler
 {
     public IEdageStorer EdageStorer { get; set; } = edageStorer;
     public IVertexStorer VertexStorer { get; set; } = vertexStorer;
-    public long StoreDataSet(string? nameData, string userName)
+
+    public async Task<long> StoreDataSet(string? nameData, string userName)
     {
         using var scope = serviceProvider.CreateScope();
         var context = scope.ServiceProvider.GetRequiredService<DataContext>();
@@ -17,8 +19,8 @@ public class StoreDataService(IServiceProvider serviceProvider, IEdageStorer eda
             if (string.IsNullOrEmpty(nameData)) return -1;
             var setData = new DataGroup(nameData,
                 context.Users.SingleOrDefault(u => u.Username.ToLower() == userName.ToLower()).UserId);
-            context.DataSets.Add(setData);
-            context.SaveChanges();
+            await context.DataSets.AddAsync(setData);
+            await context.SaveChangesAsync();
             return setData.Id;
         }
         catch (ArgumentException e)

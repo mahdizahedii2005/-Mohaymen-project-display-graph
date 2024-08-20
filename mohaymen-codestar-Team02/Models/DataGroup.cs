@@ -10,8 +10,8 @@ public class DataGroup(string name, long userId)
     [Key] public long Id { get; set; }
 
     public string Name { get; set; } = name;
-    public DateTime CreateAt { get; set; } = DateTime.Now;
-    public DateTime UpdateAt { get; set; } = DateTime.Now;
+    public DateTime CreateAt { get; set; } = DateTime.UtcNow;
+    public DateTime UpdateAt { get; set; } =  DateTime.UtcNow;
 
     public virtual EdgeEntity Edge { get; set; }
     public virtual VertexEntity Vertex { get; set; }

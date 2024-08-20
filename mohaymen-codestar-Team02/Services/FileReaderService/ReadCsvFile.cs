@@ -9,15 +9,9 @@ public class ReadCsvFile : IFileReader
             return "";
         }
 
-        var supportedTypes = new[] { "csv" };
-        var fileExt = Path.GetExtension(file.FileName).Substring(1);
-        if (!supportedTypes.Contains(fileExt.ToLower()))
+        using (var reader = new StreamReader(file.OpenReadStream()))
         {
-            return "";
+            return reader.ReadToEnd();
         }
-
-        var fileName = Path.GetFileName(file.FileName);
-        var filePath = Path.Combine("uploads", fileName);
-        return File.ReadAllText(filePath);
     }
 }

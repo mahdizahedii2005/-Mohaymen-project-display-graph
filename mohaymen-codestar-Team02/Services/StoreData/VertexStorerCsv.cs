@@ -16,6 +16,8 @@ public class VertexStorerCsv(IServiceProvider serviceProvider) : IVertexStorer
             VertexEntity edgeEntity = new VertexEntity(entityName, dataGroupId);
             List<VertexAttribute> edgeAttributes = new List<VertexAttribute>();
             List<VertexValue> edgeValues = new List<VertexValue>();
+            await dataContext.VertexEntities.AddAsync(edgeEntity);
+            await dataContext.SaveChangesAsync();
             using (var reader = new StringReader(dataFile))
             {
                 string? headerLine = reader.ReadLine();
@@ -24,17 +26,38 @@ public class VertexStorerCsv(IServiceProvider serviceProvider) : IVertexStorer
                     return false;
                 }
 
-                var headers = headerLine.Split(',');
+                var headers = headerLine.Split("\",\"");
+                headers[0] = headers[0].Substring(1);
+                if (headers.Length != 0)
+                {
+                    var lastWords = headers[headers.Length - 1];
+                    headers[headers.Length - 1] = lastWords.Substring(0, lastWords.Length - 1);
+                }
+
                 foreach (var att in headers)
                 {
                     edgeAttributes.Add(new VertexAttribute(att, edgeEntity.Id));
                 }
 
+                foreach (var attribute in edgeAttributes)
+                {
+                    await dataContext.VertexAttributes.AddAsync(attribute);
+                }
+
+                await dataContext.SaveChangesAsync();
                 string? line;
-                while ((line = reader.ReadLine()) != null)
+                while (!string.IsNullOrEmpty(line = reader.ReadLine()))
                 {
                     var objectId = Guid.NewGuid().ToString();
-                    var values = line.Split(',');
+                    var values = line.Split("\",\"");
+
+                    values[0] = values[0].Substring(1);
+                    if (values.Length != 0)
+                    {
+                        var lastWord = values[values.Length - 1];
+                        values[values.Length - 1] = lastWord.Substring(0, lastWord.Length - 1);
+                    }
+
                     for (int i = 0; i < values.Length; i++)
                     {
                         edgeValues.Add(new VertexValue(values[i], edgeAttributes[i].Id, objectId));
@@ -42,11 +65,6 @@ public class VertexStorerCsv(IServiceProvider serviceProvider) : IVertexStorer
                 }
             }
 
-            await dataContext.VertexEntities.AddAsync(edgeEntity);
-            foreach (var attribute in edgeAttributes)
-            {
-                await dataContext.VertexAttributes.AddAsync(attribute);
-            }
 
             foreach (var value in edgeValues)
             {
