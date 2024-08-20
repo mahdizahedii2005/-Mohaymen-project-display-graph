@@ -33,7 +33,7 @@ public class AuthenticationService : IAuthenticationService
         {
             return new ServiceResponse<GetUserDto?>(null, ApiResponseType.BadRequest, Resources.InvalidInpute);
         }
-        
+
         var user = await GetUser(username);
 
         if (user is null)

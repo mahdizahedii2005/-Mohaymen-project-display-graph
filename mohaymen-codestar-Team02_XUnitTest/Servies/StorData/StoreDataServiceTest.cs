@@ -28,17 +28,18 @@ public class StoreDataServiceTest
         IEdageStorer edageStorer = Substitute.For<IEdageStorer>();
         IVertexStorer vertexStorer = Substitute.For<IVertexStorer>();
         _sut = new StoreDataService(_serviceProvider, edageStorer, vertexStorer);
-      
+
     }
 
     [Fact]
     public async Task StoreDataSet_ShouldStoreTheData_whenDataIsVilid()
-    {  using var scope = _serviceProvider.CreateScope();
+    {
+        using var scope = _serviceProvider.CreateScope();
         _mockContext = scope.ServiceProvider.GetRequiredService<DataContext>();
         //Arrange
         var name = "mahdi";
         _mockContext.Users.Add(new User()
-            { Username = "3", UserId = 4, PasswordHash = Array.Empty<byte>(), Salt = Array.Empty<byte>() });
+        { Username = "3", UserId = 4, PasswordHash = Array.Empty<byte>(), Salt = Array.Empty<byte>() });
         _mockContext.SaveChanges();
         //Act
         var bolResult = _sut.StoreDataSet(name, "3");
@@ -50,7 +51,8 @@ public class StoreDataServiceTest
 
     [Fact]
     public async Task StoreDataSet_ShouldReturnFalse_NameDataIsNull()
-    {  using var scope = _serviceProvider.CreateScope();
+    {
+        using var scope = _serviceProvider.CreateScope();
         _mockContext = scope.ServiceProvider.GetRequiredService<DataContext>();
         //Arrange
         //Act 

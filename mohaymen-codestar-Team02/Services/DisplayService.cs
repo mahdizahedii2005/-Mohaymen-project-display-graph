@@ -7,7 +7,8 @@ using QuikGraph;
 
 namespace mohaymen_codestar_Team02.Services;
 
-public class DisplayService{
+public class DisplayService
+{
 
     private readonly DataContext _context;
     private readonly ModelBuilder _modelBuilder;
@@ -24,9 +25,9 @@ public class DisplayService{
     {
         // get dataset
         var dataSet = _context.DataSets.Include(ds => ds.VertexEntity)
-            .ThenInclude(ve => ve.VertexAttributes).ThenInclude(vv=>vv.VertexValues).Include(ds => ds.EdgeEntity)
-            .ThenInclude(ee => ee.EdgeAttributes).ThenInclude(ev=>ev.EdgeValues).FirstOrDefault(ds=>ds.Name.ToLower().Equals(databaseName.ToLower()));
-        
+            .ThenInclude(ve => ve.VertexAttributes).ThenInclude(vv => vv.VertexValues).Include(ds => ds.EdgeEntity)
+            .ThenInclude(ee => ee.EdgeAttributes).ThenInclude(ev => ev.EdgeValues).FirstOrDefault(ds => ds.Name.ToLower().Equals(databaseName.ToLower()));
+
         // get vertex info
         var vertexTypeName = dataSet.VertexEntity.Name;
 
@@ -41,7 +42,7 @@ public class DisplayService{
             vertexFieldNamesTypes.Add(vertexFieldNameType.Key, typeof(string));
         }
         var vertexType = _modelBuilder.CreateDynamicClass(vertexTypeName, vertexFieldNamesTypes, null);
-        
+
         vertices = new List<dynamic>(); //
         foreach (var vertexRecord in vertexRecords)
         {
@@ -54,10 +55,10 @@ public class DisplayService{
         var EdgeFieldNames = dataSet.EdgeEntity.EdgeAttributes.Select(a => a.Name).ToList();
         var edgeRecords = dataSet.EdgeEntity.EdgeAttributes.Select(ea => ea.EdgeValues).SelectMany(v => v).GroupBy(v => v.ObjectId)
             .Select(g => g.ToDictionary(v => v.EdgeAttribute.Name, v => v.StringValue)).ToList();
-        
-        
+
+
         var edgeFieldNameTypes = new Dictionary<string, Type>(); //
-        
+
         edgeFieldNameTypes.Add("Source", vertexType);
         edgeFieldNameTypes.Add("Target", vertexType);
 
@@ -67,7 +68,7 @@ public class DisplayService{
         }
 
         var edgeType = _modelBuilder.CreateDynamicClass(edgeTypeName, edgeFieldNameTypes, typeof(IEdge<>));
-        
+
         edges = new List<dynamic>(); //
         // get valid edgges
         List<Dictionary<string, string>> sources = new List<Dictionary<string, string>>();

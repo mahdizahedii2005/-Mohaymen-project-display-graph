@@ -10,7 +10,7 @@ public class StoreDataService
     private readonly IServiceProvider _serviceProvider;
     private readonly IEdageStorer _edageStorer;
     private readonly IVertexStorer _vertexStorer;
-    
+
     public StoreDataService(IServiceProvider serviceProvider, IEdageStorer edageStorer, IVertexStorer vertexStorer)
     {
         _serviceProvider = serviceProvider;

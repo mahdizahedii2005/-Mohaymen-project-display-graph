@@ -8,7 +8,7 @@ public class ModelBuilder
     public Type CreateDynamicClass(string className, Dictionary<string, Type> fieldNamesTypes, Type interfaceType)
     {
         var typeBuilder = GetTypeBuilder(className);
-        
+
         if (interfaceType != null)
         {
             typeBuilder.AddInterfaceImplementation(interfaceType);
@@ -21,7 +21,7 @@ public class ModelBuilder
 
         return typeBuilder.CreateType();
     }
-    
+
     private TypeBuilder GetTypeBuilder(string className)
     {
         var typeSignature = className;

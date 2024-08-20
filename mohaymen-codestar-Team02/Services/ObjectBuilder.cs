@@ -2,7 +2,8 @@ using mohaymen_codestar_Team02.Data;
 
 namespace mohaymen_codestar_Team02.Services.TokenService;
 
-public class ObjectBuilder{
+public class ObjectBuilder
+{
 
     public object CreateDynamicObject(Type objectType, Dictionary<string, string> attributeValues)
     {
