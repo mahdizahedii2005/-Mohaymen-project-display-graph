@@ -1,6 +1,5 @@
 using System.Text;
 using AutoMapper;
-using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using mohaymen_codestar_Team02.Data;
 using mohaymen_codestar_Team02.Dto.User;
@@ -16,7 +15,6 @@ namespace mohaymen_codestar_Team02_XUnitTest.Servies.ProfileService
     {
         private readonly mohaymen_codestar_Team02.Services.ProfileService.ProfileService _sut;
         private readonly ICookieService _cookieService;
-        private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly DataContext _mockContext;
         private readonly IPasswordService _passwordService;
         private readonly ITokenService _tokenService;
@@ -26,11 +24,13 @@ namespace mohaymen_codestar_Team02_XUnitTest.Servies.ProfileService
         {
             _passwordService = Substitute.For<IPasswordService>();
             _cookieService = Substitute.For<ICookieService>();
-            _httpContextAccessor = Substitute.For<IHttpContextAccessor>();
             _tokenService = Substitute.For<ITokenService>();
 
-            // تنظیم Mapper
-            var config = new MapperConfiguration(cfg => { cfg.CreateMap<UpdateUserDto, User>(); });
+            var config = new MapperConfiguration(cfg =>
+            {
+                cfg.CreateMap<User, GetUserDto>();
+                cfg.CreateMap<UpdateUserDto, User>();
+            });
             _mapper = config.CreateMapper();
 
             var options = new DbContextOptionsBuilder<DataContext>()
@@ -38,8 +38,8 @@ namespace mohaymen_codestar_Team02_XUnitTest.Servies.ProfileService
                 .Options;
             _mockContext = new DataContext(options);
 
-            _sut = new mohaymen_codestar_Team02.Services.ProfileService.ProfileService(
-                _httpContextAccessor, _mockContext, _cookieService, _passwordService, _tokenService, _mapper);
+            _sut = new mohaymen_codestar_Team02.Services.ProfileService.ProfileService(_mockContext, _cookieService,
+                _passwordService, _tokenService, _mapper);
         }
 
         [Fact]
@@ -108,31 +108,6 @@ namespace mohaymen_codestar_Team02_XUnitTest.Servies.ProfileService
 
             // Assert
             Assert.Equal(ApiResponseType.Success, result.Type);
-
-            // Verify that the user's password was update
-        }
-
-        [Fact]
-        public void Logout_ShouldClearLoginCookie_WhenCookieExists()
-        {
-            // Arrange
-            var context = Substitute.For<HttpContext>();
-            var responseCookies = Substitute.For<IResponseCookies>();
-            context.Response.Cookies.Returns(responseCookies);
-
-            var requestCookies = Substitute.For<IRequestCookieCollection>();
-            requestCookies.ContainsKey("login").Returns(true); // Ensure the cookie "login" exists
-
-            context.Request.Cookies.Returns(requestCookies);
-            _httpContextAccessor.HttpContext.Returns(context);
-
-            // Act
-            var result = _sut.Logout();
-
-            // Assert
-            Assert.Equal(ApiResponseType.Success, result.Type);
-            responseCookies.Received(1)
-                .Append("login", "", Arg.Is<CookieOptions>(options => options.Expires < DateTime.Now));
         }
 
         [Fact]
@@ -140,7 +115,7 @@ namespace mohaymen_codestar_Team02_XUnitTest.Servies.ProfileService
         {
             // Arrange
             var updateUserDto = new UpdateUserDto
-                { FirstName = "NewFirstName", LastName = "NewLastName", Email = "newemail@example.com" };
+            { FirstName = "NewFirstName", LastName = "NewLastName", Email = "newemail@example.com" };
             _cookieService.GetCookieValue().Returns(string.Empty);
 
             // Act
@@ -155,7 +130,7 @@ namespace mohaymen_codestar_Team02_XUnitTest.Servies.ProfileService
         {
             // Arrange
             var updateUserDto = new UpdateUserDto
-                { FirstName = "NewFirstName", LastName = "NewLastName", Email = "newemail@example.com" };
+            { FirstName = "NewFirstName", LastName = "NewLastName", Email = "newemail@example.com" };
             _cookieService.GetCookieValue().Returns("validToken");
             _tokenService.GetUserNameFromToken().Returns("nonexistentUser");
 
@@ -175,7 +150,7 @@ namespace mohaymen_codestar_Team02_XUnitTest.Servies.ProfileService
             _tokenService.GetUserNameFromToken().Returns("existingUser");
 
             var updateUserDto = new UpdateUserDto
-                { FirstName = "NewFirstName", LastName = "NewLastName", Email = "newemail@example.com" };
+            { FirstName = "NewFirstName", LastName = "NewLastName", Email = "newemail@example.com" };
 
             // Act
             var result = await _sut.UpdateUser(updateUserDto);

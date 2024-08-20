@@ -28,42 +28,75 @@ public class AdminService : IAdminService
         _mapper = mapper;
     }
 
-    public async Task<ServiceResponse<GetUserDto>> GetUserByUsername(string username)
+    public async Task<ServiceResponse<GetUserDto?>> GetUserByUsername(string? username)
     {
+        var token = _cookieService.GetCookieValue();
+        if (string.IsNullOrEmpty(token))
+            return new ServiceResponse<GetUserDto?>(null, ApiResponseType.Unauthorized, Resources.UnauthorizedMessage);
+
+        var adminId = _tokenService.GetUserNameFromToken();
+        var admin = await GetUser(adminId);
+        if (admin is null)
+            return new ServiceResponse<GetUserDto?>(null, ApiResponseType.BadRequest, Resources.UserNotFoundMessage);
+
+        if (!await IsAdmin(admin))
+            return new ServiceResponse<GetUserDto?>(null, ApiResponseType.Forbidden, Resources.accessDeniedMessage);
+
         var user = await GetUser(username);
-        var userDto = _mapper.Map<GetUserDto>(user);
-        return new ServiceResponse<GetUserDto>(userDto, ApiResponseType.Success, "");
+        if (user is null)
+            return new ServiceResponse<GetUserDto?>(null, ApiResponseType.NotFound, Resources.UserNotFoundMessage);
+
+        GetUserDto userDto = _mapper.Map<GetUserDto>(user);
+        return new ServiceResponse<GetUserDto?>(userDto, ApiResponseType.Success, Resources.UserRetrievedMassage);
     }
 
-    public async Task<ServiceResponse<List<GetUserDto>>> GetAllUsers()
+    public async Task<ServiceResponse<List<GetUserDto>?>> GetAllUsers()
     {
+        var token = _cookieService.GetCookieValue();
+        if (string.IsNullOrEmpty(token))
+            return new ServiceResponse<List<GetUserDto>?>(null, ApiResponseType.Unauthorized,
+                Resources.UnauthorizedMessage);
+
+        var adminId = _tokenService.GetUserNameFromToken();
+        var admin = await GetUser(adminId);
+        if (admin is null)
+            return new ServiceResponse<List<GetUserDto>?>(null, ApiResponseType.BadRequest,
+                Resources.UserNotFoundMessage);
+
+        if (!await IsAdmin(admin))
+            return new ServiceResponse<List<GetUserDto>?>(null, ApiResponseType.Forbidden,
+                Resources.accessDeniedMessage);
+
         List<User> users = await _context.Users.Include(u => u.UserRoles).ThenInclude(ur => ur.Role).ToListAsync();
         List<GetUserDto> userDtos = users.Select(u => _mapper.Map<GetUserDto>(u)).ToList();
-        return new ServiceResponse<List<GetUserDto>>(userDtos, ApiResponseType.Success, "");
+        return new ServiceResponse<List<GetUserDto>?>(userDtos, ApiResponseType.Success,
+            Resources.UserRetrievedMassage);
     }
 
     public async Task<ServiceResponse<List<GetRoleDto>>> GetAllRoles()
     {
         List<GetRoleDto> roles = await _context.Roles.Select(r => _mapper.Map<GetRoleDto>(r)).ToListAsync();
-        return new ServiceResponse<List<GetRoleDto>>(roles, ApiResponseType.Success, "");
+        return new ServiceResponse<List<GetRoleDto>>(roles, ApiResponseType.Success, Resources.UsersRetrievedMassage);
     }
 
-    public async Task<ServiceResponse<User>> Register(User user, string password)
+    public async Task<ServiceResponse<GetUserDto?>> Register(User user, string password)
     {
         var token = _cookieService.GetCookieValue();
         if (string.IsNullOrEmpty(token))
-            return new ServiceResponse<User>(null, ApiResponseType.Unauthorized, Resources.UnauthorizedMessage);
+        {
+            return new ServiceResponse<GetUserDto?>(null, ApiResponseType.Unauthorized, Resources.UnauthorizedMessage);
+        }
 
         var adminUsername = _tokenService.GetUserNameFromToken();
         var admin = await GetUser(adminUsername);
         if (admin is null)
-            return new ServiceResponse<User>(null, ApiResponseType.BadRequest, Resources.UserNotFoundMessage);
+            return new ServiceResponse<GetUserDto?>(null, ApiResponseType.BadRequest, Resources.UserNotFoundMessage);
 
         if (!await IsAdmin(admin))
-            return new ServiceResponse<User>(null, ApiResponseType.Forbidden, Resources.accessDeniedMessage);
+            return new ServiceResponse<GetUserDto?>(null, ApiResponseType.Forbidden, Resources.accessDeniedMessage);
 
         if (await UserExists(user.Username))
-            return new ServiceResponse<User>(null, ApiResponseType.Conflict, Resources.UserAlreadyExistsMessage);
+            return new ServiceResponse<GetUserDto?>(null, ApiResponseType.Conflict, Resources.UserAlreadyExistsMessage);
 
         _passwordService.CreatePasswordHash(password, out var passwordHash, out var passwordSalt);
         user.PasswordHash = passwordHash;
@@ -72,34 +105,65 @@ public class AdminService : IAdminService
         await _context.Users.AddAsync(user);
         await _context.SaveChangesAsync();
 
-        return new ServiceResponse<User>(user, ApiResponseType.Created, Resources.UserCreatedSuccessfullyMessage);
+        GetUserDto userDto = _mapper.Map<GetUserDto>(user);
+
+        return new ServiceResponse<GetUserDto?>(userDto, ApiResponseType.Created,
+            Resources.UserCreatedSuccessfullyMessage);
     }
 
-
-    public async Task<ServiceResponse<User>> AddRole(User user, Role role)
+    public async Task<ServiceResponse<GetUserDto?>> DeleteUser(User user)
     {
         var token = _cookieService.GetCookieValue();
         if (string.IsNullOrEmpty(token))
-            return new ServiceResponse<User>(null, ApiResponseType.Unauthorized, Resources.UnauthorizedMessage);
+            return new ServiceResponse<GetUserDto?>(null, ApiResponseType.Unauthorized, Resources.UnauthorizedMessage);
 
         var adminId = _tokenService.GetUserNameFromToken();
         var admin = await GetUser(adminId);
         if (admin is null)
-            return new ServiceResponse<User>(null, ApiResponseType.BadRequest, Resources.UserNotFoundMessage);
+            return new ServiceResponse<GetUserDto?>(null, ApiResponseType.BadRequest, Resources.UserNotFoundMessage);
 
         if (!await IsAdmin(admin))
-            return new ServiceResponse<User>(null, ApiResponseType.Forbidden, Resources.accessDeniedMessage);
+            return new ServiceResponse<GetUserDto?>(null, ApiResponseType.Forbidden, Resources.accessDeniedMessage);
 
         var foundUser = await GetUser(user.Username);
         if (foundUser is null)
-            return new ServiceResponse<User>(null, ApiResponseType.NotFound, Resources.UserNotFoundMessage);
+            return new ServiceResponse<GetUserDto?>(null, ApiResponseType.NotFound, Resources.UserNotFoundMessage);
+
+        if (user.Username == admin.Username)
+            return new ServiceResponse<GetUserDto?>(null, ApiResponseType.BadRequest,
+                Resources.CanNotDeleteYourself);
+        _context.Users.Remove(foundUser);
+        await _context.SaveChangesAsync();
+
+        GetUserDto userDto = _mapper.Map<GetUserDto>(user);
+
+        return new ServiceResponse<GetUserDto?>(userDto, ApiResponseType.Success, Resources.UserDeletionSuccessful);
+    }
+
+    public async Task<ServiceResponse<GetUserDto?>> AddRole(User user, Role role)
+    {
+        var token = _cookieService.GetCookieValue();
+        if (string.IsNullOrEmpty(token))
+            return new ServiceResponse<GetUserDto?>(null, ApiResponseType.Unauthorized, Resources.UnauthorizedMessage);
+
+        var adminId = _tokenService.GetUserNameFromToken();
+        var admin = await GetUser(adminId);
+        if (admin is null)
+            return new ServiceResponse<GetUserDto?>(null, ApiResponseType.BadRequest, Resources.UserNotFoundMessage);
+
+        if (!await IsAdmin(admin))
+            return new ServiceResponse<GetUserDto?>(null, ApiResponseType.Forbidden, Resources.accessDeniedMessage);
+
+        var foundUser = await GetUser(user.Username);
+        if (foundUser is null)
+            return new ServiceResponse<GetUserDto?>(null, ApiResponseType.NotFound, Resources.UserNotFoundMessage);
 
         var foundRole = await GetRole(role.RoleType);
         if (foundRole is null)
-            return new ServiceResponse<User>(null, ApiResponseType.BadRequest, Resources.RoleNotFoundMessage);
+            return new ServiceResponse<GetUserDto?>(null, ApiResponseType.BadRequest, Resources.RoleNotFoundMessage);
 
         if (await GetUserRole(foundRole, foundUser) is not null)
-            return new ServiceResponse<User>(null, ApiResponseType.BadRequest, Resources.RoleAlreadyAssigned);
+            return new ServiceResponse<GetUserDto?>(null, ApiResponseType.BadRequest, Resources.RoleAlreadyAssigned);
 
         var userRole = new UserRole
         {
@@ -112,54 +176,60 @@ public class AdminService : IAdminService
         await _context.UserRoles.AddAsync(userRole);
         await _context.SaveChangesAsync();
 
-        return new ServiceResponse<User>(user, ApiResponseType.Success, Resources.RoleAddedSuccessfulyMassage);
+        GetUserDto userDto = _mapper.Map<GetUserDto>(user);
+
+        return new ServiceResponse<GetUserDto?>(userDto, ApiResponseType.Success,
+            Resources.RoleAddedSuccessfulyMassage);
     }
 
-    public async Task<ServiceResponse<User>> DeleteRole(User user, Role role)
+    public async Task<ServiceResponse<GetUserDto?>> DeleteRole(User user, Role role)
     {
         var token = _cookieService.GetCookieValue();
         if (string.IsNullOrEmpty(token))
-            return new ServiceResponse<User>(null, ApiResponseType.Unauthorized, Resources.UnauthorizedMessage);
+            return new ServiceResponse<GetUserDto?>(null, ApiResponseType.Unauthorized, Resources.UnauthorizedMessage);
 
         var adminId = _tokenService.GetUserNameFromToken();
         var admin = await GetUser(adminId);
         if (admin is null)
-            return new ServiceResponse<User>(null, ApiResponseType.BadRequest, Resources.UserNotFoundMessage);
+            return new ServiceResponse<GetUserDto?>(null, ApiResponseType.BadRequest, Resources.UserNotFoundMessage);
 
         if (!await IsAdmin(admin))
-            return new ServiceResponse<User>(null, ApiResponseType.Forbidden, Resources.accessDeniedMessage);
+            return new ServiceResponse<GetUserDto?>(null, ApiResponseType.Forbidden, Resources.accessDeniedMessage);
 
         var foundUser = await GetUser(user.Username);
         if (foundUser is null)
-            return new ServiceResponse<User>(null, ApiResponseType.NotFound, Resources.UserNotFoundMessage);
+            return new ServiceResponse<GetUserDto?>(null, ApiResponseType.NotFound, Resources.UserNotFoundMessage);
 
         var foundRole = await GetRole(role.RoleType);
         if (foundRole is null)
-            return new ServiceResponse<User>(null, ApiResponseType.BadRequest, Resources.RoleNotFoundMessage);
+            return new ServiceResponse<GetUserDto?>(null, ApiResponseType.BadRequest, Resources.RoleNotFoundMessage);
 
 
         var userRole = await GetUserRole(foundRole, foundUser);
         if (userRole is null)
-            return new ServiceResponse<User>(null, ApiResponseType.BadRequest, Resources.dontHaveThisRole);
+            return new ServiceResponse<GetUserDto?>(null, ApiResponseType.BadRequest, Resources.DontHaveThisRole);
 
         _context.UserRoles.Remove(userRole);
         await _context.SaveChangesAsync();
 
-        return new ServiceResponse<User>(foundUser, ApiResponseType.Success, Resources.RoleRemovedSuccessfullyMessage);
+        GetUserDto userDto = _mapper.Map<GetUserDto>(user);
+
+        return new ServiceResponse<GetUserDto?>(userDto, ApiResponseType.Success,
+            Resources.RoleRemovedSuccessfullyMessage);
     }
 
-    private async Task<User?> GetUser(string username)
-    {
-        return await _context.Users.FirstOrDefaultAsync(x => x.Username.ToLower().Equals(username.ToLower()));
-    }
+    private async Task<User?> GetUser(string? username) =>
+        await _context.Users.FirstOrDefaultAsync(x =>
+            username != null && x.Username != null && x.Username.ToLower().Equals(username.ToLower()));
 
-    private async Task<bool> IsAdmin(User? user)
+    private Task<bool> IsAdmin(User? user)
     {
-        if (user == null) return false;
-        var targetUSer = _context.Users.SingleOrDefault(a => a.Username == user.Username);
-        var result = targetUSer.UserRoles.Any(Userrole =>
-            Userrole.Role.RoleType.ToLower() == RoleType.SystemAdmin.ToString().ToLower());
-        return result;
+        if (user == null) return Task.FromResult(false);
+        var targetUser = _context.Users.Include(u => u.UserRoles).ThenInclude(userRole => userRole.Role)
+            .SingleOrDefault(a => a.Username == user.Username);
+        var result = targetUser != null && targetUser.UserRoles.Any(userrole =>
+            userrole.Role.RoleType.ToLower() == RoleType.SystemAdmin.ToString().ToLower());
+        return Task.FromResult(result);
     }
 
     private async Task<Role?> GetRole(string? roleType)
@@ -168,15 +238,12 @@ public class AdminService : IAdminService
         return await _context.Roles.FirstOrDefaultAsync(x => x.RoleType.ToLower() == roleType.ToLower());
     }
 
+    private async Task<UserRole?> GetUserRole(Role foundRole, User foundUser) =>
+        await _context.UserRoles.FirstOrDefaultAsync(x =>
+            x.User.Username != null && foundUser.Username != null && x.RoleId == foundRole.RoleId &&
+            x.User.Username.ToLower() == foundUser.Username.ToLower());
 
-    private async Task<UserRole?> GetUserRole(Role foundRole, User foundUser)
-    {
-        return await _context.UserRoles.FirstOrDefaultAsync(x =>
-            x.RoleId == foundRole.RoleId && x.User.Username.ToLower() == foundUser.Username.ToLower());
-    }
-
-    private async Task<bool> UserExists(string username)
-    {
-        return await _context.Users.AnyAsync(x => x.Username.ToLower() == username.ToLower());
-    }
+    private async Task<bool> UserExists(string? username) =>
+        await _context.Users.AnyAsync(x =>
+            username != null && x.Username != null && x.Username.ToLower() == username.ToLower());
 }

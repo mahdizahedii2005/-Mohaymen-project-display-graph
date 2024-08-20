@@ -27,13 +27,14 @@ public class AdminServiceTest
         _tokenService = Substitute.For<ITokenService>();
         _passwordService = Substitute.For<IPasswordService>();
         _mapper = Substitute.For<IMapper>();
+
         var options = new DbContextOptionsBuilder<DataContext>()
-            .UseInMemoryDatabase(databaseName: new Random().NextInt64() + Guid.NewGuid().ToString())
+            .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
             .Options;
         _mockContext = new DataContext(options);
-        _sut = new AdminService(_mockContext, _cookieService, _tokenService, _passwordService,
-            _mapper); 
+        _sut = new AdminService(_mockContext, _cookieService, _tokenService, _passwordService, _mapper);
     }
+
     [Fact]
     public async Task Register_ShouldReturnUnauthorized_WhenTokenIsEmpty()
     {
@@ -105,27 +106,63 @@ public class AdminServiceTest
                 x[1] = fakePasswordHash;
                 x[2] = fakePasswordSalt;
             });
+
         // Act
         var result = await _sut.Register(
-            new User(){UserId = 8,Username = "mamad"}, "password");
+            new User() { UserId = 8, Username = "mamad" }, "password");
 
         // Assert
         Assert.Equal(ApiResponseType.Created, result.Type);
     }
 
+
+    [Fact]
+    public async Task Register_ShouldSetCorrectPasswordHashAndSalt_WhenUserIsSuccessfullyRegistered()
+    {
+        // Arrange
+        FixTheReturnOfCookies("admin");
+        AddUserWithRole("admin", "SystemAdmin", 1);
+
+        byte[] fakePasswordHash = new byte[] { 1, 2, 3, 4 };
+        byte[] fakePasswordSalt = new byte[] { 5, 6, 7, 8 };
+
+        _passwordService
+            .When(x => x.CreatePasswordHash(Arg.Any<string>(), out Arg.Any<byte[]>(), out Arg.Any<byte[]>()))
+            .Do(x =>
+            {
+                x[1] = fakePasswordHash;
+                x[2] = fakePasswordSalt;
+            });
+
+        var newUser = new User() { UserId = 8, Username = "mamad" };
+
+        // Act
+        var result = await _sut.Register(newUser, "password");
+
+        // Assert
+        Assert.Equal(ApiResponseType.Created, result.Type);
+        Assert.Equal(fakePasswordHash, newUser.PasswordHash);
+        Assert.Equal(fakePasswordSalt, newUser.Salt);
+    }
+
+
     [Fact]
     public async Task GetUserByUsername_ShouldReturnSuccess_WhenUserIsFound()
     {
         // Arrange
-        var user = AddUserWithRole("testUser", "SystemAdmin", 1);
-
-        _mapper.Map<GetUserDto>(Arg.Any<User>()).Returns(new GetUserDto());
+        FixTheReturnOfCookies("admin");
+        var adminUser = AddUserWithRole("admin", "SystemAdmin", 1);
+        var testUser = AddUserWithRole("testUser", "SystemAdmin", 2);
+        var userDto = new GetUserDto { Username = "testUser" };
+        _mapper.Map<GetUserDto>(Arg.Any<User>()).Returns(userDto);
 
         // Act
         var result = await _sut.GetUserByUsername("testUser");
 
         // Assert
         Assert.Equal(ApiResponseType.Success, result.Type);
+        Assert.NotNull(result.Data);
+        Assert.Equal("testUser", result.Data.Username);
     }
 
     [Fact]
@@ -142,8 +179,10 @@ public class AdminServiceTest
     public async Task GetAllUsers_ShouldReturnAllUsersSuccessfully()
     {
         // Arrange
-        AddUserWithRole("admin1", "SystemAdmin", 1);
-        AddUserWithRole("admin2", "SystemAdmin", 2);
+        FixTheReturnOfCookies("admin");
+        var adminUser = AddUserWithRole("admin", "SystemAdmin", 1);
+        AddUserWithRole("user1", "User", 2);
+        AddUserWithRole("user2", "User", 3);
 
         _mapper.Map<GetUserDto>(Arg.Any<User>()).Returns(new GetUserDto());
 
@@ -152,8 +191,9 @@ public class AdminServiceTest
 
         // Assert
         Assert.Equal(ApiResponseType.Success, result.Type);
-        Assert.Equal(2, result.Data.Count);
+        Assert.Equal(3, result.Data.Count);
     }
+
 
     [Fact]
     public async Task GetAllRoles_ShouldReturnAllRolesSuccessfully()
@@ -173,7 +213,7 @@ public class AdminServiceTest
         Assert.Equal(2, result.Data.Count);
     }
 
-    private void FixTheReturnOfCookies(string returnThis)
+    private void FixTheReturnOfCookies(string? returnThis)
     {
         _cookieService.GetCookieValue().Returns(returnThis);
         _tokenService.GetUserNameFromToken().Returns(returnThis);
@@ -355,4 +395,90 @@ public class AdminServiceTest
             ur.UserId == user.User.UserId && ur.RoleId == user.Role.RoleId);
         Assert.Null(result);
     }
+
+    [Fact]
+    public async Task DeleteUser_ShouldReturnUnauthorized_WhenTokenIsEmpty()
+    {
+        // Arrange
+        _cookieService.GetCookieValue().Returns(string.Empty);
+
+        // Act
+        var result = await _sut.DeleteUser(null);
+
+        // Assert
+        Assert.Equal(ApiResponseType.Unauthorized, result.Type);
+    }
+
+    [Fact]
+    public async Task DeleteUser_ShouldReturnBadRequest_WhenAdminNotFound()
+    {
+        // Arrange
+        FixTheReturnOfCookies("admin");
+
+        // Act
+        var response = await _sut.DeleteUser(null);
+
+        // Assert
+        Assert.Equal(ApiResponseType.BadRequest, response.Type);
+    }
+
+    [Fact]
+    public async Task DeleteUser_ShouldReturnForbidden_WhenUserIsNotAdmin()
+    {
+        // Arrange
+        FixTheReturnOfCookies("fakeAdmin");
+        AddUserWithRole("fakeAdmin", "Analyst", 1);
+
+        // Act
+        var result = await _sut.DeleteUser(new User());
+
+        // Assert
+        Assert.Equal(ApiResponseType.Forbidden, result.Type);
+    }
+
+    [Fact]
+    public async Task DeleteUser_ShouldReturnNotFound_WhenUserDoesNotExist()
+    {
+        // Arrange
+        FixTheReturnOfCookies("admin");
+        AddUserWithRole("admin", "SystemAdmin", 1);
+        var user = AddUserWithRole("target", "DataAdmin", 2);
+        var role = AddUserWithRole("fakeUser", "Analyst", 3);
+
+        // Act
+        var result = await _sut.DeleteUser(new User() { Username = "testUser" });
+        // Assert
+        Assert.Equal(ApiResponseType.NotFound, result.Type);
+    }
+
+    [Fact]
+    public async Task DeleteRole_ShouldReturnSuccess_WhenAdminAndUserExist()
+    {
+        // Arrange
+        FixTheReturnOfCookies("admin");
+        AddUserWithRole("admin", "SystemAdmin", 1);
+        var user = AddUserWithRole("target", "DataAdmin", 2);
+
+        // Act
+        var result = await _sut.DeleteUser(user.User);
+
+        // Assert
+        Assert.Equal(ApiResponseType.Success, result.Type);
+    }
+
+    [Fact]
+    public async Task DeleteRole_ShouldReturnYouCanNotDeleteYourself_WhenAdminDeleteHimself()
+    {
+        // Arrange
+        FixTheReturnOfCookies("admin");
+        AddUserWithRole("admin", "SystemAdmin", 1);
+        var user = AddUserWithRole("target", "DataAdmin", 2);
+
+        // Act
+        var result = await _sut.DeleteUser(new User() { Username = "admin" });
+
+        // Assert
+        Assert.Equal(ApiResponseType.BadRequest, result.Type);
+    }
+
 }

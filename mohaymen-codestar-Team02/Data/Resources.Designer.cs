@@ -69,11 +69,20 @@ namespace mohaymen_codestar_Team02.Data {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Can Not Delete Yourself.
+        /// </summary>
+        internal static string CanNotDeleteYourself {
+            get {
+                return ResourceManager.GetString("CanNotDeleteYourself", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to This User Doesn&apos;t Have This Role.
         /// </summary>
-        internal static string dontHaveThisRole {
+        internal static string DontHaveThisRole {
             get {
-                return ResourceManager.GetString("dontHaveThisRole", resourceCulture);
+                return ResourceManager.GetString("DontHaveThisRole", resourceCulture);
             }
         }
         
@@ -159,6 +168,15 @@ namespace mohaymen_codestar_Team02.Data {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Roles Retrieved Successfully.
+        /// </summary>
+        internal static string RolesRetrievedMassage {
+            get {
+                return ResourceManager.GetString("RolesRetrievedMassage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Unauthorized.
         /// </summary>
         internal static string UnauthorizedMessage {
@@ -186,11 +204,38 @@ namespace mohaymen_codestar_Team02.Data {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to User Deleted Successfuly.
+        /// </summary>
+        internal static string UserDeletionSuccessful {
+            get {
+                return ResourceManager.GetString("UserDeletionSuccessful", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to User Not Found.
         /// </summary>
         internal static string UserNotFoundMessage {
             get {
                 return ResourceManager.GetString("UserNotFoundMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to User Retrieved Successfully.
+        /// </summary>
+        internal static string UserRetrievedMassage {
+            get {
+                return ResourceManager.GetString("UserRetrievedMassage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Users Retrieved Successfully.
+        /// </summary>
+        internal static string UsersRetrievedMassage {
+            get {
+                return ResourceManager.GetString("UsersRetrievedMassage", resourceCulture);
             }
         }
         

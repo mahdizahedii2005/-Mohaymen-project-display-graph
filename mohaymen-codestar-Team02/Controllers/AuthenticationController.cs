@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
+using mohaymen_codestar_Team02.Dto.User;
 using mohaymen_codestar_Team02.Dto.UserDtos;
+using mohaymen_codestar_Team02.Models;
 using mohaymen_codestar_Team02.Services.Authenticatoin;
 
 namespace mohaymen_codestar_Team02.Controllers;
@@ -18,7 +20,15 @@ public class AuthenticationController : ControllerBase
     [HttpPost("login")]
     public async Task<IActionResult> Login(LoginUserDto request)
     {
-        var response = await _authenticationService.Login(request.Username, request.Password);
-        return StatusCode((int)response.Type, response.Message);
+        ServiceResponse<GetUserDto?> response = await _authenticationService.Login(request.Username, request.Password);
+        return StatusCode((int)response.Type, response);
+    }
+
+    [HttpPost("logout")]
+    //[ValidateAntiForgeryToken]
+    public IActionResult Logout()
+    {
+        ServiceResponse<string?> response = _authenticationService.Logout();
+        return StatusCode((int)response.Type, response);
     }
 }

@@ -118,10 +118,12 @@ public class InitialServices
 
 
         foreach (var role in roles)
+        {
             if (!_context.Roles.Any(r => r.RoleType == role.RoleType))
                 _context.Roles.Add(role);
 
-        _context.SaveChanges();
+            _context.SaveChanges();
+        }
     }
 
     public void SeadAdmin()
@@ -139,7 +141,7 @@ public class InitialServices
             var role = _context.Roles.FirstOrDefault(r =>
                 r.RoleType.ToLower().Equals(RoleType.SystemAdmin.ToString().ToLower()));
 
-            var userRole = new UserRole()
+            UserRole userRole = new UserRole()
             { RoleId = role.RoleId, UserId = admin.UserId, Role = role, User = admin };
             _context.UserRoles.Add(userRole);
 

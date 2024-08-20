@@ -6,6 +6,8 @@ using mohaymen_codestar_Team02.Services.ProfileService;
 
 namespace mohaymen_codestar_Team02.Controllers;
 
+[ApiController]
+[Route("user")]
 public class ProfileController : ControllerBase
 {
     private readonly IProfileService _profileService;
@@ -15,26 +17,18 @@ public class ProfileController : ControllerBase
         _profileService = profileService;
     }
 
-    [HttpPut("changePassword")]
-    public async Task<IActionResult> ChangePassword(ChangePasswordUserDto request)
+    [HttpPatch("password")]
+    public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordUserDto request)
     {
-        ServiceResponse<User> response =
+        ServiceResponse<object> response =
             await _profileService.ChangePassword(request.PreviousPassword, request.NewPassword);
-        return StatusCode((int)response.Type, response.Message);
+        return StatusCode((int)response.Type, response);
     }
 
-    [HttpPost("logout")]
-    //[ValidateAntiForgeryToken]
-    public IActionResult Logout()
+    [HttpPut("update")]
+    public async Task<IActionResult> UpdateUser([FromBody] UpdateUserDto request)
     {
-        ServiceResponse<User> response = _profileService.Logout();
-        return StatusCode((int)response.Type, response.Message);
-    }
-
-    [HttpPost("UpdateUser")]
-    public async Task<IActionResult> UpdateUser(UpdateUserDto request)
-    {
-        ServiceResponse<User> response = await _profileService.UpdateUser(request);
-        return StatusCode((int)response.Type, response.Message);
+        ServiceResponse<GetUserDto?> response = await _profileService.UpdateUser(request);
+        return StatusCode((int)response.Type, response);
     }
 }

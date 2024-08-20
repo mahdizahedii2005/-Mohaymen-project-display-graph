@@ -11,13 +11,12 @@ namespace mohaymen_codestar_Team02.Services.ProfileService;
 public class ProfileService : IProfileService
 {
     private readonly DataContext _context;
-    private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly ICookieService _cookieService;
     private readonly IPasswordService _passwordService;
     private readonly ITokenService _tokenService;
     private readonly IMapper _mapper;
 
-    public ProfileService(IHttpContextAccessor httpContextAccessor, DataContext context, ICookieService cookieService,
+    public ProfileService(DataContext context, ICookieService cookieService,
         IPasswordService passwordService, ITokenService tokenService, IMapper mapper)
     {
         _mapper = mapper;
@@ -26,23 +25,24 @@ public class ProfileService : IProfileService
         _passwordService = passwordService;
         _tokenService = tokenService;
         _mapper = mapper;
-        _httpContextAccessor = httpContextAccessor;
     }
 
-    public async Task<ServiceResponse<User>> ChangePassword(string previousPassword, string newPassword)
+    public async Task<ServiceResponse<object>> ChangePassword(string previousPassword, string newPassword)
     {
         var token = _cookieService.GetCookieValue();
         if (string.IsNullOrEmpty(token))
-            return new ServiceResponse<User>(null, ApiResponseType.Unauthorized, Resources.UnauthorizedMessage);
+        {
+            return new ServiceResponse<object>(new { }, ApiResponseType.Unauthorized, Resources.UnauthorizedMessage);
+        }
 
         var username = _tokenService.GetUserNameFromToken();
         var user = await GetUser(username);
 
         if (user is null)
-            return new ServiceResponse<User>(null, ApiResponseType.BadRequest, Resources.UserNotFoundMessage);
+            return new ServiceResponse<object>(new { }, ApiResponseType.BadRequest, Resources.UserNotFoundMessage);
 
-        if (!_passwordService.VerifyPasswordHash(newPassword, user.PasswordHash, user.Salt))
-            return new ServiceResponse<User>(null, ApiResponseType.BadRequest, Resources.WrongPasswordMessage);
+        if (!_passwordService.VerifyPasswordHash(previousPassword, user.PasswordHash, user.Salt))
+            return new ServiceResponse<object>(new { }, ApiResponseType.BadRequest, Resources.WrongPasswordMessage);
 
         _passwordService.CreatePasswordHash(newPassword, out var passwordHash, out var passwordSalt);
         user.PasswordHash = passwordHash;
@@ -51,38 +51,23 @@ public class ProfileService : IProfileService
         _context.Users.Update(user);
         await _context.SaveChangesAsync();
 
-        return new ServiceResponse<User>(user, ApiResponseType.Success, Resources.PasswordChangedSuccessfulyMessage);
+        return new ServiceResponse<object>(new { }, ApiResponseType.Success, Resources.PasswordChangedSuccessfulyMessage);
     }
 
-    public ServiceResponse<User> Logout()
-    {
-        if (_httpContextAccessor.HttpContext?.Request.Cookies.ContainsKey("login") == true)
-        {
-            var cookieOptions = new CookieOptions
-            {
-                HttpOnly = true,
-                Secure = true,
-                Expires = DateTime.Now.AddDays(-1)
-            };
-
-            _httpContextAccessor.HttpContext.Response.Cookies.Append("login", "", cookieOptions);
-        }
-
-        return new ServiceResponse<User>(null, ApiResponseType.Success, Resources.LogoutSuccessfuly);
-    }
-
-    public async Task<ServiceResponse<User>> UpdateUser(UpdateUserDto updateUserDto)
+    public async Task<ServiceResponse<GetUserDto?>> UpdateUser(UpdateUserDto updateUserDto)
     {
         var newUser = _mapper.Map<UpdateUserDto>(updateUserDto);
 
         var token = _cookieService.GetCookieValue();
         if (string.IsNullOrEmpty(token))
-            return new ServiceResponse<User>(null, ApiResponseType.Unauthorized, Resources.UnauthorizedMessage);
+        {
+            return new ServiceResponse<GetUserDto?>(null, ApiResponseType.Unauthorized, Resources.UnauthorizedMessage);
+        }
 
         var username = _tokenService.GetUserNameFromToken();
         var user = await GetUser(username);
         if (user is null)
-            return new ServiceResponse<User>(null, ApiResponseType.BadRequest, Resources.UserNotFoundMessage);
+            return new ServiceResponse<GetUserDto?>(null, ApiResponseType.BadRequest, Resources.UserNotFoundMessage);
 
         user.FirstName = newUser.FirstName;
         user.LastName = newUser.LastName;
@@ -91,11 +76,11 @@ public class ProfileService : IProfileService
         _context.Users.Update(user);
         await _context.SaveChangesAsync();
 
-        return new ServiceResponse<User>(user, ApiResponseType.Success, Resources.ProfileInfoUpdateSuccessfulyMessage);
+        var userDto = _mapper.Map<GetUserDto>(user);
+        return new ServiceResponse<GetUserDto?>(userDto, ApiResponseType.Success,
+            Resources.ProfileInfoUpdateSuccessfulyMessage);
     }
 
-    private Task<User?> GetUser(string username)
-    {
-        return _context.Users.FirstOrDefaultAsync(x => x.Username.ToLower() == username.ToLower());
-    }
+    private Task<User?> GetUser(string? username) =>
+        _context.Users.FirstOrDefaultAsync(x => x.Username.ToLower() == username.ToLower());
 }
