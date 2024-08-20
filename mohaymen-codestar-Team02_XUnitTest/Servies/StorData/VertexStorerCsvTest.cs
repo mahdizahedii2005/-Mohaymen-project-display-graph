@@ -46,7 +46,7 @@ namespace mohaymen_codestar_Team02_XUnitTest.Servies.StorData
             Assert.True(result);
             Assert.Equal(1, await _dataContext.VertexEntities.CountAsync());
             Assert.Equal(1, await _dataContext.VertexAttributes.CountAsync());
-            Assert.Equal(4, await _dataContext.VertexValues.CountAsync());
+            Assert.Equal(2, await _dataContext.VertexValues.CountAsync());
         }
 
         [Fact]
