@@ -32,7 +32,7 @@ public class AdminServiceTest
             .Options;
         _mockContext = new DataContext(options);
         _sut = new AdminService(_mockContext, _cookieService, _tokenService, _passwordService,
-            _mapper); // پاس دادن Mapper به کلاس AdminService
+            _mapper); 
     }
     [Fact]
     public async Task Register_ShouldReturnUnauthorized_WhenTokenIsEmpty()

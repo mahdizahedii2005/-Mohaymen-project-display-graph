@@ -5,9 +5,9 @@ using mohaymen_codestar_Team02.Services.StoreData.Abstraction;
 
 namespace mohaymen_codestar_Team02.Services.StoreData;
 
-public class EdgeStorerCsv(IServiceProvider serviceProvider) : IEdageStorer
+public class EdgeStorerCsv(IServiceProvider? serviceProvider) : IEdageStorer
 {
-    public async Task<bool> StoreFileData(string entityName, string dataFile, string dataGroupId)
+    public async Task<bool> StoreFileData(string entityName, string dataFile, long dataGroupId)
     {
         using var scope = serviceProvider.CreateScope();
         var dataContext = scope.ServiceProvider.GetRequiredService<DataContext>();

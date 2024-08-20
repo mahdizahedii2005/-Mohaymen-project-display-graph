@@ -8,13 +8,13 @@ public class StoreDataService(IServiceProvider serviceProvider, IEdageStorer eda
 {
     public IEdageStorer EdageStorer { get; set; } = edageStorer;
     public IVertexStorer VertexStorer { get; set; } = vertexStorer;
-    public string StoreDataSet(string? nameData, string userName)
+    public long StoreDataSet(string? nameData, string userName)
     {
         using var scope = serviceProvider.CreateScope();
         var context = scope.ServiceProvider.GetRequiredService<DataContext>();
         try
         {
-            if (string.IsNullOrEmpty(nameData)) return string.Empty;
+            if (string.IsNullOrEmpty(nameData)) return -1;
             var setData = new DataGroup(nameData,
                 context.Users.SingleOrDefault(u => u.Username.ToLower() == userName.ToLower()).UserId);
             context.DataSets.Add(setData);
@@ -23,7 +23,7 @@ public class StoreDataService(IServiceProvider serviceProvider, IEdageStorer eda
         }
         catch (ArgumentException e)
         {
-            return string.Empty;
+            return -1;
         }
     }
 }

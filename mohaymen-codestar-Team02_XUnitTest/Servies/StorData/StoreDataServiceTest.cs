@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using mohaymen_codestar_Team02.Data;
 using mohaymen_codestar_Team02.Models;
 using mohaymen_codestar_Team02.Services.StoreData;
@@ -9,23 +10,31 @@ namespace mohaymen_codestar_Team02_XUnitTest.Servies.StorData;
 
 public class StoreDataServiceTest
 {
-    private DataContext _mockContext;
     private StoreDataService _sut;
+    private DataContext _mockContext;
+    private ServiceProvider _serviceProvider;
 
     public StoreDataServiceTest()
     {
+        var serviceCollection = new ServiceCollection();
+
         var options = new DbContextOptionsBuilder<DataContext>()
-            .UseInMemoryDatabase(databaseName: new Random().NextInt64() + Guid.NewGuid().ToString())
+            .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
             .Options;
-        _mockContext = new DataContext(options);
+
+        serviceCollection.AddScoped(_ => new DataContext(options));
+
+        _serviceProvider = serviceCollection.BuildServiceProvider();
         IEdageStorer edageStorer = Substitute.For<IEdageStorer>();
         IVertexStorer vertexStorer = Substitute.For<IVertexStorer>();
-        _sut = new StoreDataService(_mockContext, edageStorer, vertexStorer);
+        _sut = new StoreDataService(_serviceProvider, edageStorer, vertexStorer);
+      
     }
 
     [Fact]
     public async Task StoreDataSet_ShouldStoreTheData_whenDataIsVilid()
-    {
+    {  using var scope = _serviceProvider.CreateScope();
+        _mockContext = scope.ServiceProvider.GetRequiredService<DataContext>();
         //Arrange
         var name = "mahdi";
         _mockContext.Users.Add(new User()
@@ -35,18 +44,19 @@ public class StoreDataServiceTest
         var bolResult = _sut.StoreDataSet(name, "3");
         var result = await _mockContext.DataSets.FirstOrDefaultAsync(x => x.Name == name);
         //Assert
-        Assert.NotEmpty(bolResult);
+        Assert.True(bolResult != -1);
         Assert.Equal(result.Name, name);
     }
 
     [Fact]
     public async Task StoreDataSet_ShouldReturnFalse_NameDataIsNull()
-    {
+    {  using var scope = _serviceProvider.CreateScope();
+        _mockContext = scope.ServiceProvider.GetRequiredService<DataContext>();
         //Arrange
         //Act 
         var result = _sut.StoreDataSet(null, "3");
         //Assert
-        Assert.Empty(result);
+        Assert.True(result == -1);
         Assert.Empty(_mockContext.DataSets);
     }
 }

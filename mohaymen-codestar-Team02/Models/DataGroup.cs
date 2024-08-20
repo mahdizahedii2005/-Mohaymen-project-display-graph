@@ -7,7 +7,7 @@ namespace mohaymen_codestar_Team02.Models;
 
 public class DataGroup(string name, long userId)
 {
-    [Key] public string Id { get; set; } = Guid.NewGuid().ToString();
+    [Key] public long Id { get; set; }
 
     public string Name { get; set; } = name;
     public DateTime CreateAt { get; set; } = DateTime.Now;

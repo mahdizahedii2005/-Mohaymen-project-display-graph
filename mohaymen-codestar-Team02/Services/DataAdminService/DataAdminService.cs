@@ -17,7 +17,7 @@ public class DataAdminService(IStorHandler storHandler)
         }
 
         var dataGroupId = storHandler.StoreDataSet(graphName, userName);
-        if (string.IsNullOrEmpty(dataGroupId))
+        if (dataGroupId == -1)
         {
             return new ServiceResponse<string>(string.Empty, ApiResponseType.BadRequest, Data.Resources.InvalidInpute);
         }
