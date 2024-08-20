@@ -7,7 +7,7 @@ public class PasswordService : IPasswordService
         using (var hmac = new System.Security.Cryptography.HMACSHA512())
         {
             passwordSalt = hmac.Key;
-            passwordHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password.ToString()));
+            passwordHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
         }
     }
 
