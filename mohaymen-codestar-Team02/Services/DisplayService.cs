@@ -36,9 +36,9 @@ public class DisplayService{
             .Select(g => g.ToDictionary(v => v.VertexAttribute.Name, v => v.StringValue)).ToList();
 
         var vertexFieldNamesTypes = new Dictionary<string, Type>();
-        foreach (var vertexFieldNameType in vertexFieldNamesTypes)
+        foreach (var vertexFieldNameType in vertexFieldNames)
         {
-            vertexFieldNamesTypes.Add(vertexFieldNameType.Key, typeof(string));
+            vertexFieldNamesTypes.Add(vertexFieldNameType, typeof(string));
         }
         var vertexType = _modelBuilder.CreateDynamicClass(vertexTypeName, vertexFieldNamesTypes, null);
         
@@ -55,18 +55,19 @@ public class DisplayService{
         var edgeRecords = dataSet.EdgeEntity.EdgeAttributes.Select(ea => ea.EdgeValues).SelectMany(v => v).GroupBy(v => v.ObjectId)
             .Select(g => g.ToDictionary(v => v.EdgeAttribute.Name, v => v.StringValue)).ToList();
         
+        // delete from field names
         
         var edgeFieldNameTypes = new Dictionary<string, Type>(); //
         
         edgeFieldNameTypes.Add("Source", vertexType);
         edgeFieldNameTypes.Add("Target", vertexType);
 
-        foreach (var edgeFieldNameType in edgeFieldNameTypes)
+        foreach (var edgeFieldNameType in EdgeFieldNames)
         {
-            edgeFieldNameTypes.Add(edgeFieldNameType.Key, typeof(string));
+            edgeFieldNameTypes.Add(edgeFieldNameType, typeof(string));
         }
-
-        var edgeType = _modelBuilder.CreateDynamicClass(edgeTypeName, edgeFieldNameTypes, typeof(IEdge<>));
+        var vertexType1 = typeof(IEdge<>).MakeGenericType(vertexType);
+        var edgeType = _modelBuilder.CreateDynamicClass(edgeTypeName, edgeFieldNameTypes, vertexType1);
         
         edges = new List<dynamic>(); //
         // get valid edgges
@@ -93,17 +94,6 @@ public class DisplayService{
             else
             {
                 // create edges
-                if (!directed)
-                {
-                    foreach (var source in sources)
-                    {
-                        foreach (var destination in destinations)
-                        {
-                            edges.Add(_objectBuilder.CreateDynamicObject1(edgeType, er, vertexType, destination, source));
-                        }
-                    }
-                }
-
                 foreach (var source in sources)
                 {
                     foreach (var destination in destinations)
