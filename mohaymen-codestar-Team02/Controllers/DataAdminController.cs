@@ -5,13 +5,21 @@ using mohaymen_codestar_Team02.Services.FileReaderService;
 
 namespace mohaymen_codestar_Team02.Controllers;
 
-public class DataAdminController(IDataAdminService _dataAdminService, IFileReader fileReader) : ControllerBase
+public class DataAdminController : ControllerBase
 {
+
+    private readonly IDataAdminService _dataAdminService;
+    private readonly IFileReader _fileReader;
+    public DataAdminController(IDataAdminService dataAdminService, IFileReader fileReader)
+    {
+        _dataAdminService = dataAdminService;
+        _fileReader = fileReader;
+    }
     [HttpPost("DataSets")]
     public async Task<IActionResult> StoreNewDataSet([FromForm] StoreDataDto storeDataDto)
     {
-        var edgeFile = fileReader.Read(storeDataDto.EdgeFile);
-        var vertexFile = fileReader.Read(storeDataDto.VertexFile);
+        var edgeFile = _fileReader.Read(storeDataDto.EdgeFile);
+        var vertexFile = _fileReader.Read(storeDataDto.VertexFile);
         var response = await _dataAdminService.StoreData(edgeFile, vertexFile, storeDataDto.DataName,
             Path.GetFileName(storeDataDto.EdgeFile.FileName), Path.GetFileName(storeDataDto.VertexFile.FileName),
             storeDataDto.CreatorUserName);

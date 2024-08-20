@@ -5,11 +5,16 @@ using mohaymen_codestar_Team02.Services.StoreData.Abstraction;
 
 namespace mohaymen_codestar_Team02.Services.StoreData;
 
-public class EdgeStorerCsv(IServiceProvider? serviceProvider) : IEdageStorer
+public class EdgeStorerCsv : IEdageStorer
 {
+    private readonly IServiceProvider? _serviceProvider;
+    public EdgeStorerCsv(IServiceProvider? serviceProvider)
+    {
+        _serviceProvider = serviceProvider;
+    }
     public async Task<bool> StoreFileData(string entityName, string dataFile, long dataGroupId)
     {
-        using var scope = serviceProvider.CreateScope();
+        using var scope = _serviceProvider.CreateScope();
         var dataContext = scope.ServiceProvider.GetRequiredService<DataContext>();
         try
         {

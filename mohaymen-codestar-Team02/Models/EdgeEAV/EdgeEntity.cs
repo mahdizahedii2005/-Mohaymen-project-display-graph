@@ -9,7 +9,7 @@ public class EdgeEntity
     public EdgeEntity(string name, long dataSetId)
     {
         _name = name + "!Edge" + "!" + Guid.NewGuid() + "!";
-        DataSetId = dataSetId;
+        DataGroupId = dataSetId;
     }
 
     [Key] public long Id { get; set; }
@@ -31,7 +31,7 @@ public class EdgeEntity
         set { _name = value + "!Edge" + "!" + Guid.NewGuid() + "!"; }
     }
 
-    public long DataSetId { get; set; }
-    [ForeignKey("DataSetId")] public virtual DataGroup? DataGroup { get; set; }
-    public virtual ICollection<EdgeAttribute> Attributes { get; set; } = new List<EdgeAttribute>();
+    public long DataGroupId { get; set; }
+    [ForeignKey("DataGroupId")] public virtual DataGroup? DataGroup { get; set; }
+    public virtual ICollection<EdgeAttribute> EdgeAttributes { get; set; } = new List<EdgeAttribute>();
 }

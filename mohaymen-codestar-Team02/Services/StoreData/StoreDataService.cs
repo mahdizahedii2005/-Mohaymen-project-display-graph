@@ -4,15 +4,25 @@ using mohaymen_codestar_Team02.Services.StoreData.Abstraction;
 
 namespace mohaymen_codestar_Team02.Services.StoreData;
 
-public class StoreDataService(IServiceProvider serviceProvider, IEdageStorer edageStorer, IVertexStorer vertexStorer)
+public class StoreDataService
     : IStorHandler
 {
-    public IEdageStorer EdageStorer { get; set; } = edageStorer;
-    public IVertexStorer VertexStorer { get; set; } = vertexStorer;
+    private readonly IServiceProvider _serviceProvider;
+    private readonly IEdageStorer _edageStorer;
+    private readonly IVertexStorer _vertexStorer;
+    
+    public StoreDataService(IServiceProvider serviceProvider, IEdageStorer edageStorer, IVertexStorer vertexStorer)
+    {
+        _serviceProvider = serviceProvider;
+        _edageStorer = edageStorer;
+        _vertexStorer = vertexStorer;
+    }
+    public IEdageStorer EdageStorer { get; set; }
+    public IVertexStorer VertexStorer { get; set; }
 
     public async Task<long> StoreDataSet(string? nameData, string userName)
     {
-        using var scope = serviceProvider.CreateScope();
+        using var scope = _serviceProvider.CreateScope();
         var context = scope.ServiceProvider.GetRequiredService<DataContext>();
         try
         {
