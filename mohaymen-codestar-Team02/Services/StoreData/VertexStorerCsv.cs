@@ -5,11 +5,16 @@ using mohaymen_codestar_Team02.Services.StoreData.Abstraction;
 
 namespace mohaymen_codestar_Team02.Services.StoreData;
 
-public class VertexStorerCsv(IServiceProvider serviceProvider) : IVertexStorer
+public class VertexStorerCsv : IVertexStorer
 {
+    private readonly IServiceProvider _serviceProvider;
+    public VertexStorerCsv(IServiceProvider serviceProvider)
+    {
+        this._serviceProvider = serviceProvider;
+    }
     public async Task<bool> StoreFileData(string entityName, string dataFile, long dataGroupId)
     {
-        using var scope = serviceProvider.CreateScope();
+        using var scope = _serviceProvider.CreateScope();
         var dataContext = scope.ServiceProvider.GetRequiredService<DataContext>();
         try
         {

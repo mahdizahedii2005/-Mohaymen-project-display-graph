@@ -3,11 +3,16 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace mohaymen_codestar_Team02.Models.EdgeEAV;
 
-public class EdgeAttribute(string name, long entityId)
+public class EdgeAttribute
 {
+    public EdgeAttribute(string name, long entityId)
+    {
+        this.Name = name;
+        this.EdgeEntityId = entityId;
+    }
     [Key] public long Id { get; set; }
-    public string Name { get; set; } = name;
-    public long EntityId { get; set; } = entityId;
-    [ForeignKey("EntityId")] public virtual EdgeEntity EdgeEntity { get; set; }
-    public virtual ICollection<EdgeValue> Values { get; set; } = new List<EdgeValue>();
+    public string Name { get; set; }
+    public long EdgeEntityId { get; set; }
+    [ForeignKey("EdgeEntityId")] public virtual EdgeEntity EdgeEntity { get; set; }
+    public virtual ICollection<EdgeValue> EdgeValues { get; set; } = new List<EdgeValue>();
 }

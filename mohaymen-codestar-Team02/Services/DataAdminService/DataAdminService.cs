@@ -1,12 +1,16 @@
 using mohaymen_codestar_Team02.Models;
-using mohaymen_codestar_Team02.Services.ModelData.Abstraction;
 using mohaymen_codestar_Team02.Services.StoreData.Abstraction;
 
 namespace mohaymen_codestar_Team02.Services.DataAdminService;
 
-public class DataAdminService(IStorHandler storHandler)
+public class DataAdminService
     : IDataAdminService
 {
+    private readonly IStorHandler storHandler;
+    public DataAdminService(IStorHandler storHandler)
+    {
+        this.storHandler = storHandler;
+    }
     public async Task<ServiceResponse<string>> StoreData(string? edgeFile, string? vertexFile, string graphName
         , string? edgeEntityName, string vertexEntityName, string userName)
     {

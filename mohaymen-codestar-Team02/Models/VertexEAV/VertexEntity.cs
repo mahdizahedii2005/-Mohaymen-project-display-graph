@@ -41,5 +41,5 @@ public class VertexEntity
 
     public long DataSetId { get; set; }
     [ForeignKey("DataSetId")] public virtual DataGroup DataGroup { get; set; }
-    public virtual ICollection<VertexAttribute> Attributes { get; set; } = new List<VertexAttribute>();
+    public virtual ICollection<VertexAttribute> VertexAttributes { get; set; } = new List<VertexAttribute>();
 }
