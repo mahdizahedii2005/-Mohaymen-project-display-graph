@@ -12,27 +12,19 @@ public class DataAdminService(IStorHandler storHandler)
     {
         if (string.IsNullOrEmpty(edgeEntityName) || string.IsNullOrEmpty(graphName) ||
             string.IsNullOrEmpty(vertexEntityName))
-        {
             return new ServiceResponse<string>(string.Empty, ApiResponseType.BadRequest, Data.Resources.InvalidInpute);
-        }
 
-        var dataGroupId =await storHandler.StoreDataSet(graphName, userName);
+        var dataGroupId = await storHandler.StoreDataSet(graphName, userName);
         if (dataGroupId == -1)
-        {
             return new ServiceResponse<string>(string.Empty, ApiResponseType.BadRequest, Data.Resources.InvalidInpute);
-        }
 
         if (!await storHandler.EdageStorer.StoreFileData(edgeEntityName, edgeFile, dataGroupId))
-        {
             return new ServiceResponse<string>(string.Empty,
                 ApiResponseType.BadRequest, Data.Resources.InvalidInpute);
-        }
 
         if (!await storHandler.VertexStorer.StoreFileData(vertexEntityName, vertexFile, dataGroupId))
-        {
             return new ServiceResponse<string>(string.Empty,
                 ApiResponseType.BadRequest, Data.Resources.InvalidInpute);
-        }
 
         return new ServiceResponse<string>(null, ApiResponseType.Success, string.Empty);
     }

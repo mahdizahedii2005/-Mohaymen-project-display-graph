@@ -44,7 +44,7 @@ public class StoreDataServiceTest
         var bolResult = _sut.StoreDataSet(name, "3");
         var result = await _mockContext.DataSets.FirstOrDefaultAsync(x => x.Name == name);
         //Assert
-        Assert.True(bolResult != -1);
+        Assert.True(bolResult.Result != -1);
         Assert.Equal(result.Name, name);
     }
 
@@ -56,7 +56,7 @@ public class StoreDataServiceTest
         //Act 
         var result = _sut.StoreDataSet(null, "3");
         //Assert
-        Assert.True(result == -1);
+        Assert.True(result.Result == -1);
         Assert.Empty(_mockContext.DataSets);
     }
 }

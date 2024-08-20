@@ -19,16 +19,13 @@ public class EdgeEntity
     {
         get
         {
-            Regex regex = new Regex(@"^(.+?)!");
-            Match match = regex.Match(_name);
-            if (match.Success)
-            {
-                return match.Groups[1].Value;
-            }
+            var regex = new Regex(@"^(.+?)!");
+            var match = regex.Match(_name);
+            if (match.Success) return match.Groups[1].Value;
 
             return null;
         }
-        set { _name = value + "!Edge" + "!" + Guid.NewGuid() + "!"; }
+        set => _name = value + "!Edge" + "!" + Guid.NewGuid() + "!";
     }
 
     public long DataSetId { get; set; }

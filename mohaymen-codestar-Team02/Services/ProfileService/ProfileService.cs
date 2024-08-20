@@ -33,9 +33,7 @@ public class ProfileService : IProfileService
     {
         var token = _cookieService.GetCookieValue();
         if (string.IsNullOrEmpty(token))
-        {
             return new ServiceResponse<User>(null, ApiResponseType.Unauthorized, Resources.UnauthorizedMessage);
-        }
 
         var username = _tokenService.GetUserNameFromToken();
         var user = await GetUser(username);
@@ -46,7 +44,7 @@ public class ProfileService : IProfileService
         if (!_passwordService.VerifyPasswordHash(newPassword, user.PasswordHash, user.Salt))
             return new ServiceResponse<User>(null, ApiResponseType.BadRequest, Resources.WrongPasswordMessage);
 
-        _passwordService.CreatePasswordHash(newPassword, out byte[] passwordHash, out byte[] passwordSalt);
+        _passwordService.CreatePasswordHash(newPassword, out var passwordHash, out var passwordSalt);
         user.PasswordHash = passwordHash;
         user.Salt = passwordSalt;
 
@@ -79,9 +77,7 @@ public class ProfileService : IProfileService
 
         var token = _cookieService.GetCookieValue();
         if (string.IsNullOrEmpty(token))
-        {
             return new ServiceResponse<User>(null, ApiResponseType.Unauthorized, Resources.UnauthorizedMessage);
-        }
 
         var username = _tokenService.GetUserNameFromToken();
         var user = await GetUser(username);
@@ -98,6 +94,8 @@ public class ProfileService : IProfileService
         return new ServiceResponse<User>(user, ApiResponseType.Success, Resources.ProfileInfoUpdateSuccessfulyMessage);
     }
 
-    private Task<User?> GetUser(string username) =>
-        _context.Users.FirstOrDefaultAsync(x => x.Username.ToLower() == username.ToLower());
+    private Task<User?> GetUser(string username)
+    {
+        return _context.Users.FirstOrDefaultAsync(x => x.Username.ToLower() == username.ToLower());
+    }
 }

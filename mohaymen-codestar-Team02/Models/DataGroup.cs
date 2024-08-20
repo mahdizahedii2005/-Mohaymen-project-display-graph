@@ -11,7 +11,7 @@ public class DataGroup(string name, long userId)
 
     public string Name { get; set; } = name;
     public DateTime CreateAt { get; set; } = DateTime.UtcNow;
-    public DateTime UpdateAt { get; set; } =  DateTime.UtcNow;
+    public DateTime UpdateAt { get; set; } = DateTime.UtcNow;
 
     public virtual EdgeEntity Edge { get; set; }
     public virtual VertexEntity Vertex { get; set; }

@@ -76,10 +76,7 @@ public class InitialServices
                     OnMessageReceived = context =>
                     {
                         var token = context.HttpContext.Request.Cookies["login"];
-                        if (!string.IsNullOrEmpty(token))
-                        {
-                            context.Token = token;
-                        }
+                        if (!string.IsNullOrEmpty(token)) context.Token = token;
 
                         return Task.CompletedTask;
                     }
@@ -100,19 +97,19 @@ public class InitialServices
 
     public void SeadRole()
     {
-        List<Role> roles = new List<Role>()
+        List<Role> roles = new()
         {
-            new Role()
+            new()
             {
                 RoleId = 1,
                 RoleType = "SystemAdmin"
             },
-            new Role()
+            new()
             {
                 RoleId = 2,
                 RoleType = "Analyst"
             },
-            new Role()
+            new()
             {
                 RoleId = 3,
                 RoleType = "DataAdmin"
@@ -121,12 +118,8 @@ public class InitialServices
 
 
         foreach (var role in roles)
-        {
             if (!_context.Roles.Any(r => r.RoleType == role.RoleType))
-            {
                 _context.Roles.Add(role);
-            }
-        }
 
         _context.SaveChanges();
     }
@@ -137,17 +130,17 @@ public class InitialServices
         {
             var admin = new User()
             {
-                Username = "admin",
+                Username = "admin"
             };
-            _passwordService.CreatePasswordHash("admin", out byte[] passwordHash, out byte[] passwordSalt);
+            _passwordService.CreatePasswordHash("admin", out var passwordHash, out var passwordSalt);
             admin.PasswordHash = passwordHash;
             admin.Salt = passwordSalt;
 
             var role = _context.Roles.FirstOrDefault(r =>
                 r.RoleType.ToLower().Equals(RoleType.SystemAdmin.ToString().ToLower()));
 
-            UserRole userRole = new UserRole()
-                { RoleId = role.RoleId, UserId = admin.UserId, Role = role, User = admin };
+            var userRole = new UserRole()
+            { RoleId = role.RoleId, UserId = admin.UserId, Role = role, User = admin };
             _context.UserRoles.Add(userRole);
 
             _context.Users.Add(admin);

@@ -21,8 +21,7 @@ public class DataContext : DbContext
     public DbSet<VertexValue> VertexValues { get; set; }
     public DbSet<EdgeValue> EdgeValues { get; set; }
     public DbSet<DataGroup> DataSets { get; set; }
-    
-    
+
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {

@@ -27,21 +27,15 @@ public class VertexEntity
     {
         get
         {
-            Regex regex = new Regex(@"^(.+?)!");
-            Match match = regex.Match(_name);
-            if (match.Success)
-            {
-                return match.Groups[1].Value;
-            }
+            var regex = new Regex(@"^(.+?)!");
+            var match = regex.Match(_name);
+            if (match.Success) return match.Groups[1].Value;
 
             return null;
         }
         set
         {
-            if (!value.Contains("!"))
-            {
-                _name = value + "!vertex" + "!" + Guid.NewGuid() + "!";
-            }
+            if (!value.Contains("!")) _name = value + "!vertex" + "!" + Guid.NewGuid() + "!";
         }
     }
 

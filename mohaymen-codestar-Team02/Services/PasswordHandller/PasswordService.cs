@@ -17,13 +17,9 @@ public class PasswordService : IPasswordService
         {
             var computedHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
 
-            for (int i = 0; i < computedHash.Length; i++)
-            {
+            for (var i = 0; i < computedHash.Length; i++)
                 if (computedHash[i] != passwordHash[i])
-                {
                     return false;
-                }
-            }
 
             return true;
         }

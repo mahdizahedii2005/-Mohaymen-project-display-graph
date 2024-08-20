@@ -31,7 +31,7 @@ public class AdminService : IAdminService
     public async Task<ServiceResponse<GetUserDto>> GetUserByUsername(string username)
     {
         var user = await GetUser(username);
-        GetUserDto userDto = _mapper.Map<GetUserDto>(user);
+        var userDto = _mapper.Map<GetUserDto>(user);
         return new ServiceResponse<GetUserDto>(userDto, ApiResponseType.Success, "");
     }
 
@@ -52,9 +52,7 @@ public class AdminService : IAdminService
     {
         var token = _cookieService.GetCookieValue();
         if (string.IsNullOrEmpty(token))
-        {
             return new ServiceResponse<User>(null, ApiResponseType.Unauthorized, Resources.UnauthorizedMessage);
-        }
 
         var adminUsername = _tokenService.GetUserNameFromToken();
         var admin = await GetUser(adminUsername);
@@ -67,7 +65,7 @@ public class AdminService : IAdminService
         if (await UserExists(user.Username))
             return new ServiceResponse<User>(null, ApiResponseType.Conflict, Resources.UserAlreadyExistsMessage);
 
-        _passwordService.CreatePasswordHash(password, out byte[] passwordHash, out byte[] passwordSalt);
+        _passwordService.CreatePasswordHash(password, out var passwordHash, out var passwordSalt);
         user.PasswordHash = passwordHash;
         user.Salt = passwordSalt;
 
@@ -103,7 +101,7 @@ public class AdminService : IAdminService
         if (await GetUserRole(foundRole, foundUser) is not null)
             return new ServiceResponse<User>(null, ApiResponseType.BadRequest, Resources.RoleAlreadyAssigned);
 
-        UserRole userRole = new UserRole
+        var userRole = new UserRole
         {
             Role = foundRole,
             User = foundUser,
@@ -150,8 +148,10 @@ public class AdminService : IAdminService
         return new ServiceResponse<User>(foundUser, ApiResponseType.Success, Resources.RoleRemovedSuccessfullyMessage);
     }
 
-    private async Task<User?> GetUser(string username) =>
-        await _context.Users.FirstOrDefaultAsync(x => x.Username.ToLower().Equals(username.ToLower()));
+    private async Task<User?> GetUser(string username)
+    {
+        return await _context.Users.FirstOrDefaultAsync(x => x.Username.ToLower().Equals(username.ToLower()));
+    }
 
     private async Task<bool> IsAdmin(User? user)
     {
@@ -169,10 +169,14 @@ public class AdminService : IAdminService
     }
 
 
-    private async Task<UserRole?> GetUserRole(Role foundRole, User foundUser) =>
-        await _context.UserRoles.FirstOrDefaultAsync(x =>
+    private async Task<UserRole?> GetUserRole(Role foundRole, User foundUser)
+    {
+        return await _context.UserRoles.FirstOrDefaultAsync(x =>
             x.RoleId == foundRole.RoleId && x.User.Username.ToLower() == foundUser.Username.ToLower());
+    }
 
-    private async Task<bool> UserExists(string username) =>
-        await _context.Users.AnyAsync(x => x.Username.ToLower() == username.ToLower());
+    private async Task<bool> UserExists(string username)
+    {
+        return await _context.Users.AnyAsync(x => x.Username.ToLower() == username.ToLower());
+    }
 }

@@ -32,7 +32,8 @@ public class DataAdminController(IDataAdminService _dataAdminService, IFileReade
     public void DisplayVertexDetails(string datasetName, int vertexId)
     {
     }
-        [HttpGet("DataSets/{dataSetName}/Edges/{edgeId}")]
+
+    [HttpGet("DataSets/{dataSetName}/Edges/{edgeId}")]
     public void DisplayEdgeDetails(string datasetName, int edgeId)
     {
     }

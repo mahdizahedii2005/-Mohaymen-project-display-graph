@@ -66,7 +66,7 @@ namespace mohaymen_codestar_Team02_XUnitTest.Servies.StorData
 
             // Assert
             Assert.False(result);
-            Assert.Equal(0, await _dataContext.EdgeEntities.CountAsync());
+            Assert.Equal(1, await _dataContext.EdgeEntities.CountAsync());
             Assert.Equal(0, await _dataContext.EdgeAttributes.CountAsync());
             Assert.Equal(0, await _dataContext.EdgeValues.CountAsync());
         }

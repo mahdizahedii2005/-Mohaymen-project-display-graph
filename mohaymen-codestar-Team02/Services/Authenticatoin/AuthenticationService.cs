@@ -25,10 +25,8 @@ public class AuthenticationService : IAuthenticationService
 
     public async Task<ServiceResponse<User>> Login(string username, string password)
     {
-        if (string.IsNullOrEmpty(username)||string.IsNullOrEmpty(password))
-        {
-            return new ServiceResponse<User>(null,ApiResponseType.BadRequest,Resources.InvalidInpute);
-        }
+        if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
+            return new ServiceResponse<User>(null, ApiResponseType.BadRequest, Resources.InvalidInpute);
         var user = await GetUser(username);
 
         if (user is null)
@@ -39,7 +37,7 @@ public class AuthenticationService : IAuthenticationService
 
         Claim[] claims = new[]
         {
-            new Claim(ClaimTypes.Name, user.Username),
+            new Claim(ClaimTypes.Name, user.Username)
         };
 
         _cookieService.CreateCookie(_tokenService.CreateToken(claims));
@@ -48,6 +46,8 @@ public class AuthenticationService : IAuthenticationService
     }
 
 
-    private async Task<User?> GetUser(string username) =>
-        await _context.Users.FirstOrDefaultAsync(x => x.Username.ToLower().Equals(username.ToLower()));
+    private async Task<User?> GetUser(string username)
+    {
+        return await _context.Users.FirstOrDefaultAsync(x => x.Username.ToLower().Equals(username.ToLower()));
+    }
 }
