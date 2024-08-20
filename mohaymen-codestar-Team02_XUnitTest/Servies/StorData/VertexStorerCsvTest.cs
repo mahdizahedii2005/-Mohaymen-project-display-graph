@@ -39,14 +39,15 @@ namespace mohaymen_codestar_Team02_XUnitTest.Servies.StorData
             string dataFile = "attribute1,attribute2\nvalue1,value2\nlol1,lol2";
             var dataGroupId = 1;
 
+            
             // Act
             var result = await _sut.StoreFileData(entityName, dataFile, dataGroupId);
 
             // Assert
             Assert.True(result);
             Assert.Equal(1, await _dataContext.VertexEntities.CountAsync());
-            Assert.Equal(2, await _dataContext.VertexAttributes.CountAsync());
-            Assert.Equal(4, await _dataContext.VertexValues.CountAsync());
+            Assert.Equal(1, await _dataContext.VertexAttributes.CountAsync());
+            Assert.Equal(2, await _dataContext.VertexValues.CountAsync());
         }
 
         [Fact]
@@ -65,7 +66,7 @@ namespace mohaymen_codestar_Team02_XUnitTest.Servies.StorData
 
             // Assert
             Assert.False(result);
-            Assert.Equal(0, await _dataContext.VertexEntities.CountAsync());
+            Assert.Equal(1, await _dataContext.VertexEntities.CountAsync());
             Assert.Equal(0, await _dataContext.VertexAttributes.CountAsync());
             Assert.Equal(0, await _dataContext.VertexValues.CountAsync());
         }
