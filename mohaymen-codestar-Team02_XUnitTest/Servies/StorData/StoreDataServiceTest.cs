@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using mohaymen_codestar_Team02.Data;
+using mohaymen_codestar_Team02.Models;
 using mohaymen_codestar_Team02.Services.StoreData;
 using mohaymen_codestar_Team02.Services.StoreData.Abstraction;
 using NSubstitute;
@@ -27,8 +28,11 @@ public class StoreDataServiceTest
     {
         //Arrange
         var name = "mahdi";
+        _mockContext.Users.Add(new User()
+            { Username = "3", UserId = 4, PasswordHash = Array.Empty<byte>(), Salt = Array.Empty<byte>() });
+        _mockContext.SaveChanges();
         //Act
-        var bolResult = _sut.StoreDataSet(name,"3");
+        var bolResult = _sut.StoreDataSet(name, "3");
         var result = await _mockContext.DataSets.FirstOrDefaultAsync(x => x.Name == name);
         //Assert
         Assert.NotEmpty(bolResult);
@@ -40,7 +44,7 @@ public class StoreDataServiceTest
     {
         //Arrange
         //Act 
-        var result = _sut.StoreDataSet(null,"3");
+        var result = _sut.StoreDataSet(null, "3");
         //Assert
         Assert.Empty(result);
         Assert.Empty(_mockContext.DataSets);

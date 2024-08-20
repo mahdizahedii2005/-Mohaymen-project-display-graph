@@ -5,10 +5,12 @@ using mohaymen_codestar_Team02.Services.StoreData.Abstraction;
 
 namespace mohaymen_codestar_Team02.Services.StoreData;
 
-public class VertexStorerCsv(DataContext dataContext) : IVertexStorer
+public class VertexStorerCsv(IServiceProvider serviceProvider) : IVertexStorer
 {
     public async Task<bool> StoreFileData(string entityName, string dataFile, string dataGroupId)
     {
+        using var scope = serviceProvider.CreateScope();
+        var dataContext = scope.ServiceProvider.GetRequiredService<DataContext>();
         try
         {
             VertexEntity edgeEntity = new VertexEntity(entityName, dataGroupId);

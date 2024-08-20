@@ -69,6 +69,7 @@ public class DataAdminServiceTest
     public async Task StoreData_ReturnsSuccses_WhenInputAreValid()
     {
         // Arrange
+        _storHandler.StoreDataSet(Arg.Any<string>(), Arg.Any<string>()).Returns("mamadl");
         // Act
         var result = await _sut.StoreData("sampleEdgeFile", "sampleVertexFile", "testData", "a", "lll","2");
         // Assert

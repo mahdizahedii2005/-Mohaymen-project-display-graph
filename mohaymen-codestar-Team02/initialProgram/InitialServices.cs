@@ -9,8 +9,12 @@ using mohaymen_codestar_Team02.Services;
 using mohaymen_codestar_Team02.Services.Administration;
 using mohaymen_codestar_Team02.Services.Authenticatoin;
 using mohaymen_codestar_Team02.Services.CookieService;
+using mohaymen_codestar_Team02.Services.DataAdminService;
+using mohaymen_codestar_Team02.Services.FileReaderService;
 using mohaymen_codestar_Team02.Services.PasswordHandller;
 using mohaymen_codestar_Team02.Services.ProfileService;
+using mohaymen_codestar_Team02.Services.StoreData;
+using mohaymen_codestar_Team02.Services.StoreData.Abstraction;
 using mohaymen_codestar_Team02.Services.TokenService;
 
 namespace mohaymen_codestar_Team02.initialProgram;
@@ -25,8 +29,8 @@ public class InitialServices
         _context = context;
         _passwordService = passwordService;
     }
-    
-    public static void ConfigureServices(IServiceCollection services , WebApplicationBuilder builder)
+
+    public static void ConfigureServices(IServiceCollection services, WebApplicationBuilder builder)
     {
         services.AddEndpointsApiExplorer();
         services.AddSwaggerGen();
@@ -34,8 +38,9 @@ public class InitialServices
         services.AddHttpContextAccessor();
 
         // Configure DbContext and Dependency Injection
+        var cs = Environment.GetEnvironmentVariable("CONNECTION_STRING");
         services.AddDbContext<DataContext>(options =>
-            options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+            options.UseNpgsql(cs));
 
         services
             .AddScoped<IAuthenticationService, AuthenticationService>()
@@ -44,11 +49,16 @@ public class InitialServices
             .AddScoped<ITokenService, TokenService>()
             .AddScoped<ICookieService, CookieService>()
             .AddScoped<IPasswordService, PasswordService>()
-            .AddScoped<InitialServices>();
+            .AddScoped<InitialServices>()
+            .AddSingleton<IEdageStorer, EdgeStorerCsv>()
+            .AddSingleton<IVertexStorer, VertexStorerCsv>()
+            .AddSingleton<IStorHandler, StoreDataService>()
+            .AddSingleton<IFileReader, ReadCsvFile>()
+            .AddSingleton<IDataAdminService, DataAdminService>();
 
         services.AddAutoMapper(typeof(AutoMapperProfile));
         services.AddAuthorization();
-        
+
         ConfigureAuthentication(services);
     }
 
@@ -108,11 +118,10 @@ public class InitialServices
                 RoleType = "DataAdmin"
             }
         };
-        
-        
+
+
         foreach (var role in roles)
         {
-            
             if (!_context.Roles.Any(r => r.RoleType == role.RoleType))
             {
                 _context.Roles.Add(role);
@@ -134,15 +143,15 @@ public class InitialServices
             admin.PasswordHash = passwordHash;
             admin.Salt = passwordSalt;
 
-            var role = _context.Roles.FirstOrDefault(r => r.RoleType.ToLower().Equals(RoleType.SystemAdmin.ToString().ToLower()));
-            
-            UserRole userRole = new UserRole() { RoleId = role.RoleId, UserId = admin.UserId, Role = role, User = admin };
+            var role = _context.Roles.FirstOrDefault(r =>
+                r.RoleType.ToLower().Equals(RoleType.SystemAdmin.ToString().ToLower()));
+
+            UserRole userRole = new UserRole()
+                { RoleId = role.RoleId, UserId = admin.UserId, Role = role, User = admin };
             _context.UserRoles.Add(userRole);
-            
+
             _context.Users.Add(admin);
             _context.SaveChanges();
         }
     }
-    
-    
 }
