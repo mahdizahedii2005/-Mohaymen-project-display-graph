@@ -1,5 +1,4 @@
 using mohaymen_codestar_Team02.Models;
-using mohaymen_codestar_Team02.Services.ModelData.Abstraction;
 using mohaymen_codestar_Team02.Services.StoreData.Abstraction;
 using NSubstitute;
 
@@ -13,7 +12,6 @@ public class DataAdminServiceTest
     public DataAdminServiceTest()
     {
         _storHandler = Substitute.For<IStorHandler>();
-        var modelHandler = Substitute.For<IModelHandler>();
         _sut = new mohaymen_codestar_Team02.Services.DataAdminService.DataAdminService( _storHandler);
         _storHandler.EdageStorer.StoreFileData(Arg.Any<string>(), Arg.Any<string>(),Arg.Any<long>()).Returns(true);
         _storHandler.VertexStorer.StoreFileData(Arg.Any<string>(), Arg.Any<string>(),Arg.Any<long>()).Returns(true);
