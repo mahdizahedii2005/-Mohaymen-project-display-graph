@@ -4,7 +4,7 @@ namespace mohaymen_codestar_Team02.Models;
 
 public class Edge : IEdge<string>
 {
-    public string Id;
-    public string Source { get; }
-    public string Target { get; }
+    public string Id { get; init; }
+    public string Source { get; init; }
+    public string Target { get; init; }
 }

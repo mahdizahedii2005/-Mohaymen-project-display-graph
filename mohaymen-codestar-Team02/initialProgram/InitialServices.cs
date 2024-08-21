@@ -1,5 +1,6 @@
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using mohaymen_codestar_Team02.Data;
@@ -10,12 +11,14 @@ using mohaymen_codestar_Team02.Services.Administration;
 using mohaymen_codestar_Team02.Services.Authenticatoin;
 using mohaymen_codestar_Team02.Services.CookieService;
 using mohaymen_codestar_Team02.Services.DataAdminService;
+using mohaymen_codestar_Team02.Services.DynamicService;
 using mohaymen_codestar_Team02.Services.FileReaderService;
 using mohaymen_codestar_Team02.Services.PasswordHandller;
 using mohaymen_codestar_Team02.Services.ProfileService;
 using mohaymen_codestar_Team02.Services.StoreData;
 using mohaymen_codestar_Team02.Services.StoreData.Abstraction;
 using mohaymen_codestar_Team02.Services.TokenService;
+using ModelBuilder = mohaymen_codestar_Team02.Services.ModelBuilder;
 
 namespace mohaymen_codestar_Team02.initialProgram;
 
@@ -50,11 +53,14 @@ public class InitialServices
             .AddScoped<ICookieService, CookieService>()
             .AddScoped<IPasswordService, PasswordService>()
             .AddScoped<InitialServices>()
-            .AddSingleton<IEdageStorer, EdgeStorerCsv>()
-            .AddSingleton<IVertexStorer, VertexStorerCsv>()
-            .AddTransient<IStorHandler, StoreDataService>()
-            .AddSingleton<IFileReader, ReadCsvFile>()
-            .AddSingleton<IDataAdminService, DataAdminService>();
+            .AddScoped<IEdageStorer, EdgeStorerCsv>()
+            .AddScoped<IVertexStorer, VertexStorerCsv>()
+            .AddScoped<IStorHandler, StoreDataService>()
+            .AddScoped<IFileReader, ReadCsvFile>()
+            .AddScoped<IDataAdminService, DataAdminService>()
+            .AddScoped<IDisplayDataService, DisplayService>()
+            .AddScoped<IModelBuilder, ModelBuilder>()
+            .AddScoped<IObjectBuilder, ObjectBuilder>();
 
         services.AddAutoMapper(typeof(AutoMapperProfile));
         services.AddAuthorization();

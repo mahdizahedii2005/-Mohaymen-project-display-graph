@@ -1,5 +1,6 @@
 using mohaymen_codestar_Team02.Dto.GraphDTO;
 using mohaymen_codestar_Team02.Models;
+using mohaymen_codestar_Team02.Models.EdgeEAV;
 using mohaymen_codestar_Team02.Services.StoreData.Abstraction;
 
 namespace mohaymen_codestar_Team02.Services.DataAdminService;
@@ -71,13 +72,18 @@ public class DataAdminService
     }
 */
     
-    public async Task<ServiceResponse<List<Vertex>>> DisplayVertexData(string databaseName, string sourceEdgeIdentifierFieldName,
+    public async Task<ServiceResponse<DisplayGraphDto>> DisplayGeraphData(string databaseName, string sourceEdgeIdentifierFieldName,
         string destinationEdgeIdentifierFieldName, string vertexIdentifierFieldName)
     {
-        var graph = _displayDataService.GetGraph2(databaseName, sourceEdgeIdentifierFieldName, destinationEdgeIdentifierFieldName,
+        var graph = _displayDataService.GetGraph(databaseName, sourceEdgeIdentifierFieldName, destinationEdgeIdentifierFieldName,
             vertexIdentifierFieldName);
 
-        return new ServiceResponse<List<Vertex>>(graph.vertices, ApiResponseType.Success, "");
+        var dto = new DisplayGraphDto()
+        {
+            Vertices = graph.vertices,
+            Edges = graph.edges,
+        };
+        return new ServiceResponse<DisplayGraphDto>(dto, ApiResponseType.Success, "");
     }
 
     public Task<ServiceResponse<List<Edge>>> DisplayEdgeData()

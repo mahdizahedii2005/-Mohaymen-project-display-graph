@@ -9,7 +9,16 @@ public class VertexEntity
 {
     public VertexEntity(string name, long dataGroupId)
     {
-        if (!name.Contains("!"))
+        Regex regex =
+            new Regex(
+                "^[^!]+!vertex![0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}!$");
+        var match = regex.Match(name);
+        if (match.Success)
+        {
+            _name = name;
+            DataGroupId = dataGroupId;
+        }
+        else if (!name.Contains("!"))
         {
             _name = name + "!vertex" + "!" + Guid.NewGuid() + "!";
             DataGroupId = dataGroupId;

@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using mohaymen_codestar_Team02.Data;
 using mohaymen_codestar_Team02.Models;
+using mohaymen_codestar_Team02.Services.DynamicService;
 using mohaymen_codestar_Team02.Services.TokenService;
 using QuikGraph;
 
@@ -9,18 +10,13 @@ namespace mohaymen_codestar_Team02.Services;
 public class DisplayService : IDisplayDataService
 {
     private readonly DataContext _context;
-    private readonly ModelBuilder _modelBuilder;
-    private readonly ObjectBuilder _objectBuilder;
 
-    public DisplayService(DataContext context, ModelBuilder modelBuilder, ObjectBuilder objectBuilder)
+    public DisplayService(DataContext context)
     {
         _context = context;
-        _modelBuilder = modelBuilder;
-        _objectBuilder = objectBuilder;
     }
 
-    
-    public (List<Vertex> vertices, List<Edge> edges) GetGraph2(string databaseName, string sourceEdgeIdentifierFieldName,
+    public (List<Vertex> vertices, List<Edge> edges) GetGraph(string databaseName, string sourceEdgeIdentifierFieldName,
         string destinationEdgeIdentifierFieldName, string vertexIdentifierFieldName)
     {
         var dataSet = _context.DataSets.Include(ds => ds.VertexEntity)
@@ -33,11 +29,11 @@ public class DisplayService : IDisplayDataService
         List<Vertex> vertices = new List<Vertex>();
         foreach (var record in vertexRecords)
         {
-            var name = record.SingleOrDefault(r => r.VertexAttribute.Name == vertexIdentifierFieldName).StringValue;
+            var value = record.SingleOrDefault(r => r.VertexAttribute.Name == vertexIdentifierFieldName).StringValue;
             Vertex v = new Vertex()
             {
                 Id = record.Key,
-                Name = name
+                Value = value
             };
             vertices.Add(v);
         }
@@ -69,7 +65,7 @@ public class DisplayService : IDisplayDataService
             {
                 foreach (var item in record1)
                 {
-                    if (item.VertexAttribute.Name == sourceEdgeIdentifierFieldName && item.StringValue == sourceValue)
+                    if (item.VertexAttribute.Name == vertexIdentifierFieldName && item.StringValue == sourceValue)
                     {
                         Vertex vertex = new Vertex()
                         {
@@ -77,7 +73,7 @@ public class DisplayService : IDisplayDataService
                         };
                         sources.Add(vertex);
                     }
-                    if (item.VertexAttribute.Name == destinationEdgeIdentifierFieldName && item.StringValue == destinationValue)
+                    if (item.VertexAttribute.Name == vertexIdentifierFieldName && item.StringValue == destinationValue)
                     {
                         Vertex vertex = new Vertex()
                         {
@@ -94,8 +90,8 @@ public class DisplayService : IDisplayDataService
                     Edge edge = new Edge()
                     {
                         Id = record.Key,
-                        SourceId = source.Id,
-                        TargeId = des.Id
+                        Source = source.Id,
+                        Target = des.Id
                     };
                     edges.Add(edge);
                 }
@@ -105,6 +101,7 @@ public class DisplayService : IDisplayDataService
         return (vertices, edges);
     }
     
+    /*
     public void GetGraph(string databaseName, string sourceEdgeIdentifierFieldName,
         string destinationEdgeIdentifierFieldName, string vertexIdentifierFieldName, bool directed,
         out List<dynamic> vertices, List<dynamic> edges)
@@ -196,5 +193,5 @@ public class DisplayService : IDisplayDataService
                 }
             }
         }
-    }
+    }*/
 }

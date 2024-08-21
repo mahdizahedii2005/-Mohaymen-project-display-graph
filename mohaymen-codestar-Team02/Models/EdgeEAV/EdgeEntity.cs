@@ -8,8 +8,25 @@ public class EdgeEntity
 {
     public EdgeEntity(string name, long dataGroupId)
     {
-        _name = name + "!Edge" + "!" + Guid.NewGuid() + "!";
-        DataGroupId = dataGroupId;
+        Regex regex =
+            new Regex(
+                "^[^!]+!Edge![0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}!$");
+        var match = regex.Match(name);
+        if (match.Success)
+        {
+            _name = name;
+            DataGroupId = dataGroupId;
+        }
+        else if (!name.Contains("!"))
+        {
+            _name = name + "!Edge" + "!" + Guid.NewGuid() + "!";
+            DataGroupId = dataGroupId;
+        }
+        else
+        {
+            throw new ArgumentException("your name contain !");
+        }
+        
     }
 
     [Key] public long Id { get; set; }

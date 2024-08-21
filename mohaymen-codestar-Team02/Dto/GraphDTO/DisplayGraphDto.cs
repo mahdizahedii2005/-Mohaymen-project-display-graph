@@ -6,5 +6,5 @@ public class DisplayGraphDto
 {
     public List<Edge> Edges { get; init; }
     public List<Vertex> Vertices { get; init; }
-    public string GraphName { get; init; }
+    public string GraphName { get; set; }
 }
