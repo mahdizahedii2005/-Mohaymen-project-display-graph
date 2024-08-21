@@ -8,7 +8,7 @@ public class StoreDataService
     : IStorHandler
 {
     private readonly IServiceProvider _serviceProvider;
-   
+
     public StoreDataService(IServiceProvider serviceProvider, IEdageStorer edageStorer, IVertexStorer vertexStorer)
     {
         _serviceProvider = serviceProvider;

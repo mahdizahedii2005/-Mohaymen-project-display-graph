@@ -4,6 +4,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "mohaymen-codestar-Team02", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "mohaymen-codestar-Team02_XUnitTest", "mohaymen-codestar-Team02_XUnitTest\mohaymen-codestar-Team02_XUnitTest.csproj", "{DBCC3406-305C-4B21-AF94-8BF8B78D1040}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "mohaymen-codestar-Team2.Migration", "mohaymen-codestar-Team2.Migration\mohaymen-codestar-Team2.Migration.csproj", "{28E49A9C-03AF-4843-9757-57D7E096B686}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,5 +20,9 @@ Global
 		{DBCC3406-305C-4B21-AF94-8BF8B78D1040}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DBCC3406-305C-4B21-AF94-8BF8B78D1040}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DBCC3406-305C-4B21-AF94-8BF8B78D1040}.Release|Any CPU.Build.0 = Release|Any CPU
+		{28E49A9C-03AF-4843-9757-57D7E096B686}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{28E49A9C-03AF-4843-9757-57D7E096B686}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{28E49A9C-03AF-4843-9757-57D7E096B686}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{28E49A9C-03AF-4843-9757-57D7E096B686}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
