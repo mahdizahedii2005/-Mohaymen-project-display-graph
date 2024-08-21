@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using mohaymen_codestar_Team02.Data;
+using mohaymen_codestar_Team02.Models;
 using mohaymen_codestar_Team02.Services.TokenService;
 using QuikGraph;
 
@@ -18,6 +19,19 @@ public class DisplayService
         _objectBuilder = objectBuilder;
     }
 
+    
+    public (List<Vertex> vertices, List<Edge> edges) GetGraph2(string databaseName, string sourceEdgeIdentifierFieldName,
+        string destinationEdgeIdentifierFieldName, string vertexIdentifierFieldName, bool directed)
+    {
+        var dataSet = _context.DataSets.Include(ds => ds.VertexEntity)
+            .ThenInclude(ve => ve.VertexAttributes).ThenInclude(vv=>vv.VertexValues).Include(ds => ds.EdgeEntity)
+            .ThenInclude(ee => ee.EdgeAttributes).ThenInclude(ev=>ev.EdgeValues).FirstOrDefault(ds=>ds.Name.ToLower().Equals(databaseName.ToLower()));
+        
+        var vertexRecords = dataSet.VertexEntity.VertexAttributes.Select(a => a.VertexValues).SelectMany(v => v).GroupBy(v => v.ObjectId)
+            .Select(g => g.ToDictionary(v => v.VertexAttribute.Name, v => v)).ToList();
+
+    }
+    
     public void GetGraph(string databaseName, string sourceEdgeIdentifierFieldName,
         string destinationEdgeIdentifierFieldName, string vertexIdentifierFieldName, bool directed,
         out List<dynamic> vertices, List<dynamic> edges)
