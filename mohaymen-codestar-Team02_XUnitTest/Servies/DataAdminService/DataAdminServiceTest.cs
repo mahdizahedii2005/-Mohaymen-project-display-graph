@@ -34,9 +34,9 @@ public class DataAdminServiceTest
         //Arrange
         _storHandler.StoreDataSet("mahdddd", "8").Returns(-1);
         //Action
-        var result = _sut.StoreData("sample", "sample", "mahdddd", "name", "ma", "8");
+        var result = await _sut.StoreData("sample", "sample", "mahdddd", "name", "ma", "8");
         //Assert
-        Assert.Equal(ApiResponseType.BadRequest, result.Result.Type);
+        Assert.Equal(ApiResponseType.BadRequest, result.Type);
     }
 
     [Fact]
@@ -45,9 +45,9 @@ public class DataAdminServiceTest
         //Arrange
         _storHandler.EdageStorer.StoreFileData(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<long>()).Returns(false);
         //Action
-        var result = _sut.StoreData("sample", "sample", "test", "mahdddd", "mahdddd", "8");
+        var result = await _sut.StoreData("sample", "sample", "test", "mahdddd", "mahdddd", "8");
         //Assert
-        Assert.Equal(ApiResponseType.BadRequest, result.Result.Type);
+        Assert.Equal(ApiResponseType.BadRequest, result.Type);
     }
 
     [Fact]
