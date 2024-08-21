@@ -1,9 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
-using mohaymen_codestar_Team02.Dto.GraphDTO;
+using mohaymen_codestar_Team02.Dto;
 using mohaymen_codestar_Team02.Dto.StoreDataDto;
 using mohaymen_codestar_Team02.Models;
+using mohaymen_codestar_Team02.Services;
 using mohaymen_codestar_Team02.Services.DataAdminService;
-using mohaymen_codestar_Team02.Services.DisplayData;
 using mohaymen_codestar_Team02.Services.FileReaderService;
 
 namespace mohaymen_codestar_Team02.Controllers;
@@ -45,17 +45,12 @@ public class DataAdminController : ControllerBase
     {
     }
 
-    [HttpGet("DataSets/{dataSetName}/Graph")]
-    public async Task<IActionResult> DisplayDataSetAsGraph(string dataSetName, [FromQuery] string vertexFieldName,
-        [FromQuery] string sourceField, [FromQuery] string targetField)
+    [HttpGet("DataSets/{dataSetName}")]
+    public async Task<IActionResult> DisplayDataSetAsGraph(GetGraphDto getGraphDto)
     {
-        var graph = await _dataAdminService.DisplayDataSetAsGraph(dataSetName, sourceField, targetField,
-            vertexFieldName);
-        if (graph.Type != ApiResponseType.Success)
-        {
-        }
-
-        return BadRequest();
+        ServiceResponse<List<Vertex>?> response =
+            await _dataAdminService.DisplayVertexData(getGraphDto.databaseName, getGraphDto.sourceEdgeIdentifierFieldName, getGraphDto.destinationEdgeIdentifierFieldName, getGraphDto.vertexIdentifierFieldName);
+        return StatusCode((int)response.Type, response);
     }
 
 

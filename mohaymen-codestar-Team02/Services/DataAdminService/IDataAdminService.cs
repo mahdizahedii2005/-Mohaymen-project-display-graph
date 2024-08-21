@@ -10,7 +10,10 @@ public interface IDataAdminService
 
     Task<ServiceResponse<DisplayGraphDto>> DisplayDataSetAsGraph(string dataSetName, string vertexFieldName
         , string sourceField, string targetField);
+    Task<ServiceResponse<string>> DisplayDataSet();
 
-    Task<ServiceResponse<DetailDto>> DisplayEdgeData(string setName, long edgeObjectId);
-    Task<ServiceResponse<DetailDto>> DisplayVertexData(string dataSetName, long vertexObjectId);
+    Task<ServiceResponse<List<Vertex>>> DisplayVertexData(string databaseName, string sourceEdgeIdentifierFieldName,
+        string destinationEdgeIdentifierFieldName, string vertexIdentifierFieldName);
+    Task<ServiceResponse<List<Edge>>> DisplayEdgeData();
+    
 }

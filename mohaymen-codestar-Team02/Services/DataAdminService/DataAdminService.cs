@@ -8,10 +8,11 @@ public class DataAdminService
     : IDataAdminService
 {
     private readonly IStorHandler storHandler;
-
-    public DataAdminService(IStorHandler storHandler)
+    private readonly IDisplayDataService _displayDataService;
+    public DataAdminService(IStorHandler storHandler, IDisplayDataService displayDataService)
     {
         this.storHandler = storHandler;
+        _displayDataService = displayDataService;
     }
 
     public async Task<ServiceResponse<string>> StoreData(string? edgeFile, string? vertexFile, string graphName
@@ -45,19 +46,41 @@ public class DataAdminService
         }
     }
 
-    public Task<ServiceResponse<DisplayGraphDto>> DisplayDataSetAsGraph(string dataSetName, string vertexFieldName
-        , string sourceField, string targetField)
+    public Task<ServiceResponse<DisplayGraphDto>> DisplayDataSetAsGraph(string dataSetName, string vertexFieldName, string sourceField, string targetField)
     {
         throw new NotImplementedException();
     }
 
-    public Task<ServiceResponse<DetailDto>> DisplayVertexData(string dataSetName, long vertexObjectId)
+    public Task<ServiceResponse<string>> DisplayGraph()
     {
-        return null;
+        throw new NotImplementedException();
+    }
+
+    public Task<ServiceResponse<string>> DisplayDataSet()
+    {
+        throw new NotImplementedException();
     }
     
+    /*
+    public Task<ServiceResponse<string>> DisplayGraph(string databaseName, string sourceEdgeIdentifierFieldName,
+        string destinationEdgeIdentifierFieldName, string vertexIdentifierFieldName)
+    {
+        var graph = _displayDataService.GetGraph2(databaseName, sourceEdgeIdentifierFieldName, destinationEdgeIdentifierFieldName,
+            vertexIdentifierFieldName);
+        return new Task<ServiceResponse<>>()
+    }
+*/
+    
+    public async Task<ServiceResponse<List<Vertex>>> DisplayVertexData(string databaseName, string sourceEdgeIdentifierFieldName,
+        string destinationEdgeIdentifierFieldName, string vertexIdentifierFieldName)
+    {
+        var graph = _displayDataService.GetGraph2(databaseName, sourceEdgeIdentifierFieldName, destinationEdgeIdentifierFieldName,
+            vertexIdentifierFieldName);
 
-    public Task<ServiceResponse<DetailDto>> DisplayEdgeData(string setName, long edgeObjectId)
+        return new ServiceResponse<List<Vertex>>(graph.vertices, ApiResponseType.Success, "");
+    }
+
+    public Task<ServiceResponse<List<Edge>>> DisplayEdgeData()
     {
         throw new NotImplementedException();
     }
