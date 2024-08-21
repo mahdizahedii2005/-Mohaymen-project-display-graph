@@ -11,7 +11,6 @@ namespace mohaymen_codestar_Team02_XUnitTest.Servies.StorData;
 public class StoreDataServiceTest
 {
     private StoreDataService _sut;
-    private DataContext _mockContext;
     private ServiceProvider _serviceProvider;
 
     public StoreDataServiceTest()
@@ -35,30 +34,30 @@ public class StoreDataServiceTest
     public async Task StoreDataSet_ShouldStoreTheData_whenDataIsVilid()
     {
         using var scope = _serviceProvider.CreateScope();
-        _mockContext = scope.ServiceProvider.GetRequiredService<DataContext>();
+        var mockContext = scope.ServiceProvider.GetRequiredService<DataContext>();
         //Arrange
         var name = "mahdi";
-        _mockContext.Users.Add(new User()
+        mockContext.Users.Add(new User()
         { Username = "3", UserId = 4, PasswordHash = Array.Empty<byte>(), Salt = Array.Empty<byte>() });
-        _mockContext.SaveChanges();
+        mockContext.SaveChanges();
         //Act
-        var bolResult = _sut.StoreDataSet(name, "3");
-        var result = await _mockContext.DataSets.FirstOrDefaultAsync(x => x.Name == name);
+        var bolResult = await _sut.StoreDataSet(name, "3");
+        var result = await mockContext.DataSets.FirstOrDefaultAsync(x => x.Name == name);
         //Assert
-        Assert.True(bolResult.Result != -1);
-        Assert.Equal(result.Name, name);
+        Assert.True(bolResult != -1);
+        Assert.Equal(result?.Name, name);
     }
 
     [Fact]
     public async Task StoreDataSet_ShouldReturnFalse_NameDataIsNull()
     {
         using var scope = _serviceProvider.CreateScope();
-        _mockContext = scope.ServiceProvider.GetRequiredService<DataContext>();
+        var mockContext = scope.ServiceProvider.GetRequiredService<DataContext>();
         //Arrange
         //Act 
-        var result = _sut.StoreDataSet(null, "3");
+        var result = await _sut.StoreDataSet(null, "3");
         //Assert
-        Assert.True(result.Result == -1);
-        Assert.Empty(_mockContext.DataSets);
+        Assert.True(result == -1);
+        Assert.Empty(mockContext.DataSets);
     }
 }
