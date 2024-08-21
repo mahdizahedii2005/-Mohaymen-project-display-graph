@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
+using mohaymen_codestar_Team02.Dto;
 using mohaymen_codestar_Team02.Dto.StoreDataDto;
+using mohaymen_codestar_Team02.Models;
 using mohaymen_codestar_Team02.Services.DataAdminService;
 using mohaymen_codestar_Team02.Services.FileReaderService;
 
@@ -32,8 +34,11 @@ public class DataAdminController : ControllerBase
     }
 
     [HttpGet("DataSets/{dataSetName}")]
-    public void DisplayDataSetAsGraph(string dataSetName)
+    public async Task<IActionResult> DisplayDataSetAsGraph(GetGraphDto getGraphDto)
     {
+        ServiceResponse<List<Vertex>?> response =
+            await _dataAdminService.DisplayVertexData(getGraphDto.databaseName, getGraphDto.sourceEdgeIdentifierFieldName, getGraphDto.destinationEdgeIdentifierFieldName, getGraphDto.vertexIdentifierFieldName);
+        return StatusCode((int)response.Type, response);
     }
 
     [HttpGet("DataSets/{dataSetName}/Vertices/{vertexId}")]
