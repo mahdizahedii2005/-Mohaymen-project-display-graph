@@ -1,7 +1,7 @@
 using System.Reflection;
 using System.Reflection.Emit;
 
-namespace mohaymen_codestar_Team02.Services;
+namespace mohaymen_codestar_Team02.Services.DynamicService;
 
 public class ModelBuilder
 {
