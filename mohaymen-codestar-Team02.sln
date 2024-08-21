@@ -1,10 +1,7 @@
-﻿
-Microsoft Visual Studio Solution File, Format Version 12.00
+﻿Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "mohaymen-codestar-Team02", "mohaymen-codestar-Team02\mohaymen-codestar-Team02.csproj", "{4D1C173E-6901-406B-AF51-8272236E98FA}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "mohaymen-codestar-Team02_XUnitTest", "mohaymen-codestar-Team02_XUnitTest\mohaymen-codestar-Team02_XUnitTest.csproj", "{DBCC3406-305C-4B21-AF94-8BF8B78D1040}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "mohaymen-codestar-Team2.Migration", "mohaymen-codestar-Team2.Migration\mohaymen-codestar-Team2.Migration.csproj", "{28E49A9C-03AF-4843-9757-57D7E096B686}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
