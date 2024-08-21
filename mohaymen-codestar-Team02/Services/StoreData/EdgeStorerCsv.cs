@@ -29,8 +29,13 @@ public class EdgeStorerCsv : IEdageStorer
         {
             var headerLine = reader.ReadLine();
             if (headerLine == null) return false;
+            
+            var headers = headerLine.Split("\",\"");
+            headers[0] = headers[0].Substring(1);
+            var lastWodrd = headers[headers.Length - 1];
+            headers[headers.Length - 1] = lastWodrd.Substring(0, lastWodrd.Length - 1);
 
-            var headers = headerLine.Split(',');
+            
             foreach (var att in headers) edgeAttributes.Add(new EdgeAttribute(att, edgeEntity.Id));
 
             foreach (var attribute in edgeAttributes) await dataContext.EdgeAttributes.AddAsync(attribute);

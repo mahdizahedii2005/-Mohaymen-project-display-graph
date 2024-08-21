@@ -1,9 +1,10 @@
 using System.Reflection;
 using System.Reflection.Emit;
+using mohaymen_codestar_Team02.Services.DynamicService;
 
 namespace mohaymen_codestar_Team02.Services.DynamicService;
 
-public class ModelBuilder
+public class ModelBuilder : IModelBuilder
 {
     public Type CreateDynamicClass(string className, Dictionary<string, Type> fieldNamesTypes, Type interfaceType)
     {
