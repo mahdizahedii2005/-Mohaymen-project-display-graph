@@ -8,13 +8,14 @@ public class StoreDataService
     : IStorHandler
 {
     private readonly IServiceProvider _serviceProvider;
-   
+
     public StoreDataService(IServiceProvider serviceProvider, IEdageStorer edageStorer, IVertexStorer vertexStorer)
     {
         _serviceProvider = serviceProvider;
         VertexStorer = vertexStorer;
         EdageStorer = edageStorer;
     }
+
     public IEdageStorer EdageStorer { get; set; }
     public IVertexStorer VertexStorer { get; set; }
 
@@ -25,8 +26,9 @@ public class StoreDataService
         try
         {
             if (string.IsNullOrEmpty(nameData)) return -1;
-            var setData = new DataGroup(nameData,
-                context.Users.SingleOrDefault(u => u.Username.ToLower() == userName.ToLower()).UserId);
+            var user = context.Users.SingleOrDefault(u => u.Username.ToLower() == userName.ToLower());
+            if (user == null) throw new NullReferenceException(Resources.UserNotFoundMessage);
+            var setData = new DataGroup(nameData, user.UserId);
             await context.DataSets.AddAsync(setData);
             await context.SaveChangesAsync();
             return setData.DataGroupId;
