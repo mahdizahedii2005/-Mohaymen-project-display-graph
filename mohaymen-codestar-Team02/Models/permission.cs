@@ -20,4 +20,8 @@ public enum Permission
     AddGraphData = 16,
     DeleteGraphData = 17,
     DeleteVertex = 18,
+    DeleteEdge = 19,
+    DeleteGraphDataFromDatabase = 20,
+    DeleteVertexFromDatabase = 21,
+    DeleteEdgeFromDatabase = 22
 }

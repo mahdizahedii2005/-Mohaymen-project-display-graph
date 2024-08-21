@@ -102,17 +102,73 @@ public class InitialServices
             new Role
             {
                 RoleId = 1,
-                RoleType = "SystemAdmin"
+                RoleType = "SystemAdmin",
+                Permissions = new List<Permission>()
+                {
+                    Permission.AddRole, Permission.DeleteRole,
+                    Permission.UserRegister,
+                    Permission.DeleteUser,
+                    Permission.GetUserList,
+                    Permission.GetSingleUser,
+                    Permission.GetRoleList,
+                    Permission.Login,
+                    Permission.Logout,
+                    Permission.ChangePass,
+                    Permission.UpdateInfo,
+                    Permission.SeeAllGraphData,
+                    Permission.SeeSingleGraphData,
+                    Permission.GetInfoOfVertex,
+                    Permission.GetInfoOfEdge,
+                    Permission.AddGraphData,
+                    Permission.DeleteGraphData,
+                    Permission.DeleteVertex,
+                    Permission.DeleteEdge,
+                    Permission.DeleteGraphDataFromDatabase,
+                    Permission.DeleteVertexFromDatabase,
+                    Permission.DeleteEdgeFromDatabase
+                }
             },
             new Role
             {
                 RoleId = 2,
-                RoleType = "Analyst"
+                RoleType = "Analyst", Permissions = new List<Permission>()
+                {
+                    Permission.Login,
+                    Permission.Logout,
+                    Permission.ChangePass,
+                    Permission.UpdateInfo,
+                    Permission.SeeAllGraphData,
+                    Permission.SeeSingleGraphData,
+                    Permission.GetInfoOfVertex,
+                    Permission.GetInfoOfEdge,
+                    Permission.DeleteGraphData,
+                    Permission.DeleteVertex,
+                    Permission.DeleteGraphData,
+                    Permission.DeleteVertex,
+                    Permission.DeleteEdge,
+                }
             },
             new Role
             {
                 RoleId = 3,
-                RoleType = "DataAdmin"
+                RoleType = "DataAdmin", Permissions = new List<Permission>()
+                {
+                    Permission.Login,
+                    Permission.Logout,
+                    Permission.ChangePass,
+                    Permission.UpdateInfo,
+                    Permission.SeeAllGraphData,
+                    Permission.SeeSingleGraphData,
+                    Permission.GetInfoOfVertex,
+                    Permission.GetInfoOfEdge,
+                    Permission.AddGraphData,
+                    Permission.DeleteGraphData,
+                    Permission.DeleteVertex,
+                    Permission.DeleteEdge,
+                    Permission.DeleteGraphDataFromDatabase,
+                    Permission.DeleteVertexFromDatabase,
+                    Permission.DeleteEdgeFromDatabase
+                }
             }
         };
 
