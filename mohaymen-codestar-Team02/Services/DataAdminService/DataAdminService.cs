@@ -1,3 +1,4 @@
+using mohaymen_codestar_Team02.Dto.GraphDTO;
 using mohaymen_codestar_Team02.Models;
 using mohaymen_codestar_Team02.Services.StoreData.Abstraction;
 
@@ -44,17 +45,19 @@ public class DataAdminService
         }
     }
 
-    public Task<ServiceResponse<string>> DisplayDataSet()
+    public Task<ServiceResponse<DisplayGraphDto>> DisplayDataSetAsGraph(string dataSetName, string vertexFieldName
+        , string sourceField, string targetField)
     {
         throw new NotImplementedException();
     }
 
-    public Task<ServiceResponse<string>> DisplayVertexData()
+    public Task<ServiceResponse<DetailDto>> DisplayVertexData(string dataSetName, long vertexObjectId)
     {
-        throw new NotImplementedException();
+        return null;
     }
+    
 
-    public Task<ServiceResponse<string>> DisplayEdgeData()
+    public Task<ServiceResponse<DetailDto>> DisplayEdgeData(string setName, long edgeObjectId)
     {
         throw new NotImplementedException();
     }

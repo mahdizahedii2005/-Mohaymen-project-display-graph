@@ -38,7 +38,7 @@ public class InitialServices
         services.AddHttpContextAccessor();
 
         // Configure DbContext and Dependency Injection
-        var cs = Environment.GetEnvironmentVariable("CONNECTION_STRING");
+        var cs = builder.Configuration["CONNECTION_STRING"];
         services.AddDbContext<DataContext>(options =>
             options.UseNpgsql(cs));
 

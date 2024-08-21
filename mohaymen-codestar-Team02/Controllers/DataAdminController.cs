@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using mohaymen_codestar_Team02.Dto.GraphDTO;
 using mohaymen_codestar_Team02.Dto.StoreDataDto;
+using mohaymen_codestar_Team02.Models;
 using mohaymen_codestar_Team02.Services.DataAdminService;
 using mohaymen_codestar_Team02.Services.DisplayData;
 using mohaymen_codestar_Team02.Services.FileReaderService;
@@ -45,21 +46,28 @@ public class DataAdminController : ControllerBase
     }
 
     [HttpGet("DataSets/{dataSetName}/Graph")]
-    public DisplayGraphDto DisplayDataSetAsGraph(string dataSetName, [FromQuery] string vertexFieldName,
+    public async Task<IActionResult> DisplayDataSetAsGraph(string dataSetName, [FromQuery] string vertexFieldName,
         [FromQuery] string sourceField, [FromQuery] string targetField)
     {
-        var result = _dataService.GetGraph(dataSetName, sourceField, targetField, vertexFieldName, true);
-        return new DisplayGraphDto() { Edges = result.edges, Vertices = result.vertices, GraphName = dataSetName };
+        var graph = await _dataAdminService.DisplayDataSetAsGraph(dataSetName, sourceField, targetField,
+            vertexFieldName);
+        if (graph.Type != ApiResponseType.Success)
+        {
+        }
+
+        return BadRequest();
     }
 
 
     [HttpGet("DataSets/{dataSetName}/Vertices/{vertexId}")]
-    public void DisplayVertexDetails(string datasetName, int vertexId)
+    public async Task<IActionResult> DisplayVertexDetails(string datasetName, int vertexId)
     {
+        return BadRequest();
     }
 
     [HttpGet("DataSets/{dataSetName}/Edges/{edgeId}")]
-    public void DisplayEdgeDetails(string datasetName, int edgeId)
+    public async Task<IActionResult> DisplayEdgeDetails(string datasetName, int edgeId)
     {
+        return BadRequest();
     }
 }
