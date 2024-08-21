@@ -43,7 +43,7 @@ public class AdminController : ControllerBase
             Username = request.Username,
             FirstName = request.FirstName,
             LastName = request.LastName,
-            Email = request.Email,
+            Email = request.Email
         };
 
         ServiceResponse<GetUserDto?> response =

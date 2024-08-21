@@ -32,7 +32,6 @@ public class AdminServiceTest
             .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
             .Options;
         _mockContext = new DataContext(options);
-
         _sut = new AdminService(_mockContext, _cookieService, _tokenService, _passwordService, _mapper);
     }
 

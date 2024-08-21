@@ -9,8 +9,12 @@ using mohaymen_codestar_Team02.Services;
 using mohaymen_codestar_Team02.Services.Administration;
 using mohaymen_codestar_Team02.Services.Authenticatoin;
 using mohaymen_codestar_Team02.Services.CookieService;
+using mohaymen_codestar_Team02.Services.DataAdminService;
+using mohaymen_codestar_Team02.Services.FileReaderService;
 using mohaymen_codestar_Team02.Services.PasswordHandller;
 using mohaymen_codestar_Team02.Services.ProfileService;
+using mohaymen_codestar_Team02.Services.StoreData;
+using mohaymen_codestar_Team02.Services.StoreData.Abstraction;
 using mohaymen_codestar_Team02.Services.TokenService;
 
 namespace mohaymen_codestar_Team02.initialProgram;
@@ -34,8 +38,9 @@ public class InitialServices
         services.AddHttpContextAccessor();
 
         // Configure DbContext and Dependency Injection
+        var cs = Environment.GetEnvironmentVariable("CONNECTION_STRING");
         services.AddDbContext<DataContext>(options =>
-            options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+            options.UseNpgsql(cs));
 
         services
             .AddScoped<IAuthenticationService, AuthenticationService>()
@@ -44,7 +49,12 @@ public class InitialServices
             .AddScoped<ITokenService, TokenService>()
             .AddScoped<ICookieService, CookieService>()
             .AddScoped<IPasswordService, PasswordService>()
-            .AddScoped<InitialServices>();
+            .AddScoped<InitialServices>()
+            .AddSingleton<IEdageStorer, EdgeStorerCsv>()
+            .AddSingleton<IVertexStorer, VertexStorerCsv>()
+            .AddTransient<IStorHandler, StoreDataService>()
+            .AddSingleton<IFileReader, ReadCsvFile>()
+            .AddSingleton<IDataAdminService, DataAdminService>();
 
         services.AddAutoMapper(typeof(AutoMapperProfile));
         services.AddAuthorization();
@@ -66,10 +76,7 @@ public class InitialServices
                     OnMessageReceived = context =>
                     {
                         var token = context.HttpContext.Request.Cookies["login"];
-                        if (!string.IsNullOrEmpty(token))
-                        {
-                            context.Token = token;
-                        }
+                        if (!string.IsNullOrEmpty(token)) context.Token = token;
 
                         return Task.CompletedTask;
                     }
@@ -90,19 +97,19 @@ public class InitialServices
 
     public void SeadRole()
     {
-        List<Role> roles = new List<Role>()
+        List<Role> roles = new()
         {
-            new Role()
+            new()
             {
                 RoleId = 1,
                 RoleType = "SystemAdmin"
             },
-            new Role()
+            new()
             {
                 RoleId = 2,
                 RoleType = "Analyst"
             },
-            new Role()
+            new()
             {
                 RoleId = 3,
                 RoleType = "DataAdmin"
@@ -113,12 +120,10 @@ public class InitialServices
         foreach (var role in roles)
         {
             if (!_context.Roles.Any(r => r.RoleType == role.RoleType))
-            {
                 _context.Roles.Add(role);
-            }
-        }
 
-        _context.SaveChanges();
+            _context.SaveChanges();
+        }
     }
 
     public void SeadAdmin()
@@ -127,9 +132,9 @@ public class InitialServices
         {
             var admin = new User()
             {
-                Username = "admin",
+                Username = "admin"
             };
-            _passwordService.CreatePasswordHash("admin", out byte[] passwordHash, out byte[] passwordSalt);
+            _passwordService.CreatePasswordHash("admin", out var passwordHash, out var passwordSalt);
             admin.PasswordHash = passwordHash;
             admin.Salt = passwordSalt;
 

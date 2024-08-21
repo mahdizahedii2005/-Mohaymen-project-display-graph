@@ -98,7 +98,7 @@ public class AdminService : IAdminService
         if (await UserExists(user.Username))
             return new ServiceResponse<GetUserDto?>(null, ApiResponseType.Conflict, Resources.UserAlreadyExistsMessage);
 
-        _passwordService.CreatePasswordHash(password, out byte[] passwordHash, out byte[] passwordSalt);
+        _passwordService.CreatePasswordHash(password, out var passwordHash, out var passwordSalt);
         user.PasswordHash = passwordHash;
         user.Salt = passwordSalt;
 
@@ -165,7 +165,7 @@ public class AdminService : IAdminService
         if (await GetUserRole(foundRole, foundUser) is not null)
             return new ServiceResponse<GetUserDto?>(null, ApiResponseType.BadRequest, Resources.RoleAlreadyAssigned);
 
-        UserRole userRole = new UserRole
+        var userRole = new UserRole
         {
             Role = foundRole,
             User = foundUser,
@@ -237,7 +237,6 @@ public class AdminService : IAdminService
         if (roleType == null) return null;
         return await _context.Roles.FirstOrDefaultAsync(x => x.RoleType.ToLower() == roleType.ToLower());
     }
-
 
     private async Task<UserRole?> GetUserRole(Role foundRole, User foundUser) =>
         await _context.UserRoles.FirstOrDefaultAsync(x =>

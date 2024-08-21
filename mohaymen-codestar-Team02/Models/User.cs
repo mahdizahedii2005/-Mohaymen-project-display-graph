@@ -20,4 +20,5 @@ public class User
     [Required][StringLength(256)] public byte[] PasswordHash { get; set; }
 
     public virtual ICollection<UserRole> UserRoles { get; set; }
+    public virtual ICollection<DataGroup> DataSets { get; set; }
 }

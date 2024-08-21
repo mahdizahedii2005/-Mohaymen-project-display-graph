@@ -44,7 +44,7 @@ public class ProfileService : IProfileService
         if (!_passwordService.VerifyPasswordHash(previousPassword, user.PasswordHash, user.Salt))
             return new ServiceResponse<object>(new { }, ApiResponseType.BadRequest, Resources.WrongPasswordMessage);
 
-        _passwordService.CreatePasswordHash(newPassword, out byte[] passwordHash, out byte[] passwordSalt);
+        _passwordService.CreatePasswordHash(newPassword, out var passwordHash, out var passwordSalt);
         user.PasswordHash = passwordHash;
         user.Salt = passwordSalt;
 
