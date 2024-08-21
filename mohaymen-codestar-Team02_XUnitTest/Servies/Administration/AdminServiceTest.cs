@@ -29,7 +29,7 @@ public class AdminServiceTest
         _mapper = Substitute.For<IMapper>();
 
         var options = new DbContextOptionsBuilder<DataContext>()
-            .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
+            .UseInMemoryDatabase(Guid.NewGuid().ToString())
             .Options;
         _mockContext = new DataContext(options);
         _sut = new AdminService(_mockContext, _cookieService, _tokenService, _passwordService, _mapper);
@@ -96,8 +96,8 @@ public class AdminServiceTest
         // Arrange
         FixTheReturnOfCookies("admin");
         var newUser = AddUserWithRole("admin", "SystemAdmin", 1);
-        byte[] fakePasswordHash = new byte[] { 1, 2, 3, 4 };
-        byte[] fakePasswordSalt = new byte[] { 5, 6, 7, 8 };
+        var fakePasswordHash = new byte[] { 1, 2, 3, 4 };
+        var fakePasswordSalt = new byte[] { 5, 6, 7, 8 };
 
         _passwordService
             .When(x => x.CreatePasswordHash(Arg.Any<string>(), out Arg.Any<byte[]>(), out Arg.Any<byte[]>()))
@@ -123,8 +123,8 @@ public class AdminServiceTest
         FixTheReturnOfCookies("admin");
         AddUserWithRole("admin", "SystemAdmin", 1);
 
-        byte[] fakePasswordHash = new byte[] { 1, 2, 3, 4 };
-        byte[] fakePasswordSalt = new byte[] { 5, 6, 7, 8 };
+        var fakePasswordHash = new byte[] { 1, 2, 3, 4 };
+        var fakePasswordSalt = new byte[] { 5, 6, 7, 8 };
 
         _passwordService
             .When(x => x.CreatePasswordHash(Arg.Any<string>(), out Arg.Any<byte[]>(), out Arg.Any<byte[]>()))
@@ -480,5 +480,4 @@ public class AdminServiceTest
         // Assert
         Assert.Equal(ApiResponseType.BadRequest, result.Type);
     }
-
 }

@@ -28,6 +28,7 @@ public class DataAdminServiceTest
         //Assert
         Assert.Equal(ApiResponseType.BadRequest, result.Type);
     }
+
     [Fact]
     public async Task StoreData_ReturnsBadRequest_WhenCreatingTheDataGroupIsFail()
     {

@@ -1,8 +1,10 @@
+using QuikGraph;
+
 namespace mohaymen_codestar_Team02.Models;
 
-public class Edge
+public class Edge : IEdge<string>
 {
     public string Id;
-    public string SourceId;
-    public string TargeId;
+    public string Source { get; }
+    public string Target { get; }
 }

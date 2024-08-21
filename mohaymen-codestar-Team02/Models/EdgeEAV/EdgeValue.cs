@@ -11,6 +11,7 @@ public class EdgeValue
         EdgeAttributeId = edgeAttributeId;
         ObjectId = objectId;
     }
+
     [Key] public long Id { get; set; }
     public string StringValue { get; set; }
     public long EdgeAttributeId { get; set; }

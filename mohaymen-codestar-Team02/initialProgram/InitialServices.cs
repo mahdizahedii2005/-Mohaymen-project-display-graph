@@ -99,17 +99,17 @@ public class InitialServices
     {
         List<Role> roles = new()
         {
-            new()
+            new Role
             {
                 RoleId = 1,
                 RoleType = "SystemAdmin"
             },
-            new()
+            new Role
             {
                 RoleId = 2,
                 RoleType = "Analyst"
             },
-            new()
+            new Role
             {
                 RoleId = 3,
                 RoleType = "DataAdmin"
@@ -141,8 +141,8 @@ public class InitialServices
             var role = _context.Roles.FirstOrDefault(r =>
                 r.RoleType.ToLower().Equals(RoleType.SystemAdmin.ToString().ToLower()));
 
-            UserRole userRole = new UserRole()
-            { RoleId = role.RoleId, UserId = admin.UserId, Role = role, User = admin };
+            var userRole = new UserRole()
+                { RoleId = role.RoleId, UserId = admin.UserId, Role = role, User = admin };
             _context.UserRoles.Add(userRole);
 
             _context.Users.Add(admin);

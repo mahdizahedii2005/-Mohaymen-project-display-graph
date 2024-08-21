@@ -13,6 +13,7 @@ public class DataGroup
         Name = name;
         UserId = userId;
     }
+
     [Key] public long DataGroupId { get; set; }
 
     public string Name { get; set; }

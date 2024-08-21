@@ -8,10 +8,12 @@ namespace mohaymen_codestar_Team02.Services.StoreData;
 public class VertexStorerCsv : IVertexStorer
 {
     private readonly IServiceProvider _serviceProvider;
+
     public VertexStorerCsv(IServiceProvider serviceProvider)
     {
-        this._serviceProvider = serviceProvider;
+        _serviceProvider = serviceProvider;
     }
+
     public async Task<bool> StoreFileData(string entityName, string dataFile, long dataGroupId)
     {
         using var scope = _serviceProvider.CreateScope();

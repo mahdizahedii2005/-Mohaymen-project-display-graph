@@ -9,15 +9,10 @@ public class ModelBuilder
     {
         var typeBuilder = GetTypeBuilder(className);
 
-        if (interfaceType != null)
-        {
-            typeBuilder.AddInterfaceImplementation(interfaceType);
-        }
+        if (interfaceType != null) typeBuilder.AddInterfaceImplementation(interfaceType);
 
         foreach (var fieldNamesType in fieldNamesTypes)
-        {
             CreateProperty(typeBuilder, fieldNamesType.Key, fieldNamesType.Value);
-        }
 
         return typeBuilder.CreateType();
     }
@@ -35,15 +30,20 @@ public class ModelBuilder
     {
         var fieldBuilder = typeBuilder.DefineField("_" + propertyName, propertyType, FieldAttributes.Private);
 
-        var propertyBuilder = typeBuilder.DefineProperty(propertyName, PropertyAttributes.HasDefault, propertyType, null);
-        var getPropMthdBldr = typeBuilder.DefineMethod("get_" + propertyName, MethodAttributes.Public | MethodAttributes.SpecialName | MethodAttributes.HideBySig, propertyType, Type.EmptyTypes);
+        var propertyBuilder =
+            typeBuilder.DefineProperty(propertyName, PropertyAttributes.HasDefault, propertyType, null);
+        var getPropMthdBldr = typeBuilder.DefineMethod("get_" + propertyName,
+            MethodAttributes.Public | MethodAttributes.SpecialName | MethodAttributes.HideBySig, propertyType,
+            Type.EmptyTypes);
         var getIl = getPropMthdBldr.GetILGenerator();
 
         getIl.Emit(OpCodes.Ldarg_0);
         getIl.Emit(OpCodes.Ldfld, fieldBuilder);
         getIl.Emit(OpCodes.Ret);
 
-        var setPropMthdBldr = typeBuilder.DefineMethod("set_" + propertyName, MethodAttributes.Public | MethodAttributes.SpecialName | MethodAttributes.HideBySig, null, new[] { propertyType });
+        var setPropMthdBldr = typeBuilder.DefineMethod("set_" + propertyName,
+            MethodAttributes.Public | MethodAttributes.SpecialName | MethodAttributes.HideBySig, null,
+            new[] { propertyType });
         var setIl = setPropMthdBldr.GetILGenerator();
 
         setIl.Emit(OpCodes.Ldarg_0);
