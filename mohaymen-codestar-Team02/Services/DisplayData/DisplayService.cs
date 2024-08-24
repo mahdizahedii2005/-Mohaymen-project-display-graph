@@ -9,19 +9,23 @@ namespace mohaymen_codestar_Team02.Services;
 
 public class DisplayService : IDisplayDataService
 {
-    private readonly DataContext _context;
+    private readonly IServiceProvider _serviceProvider;
 
-    public DisplayService(DataContext context)
+    public DisplayService(IServiceProvider serviceProvider)
     {
-        _context = context;
+        _serviceProvider = serviceProvider;
     }
 
     public (List<Vertex> vertices, List<Edge> edges) GetGraph(string databaseName, string sourceEdgeIdentifierFieldName,
         string destinationEdgeIdentifierFieldName, string vertexIdentifierFieldName)
     {
+        using var scope = _serviceProvider.CreateScope();
+        var _context = scope.ServiceProvider.GetRequiredService<DataContext>();
+
         var dataSet = _context.DataSets.Include(ds => ds.VertexEntity)
             .ThenInclude(ve => ve.VertexAttributes).ThenInclude(vv => vv.VertexValues).Include(ds => ds.EdgeEntity)
-            .ThenInclude(ee => ee.EdgeAttributes).ThenInclude(ev => ev.EdgeValues).FirstOrDefault(ds => ds.Name.ToLower().Equals(databaseName.ToLower()));
+            .ThenInclude(ee => ee.EdgeAttributes).ThenInclude(ev => ev.EdgeValues)
+            .FirstOrDefault(ds => ds.Name.ToLower().Equals(databaseName.ToLower()));
 
         var vertexRecords = dataSet.VertexEntity.VertexAttributes.Select(a => a.VertexValues).SelectMany(v => v)
             .GroupBy(v => v.ObjectId);
@@ -52,6 +56,7 @@ public class DisplayService : IDisplayDataService
                 {
                     sourceValue = item.StringValue;
                 }
+
                 if (item.EdgeAttribute.Name == destinationEdgeIdentifierFieldName)
                 {
                     destinationValue = item.StringValue;
@@ -73,6 +78,7 @@ public class DisplayService : IDisplayDataService
                         };
                         sources.Add(vertex);
                     }
+
                     if (item.VertexAttribute.Name == vertexIdentifierFieldName && item.StringValue == destinationValue)
                     {
                         Vertex vertex = new Vertex()
@@ -83,6 +89,7 @@ public class DisplayService : IDisplayDataService
                     }
                 }
             }
+
             foreach (var source in sources)
             {
                 foreach (var des in destinations)

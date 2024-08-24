@@ -11,16 +11,17 @@ namespace mohaymen_codestar_Team02.Services.Authenticatoin;
 
 public class AuthenticationService : IAuthenticationService
 {
-    private readonly DataContext _context;
+    private readonly IServiceProvider _serviceProvider;
     private readonly ITokenService _tokenService;
     private readonly ICookieService _cookieService;
     private readonly IPasswordService _passwordService;
     private readonly IMapper _mapper;
 
-    public AuthenticationService(DataContext context, ICookieService cookieService, ITokenService tokenService,
+    public AuthenticationService(IServiceProvider serviceProvider, ICookieService cookieService,
+        ITokenService tokenService,
         IPasswordService passwordService, IMapper mapper)
     {
-        _context = context;
+        _serviceProvider = serviceProvider;
         _cookieService = cookieService;
         _tokenService = tokenService;
         _passwordService = passwordService;
@@ -62,6 +63,9 @@ public class AuthenticationService : IAuthenticationService
 
     private async Task<User?> GetUser(string username)
     {
+        using var scope = _serviceProvider.CreateScope();
+        var _context = scope.ServiceProvider.GetRequiredService<DataContext>();
+
         return await _context.Users.FirstOrDefaultAsync(x =>
             x.Username != null && x.Username.ToLower().Equals(username.ToLower()));
     }
