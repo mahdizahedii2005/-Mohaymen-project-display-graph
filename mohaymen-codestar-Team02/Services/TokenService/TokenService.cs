@@ -37,4 +37,11 @@ public class TokenService : ITokenService
         var usernameClaim = user?.FindFirst(ClaimTypes.Name);
         return usernameClaim?.Value;
     }
+    
+    public string? GetRolesFromToken()
+    {
+        var user = _httpContextAccessor.HttpContext?.User;
+        var userRolesClaim = user?.FindFirst(ClaimTypes.Role);
+        return userRolesClaim?.Value;
+    }
 }

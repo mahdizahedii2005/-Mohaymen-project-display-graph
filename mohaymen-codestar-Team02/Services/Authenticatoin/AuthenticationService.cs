@@ -2,6 +2,7 @@ using System.Security.Claims;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using mohaymen_codestar_Team02.Data;
+using mohaymen_codestar_Team02.Dto.Permission;
 using mohaymen_codestar_Team02.Dto.User;
 using mohaymen_codestar_Team02.Models;
 using mohaymen_codestar_Team02.Services.CookieService;
@@ -42,7 +43,9 @@ public class AuthenticationService : IAuthenticationService
 
         Claim[] claims = new[]
         {
-            new Claim(ClaimTypes.Name, user.Username)
+            new Claim(ClaimTypes.Name, user.Username),
+            new Claim(ClaimTypes.Role, string.Join(",", user.UserRoles.Select(ur => ur.Role.RoleType))) 
+
         };
 
         _cookieService.CreateCookie(_tokenService.CreateToken(claims));
@@ -59,6 +62,48 @@ public class AuthenticationService : IAuthenticationService
         return new ServiceResponse<string?>(null, ApiResponseType.Success,
             Resources.LogoutSuccessfuly);
     }
+
+    public async Task<ServiceResponse<GetPermissionDto>> GetPermission()
+    {
+        var token = _cookieService.GetCookieValue();
+        if (string.IsNullOrEmpty(token))
+            return new ServiceResponse<GetPermissionDto>(null, ApiResponseType.Unauthorized, Resources.UnauthorizedMessage);
+
+        var username = _tokenService.GetUserNameFromToken();
+        var user = await GetUser(username);
+
+        if (user is null)
+            return new ServiceResponse<GetPermissionDto>(null, ApiResponseType.BadRequest, Resources.UserNotFoundMessage);
+
+        var roles = _tokenService.GetRolesFromToken();
+        var splitRoles = roles?.Split(",");
+
+        HashSet<Permission> permissions = new HashSet<Permission>();
+        foreach (var userRole in splitRoles)
+        {
+            var role = await _context.Roles.FirstOrDefaultAsync(r => r.RoleType.ToLower() == userRole.ToLower());
+            var permission = role?.Permissions;
+
+            if (permission != null)
+            { 
+                foreach (var eachPermission in permission)
+                {
+                    permissions.Add(eachPermission);
+                }
+            }
+
+        }
+
+        var permissionDto = new GetPermissionDto()
+        {
+            Permissions = permissions.ToList()
+        };
+        
+        return new ServiceResponse<GetPermissionDto>(permissionDto, ApiResponseType.Success,
+            Resources.GetPermissionsSuccessfuly);
+        
+    }
+    
 
     private async Task<User?> GetUser(string username)
     {
