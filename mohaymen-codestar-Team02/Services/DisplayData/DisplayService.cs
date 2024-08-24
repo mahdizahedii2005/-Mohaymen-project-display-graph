@@ -20,8 +20,8 @@ public class DisplayService : IDisplayDataService
         string destinationEdgeIdentifierFieldName, string vertexIdentifierFieldName)
     {
         var dataSet = _context.DataSets.Include(ds => ds.VertexEntity)
-            .ThenInclude(ve => ve.VertexAttributes).ThenInclude(vv=>vv.VertexValues).Include(ds => ds.EdgeEntity)
-            .ThenInclude(ee => ee.EdgeAttributes).ThenInclude(ev=>ev.EdgeValues).FirstOrDefault(ds=>ds.Name.ToLower().Equals(databaseName.ToLower()));
+            .ThenInclude(ve => ve.VertexAttributes).ThenInclude(vv => vv.VertexValues).Include(ds => ds.EdgeEntity)
+            .ThenInclude(ee => ee.EdgeAttributes).ThenInclude(ev => ev.EdgeValues).FirstOrDefault(ds => ds.Name.ToLower().Equals(databaseName.ToLower()));
 
         var vertexRecords = dataSet.VertexEntity.VertexAttributes.Select(a => a.VertexValues).SelectMany(v => v)
             .GroupBy(v => v.ObjectId);
@@ -57,10 +57,10 @@ public class DisplayService : IDisplayDataService
                     destinationValue = item.StringValue;
                 }
             }
-            
+
             List<Vertex> sources = new List<Vertex>();
             List<Vertex> destinations = new List<Vertex>();
-            
+
             foreach (var record1 in vertexRecords)
             {
                 foreach (var item in record1)
@@ -100,7 +100,7 @@ public class DisplayService : IDisplayDataService
 
         return (vertices, edges);
     }
-    
+
     /*
     public void GetGraph(string databaseName, string sourceEdgeIdentifierFieldName,
         string destinationEdgeIdentifierFieldName, string vertexIdentifierFieldName, bool directed,
