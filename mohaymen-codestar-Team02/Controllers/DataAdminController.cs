@@ -32,8 +32,7 @@ public class DataAdminController : ControllerBase
             var edgeFile = _fileReader.Read(storeDataDto.EdgeFile);
             var vertexFile = _fileReader.Read(storeDataDto.VertexFile);
             var response = await _dataAdminService.StoreData(edgeFile, vertexFile, storeDataDto.DataName,
-                Path.GetFileName(storeDataDto.EdgeFile.FileName), Path.GetFileName(storeDataDto.VertexFile.FileName),
-                storeDataDto.CreatorUserName);
+                Path.GetFileName(storeDataDto.EdgeFile.FileName), Path.GetFileName(storeDataDto.VertexFile.FileName));
             return StatusCode((int)response.Type, response);
         }
         catch (FormatException e)
@@ -60,13 +59,14 @@ public class DataAdminController : ControllerBase
     }
 
 
-    [HttpGet("DataSets/Vertices/{vertexId}")]
+    [HttpGet("DataSets/Vertices/{objectId}")]
     public async Task<IActionResult> DisplayVertexDetails(string objectId)
     {
         var respond = _dataAdminService.GetVertexDetail(objectId);
-        return StatusCode((int)respond.Type, respond);    }
+        return StatusCode((int)respond.Type, respond);
+    }
 
-    [HttpGet("DataSets/Edges/{edgeId}")]
+    [HttpGet("DataSets/Edges/{objectId}")]
     public async Task<IActionResult> DisplayEdgeDetails(string objectId)
     {
         var respond = _dataAdminService.GetEdgeDetail(objectId);

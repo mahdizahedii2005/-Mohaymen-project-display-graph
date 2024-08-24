@@ -6,7 +6,7 @@ namespace mohaymen_codestar_Team02.Services.DataAdminService;
 public interface IDataAdminService
 {
     Task<ServiceResponse<string>> StoreData(string? edgeFile, string? vertexFile, string graphName
-        , string? edgeEntityName, string vertexEntityName, string userName);
+        , string? edgeEntityName, string vertexEntityName);
 
     Task<ServiceResponse<string>> DisplayDataSet();
 

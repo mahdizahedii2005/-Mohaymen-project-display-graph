@@ -1,6 +1,8 @@
+using mohaymen_codestar_Team02.Data;
 using mohaymen_codestar_Team02.Dto.GraphDTO;
 using mohaymen_codestar_Team02.Models;
 using mohaymen_codestar_Team02.Models.EdgeEAV;
+using mohaymen_codestar_Team02.Services.CookieService;
 using mohaymen_codestar_Team02.Services.StoreData.Abstraction;
 
 namespace mohaymen_codestar_Team02.Services.DataAdminService;
@@ -8,14 +10,23 @@ namespace mohaymen_codestar_Team02.Services.DataAdminService;
 public class DataAdminService
     : IDataAdminService
 {
+    private readonly ITokenService _tokenService;
+    private readonly ICookieService _cookieService;
     private readonly IEdgeService _edgeService;
     private readonly IVertexService _vertexService;
     private readonly IStorHandler _storHandler;
     private readonly IDisplayDataService _displayDataService;
 
-    public DataAdminService(IStorHandler storHandler, IDisplayDataService displayDataService, IEdgeService edgeService,
+    public DataAdminService(
+        ITokenService tokenService,
+        ICookieService cookieService,
+        IStorHandler storHandler,
+        IDisplayDataService displayDataService,
+        IEdgeService edgeService,
         IVertexService vertexService)
     {
+        _tokenService = tokenService;
+        _cookieService = cookieService;
         _vertexService = vertexService;
         _edgeService = edgeService;
         _storHandler = storHandler;
@@ -23,10 +34,18 @@ public class DataAdminService
     }
 
     public async Task<ServiceResponse<string>> StoreData(string? edgeFile, string? vertexFile, string graphName
-        , string? edgeEntityName, string vertexEntityName, string userName)
+        , string? edgeEntityName, string vertexEntityName)
     {
         try
         {
+            var token = _cookieService.GetCookieValue();
+            if (string.IsNullOrEmpty(token))
+            {
+                return new ServiceResponse<string>(null, ApiResponseType.Unauthorized,
+                    Resources.UnauthorizedMessage);
+            }
+
+            var userName = _tokenService.GetUserNameFromToken();
             if (string.IsNullOrEmpty(edgeEntityName) || string.IsNullOrEmpty(graphName) ||
                 string.IsNullOrEmpty(vertexEntityName))
                 return new ServiceResponse<string>(string.Empty, ApiResponseType.BadRequest,
