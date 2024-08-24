@@ -12,7 +12,7 @@ RUN dotnet restore
 COPY . .
 RUN dotnet build -c Release
 RUN dotnet publish -c Release -o output --no-build
-RUN dotnet ef migrations bundle --no-build -o dbmigrate
+RUN dotnet ef migrations bundle -o dbmigrate
 # </Build>
 
 # <Run>
