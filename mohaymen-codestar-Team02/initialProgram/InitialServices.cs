@@ -1,5 +1,6 @@
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using mohaymen_codestar_Team02.Data;
 using mohaymen_codestar_Team02.Mapper;
@@ -16,7 +17,7 @@ using mohaymen_codestar_Team02.Services.ProfileService;
 using mohaymen_codestar_Team02.Services.StoreData;
 using mohaymen_codestar_Team02.Services.StoreData.Abstraction;
 using mohaymen_codestar_Team02.Services.TokenService;
-using Microsoft.EntityFrameworkCore;
+
 namespace mohaymen_codestar_Team02.initialProgram;
 
 public class InitialServices
@@ -148,7 +149,7 @@ public class InitialServices
                     Permission.DeleteVertex,
                     Permission.DeleteGraphData,
                     Permission.DeleteVertex,
-                    Permission.DeleteEdge,
+                    Permission.DeleteEdge
                 }
             },
             new Role
