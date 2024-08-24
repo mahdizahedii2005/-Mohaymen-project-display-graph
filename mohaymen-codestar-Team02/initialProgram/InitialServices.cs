@@ -192,7 +192,10 @@ public class InitialServices
         {
             var admin = new User()
             {
-                Username = "admin"
+                Username = "admin",
+                FirstName = "admin",
+                LastName = "admin",
+                Email = "admin@gmail.com"
             };
             _passwordService.CreatePasswordHash("admin", out var passwordHash, out var passwordSalt);
             admin.PasswordHash = passwordHash;

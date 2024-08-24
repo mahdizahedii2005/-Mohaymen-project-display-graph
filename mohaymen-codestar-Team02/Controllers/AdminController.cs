@@ -75,23 +75,23 @@ public class AdminController : ControllerBase
     }
 
     [HttpPut("users/{username}/roles")]
-    public async Task<IActionResult> AddRole([FromBody] AddUserRoleDto request)
+    public async Task<IActionResult> AddRole([FromBody] AddUserRoleDto request , string username)
     {
         ServiceResponse<GetUserDto?> response =
             await _adminService.AddRole(
-                new User { Username = request.Username },
+                new User { Username = username },
                 new Role() { RoleType = request.RoleType }
             );
 
         return StatusCode((int)response.Type, response);
     }
 
-    [HttpDelete("users/{username}/roles/{roleType}")]
-    public async Task<IActionResult> DeleteRole([FromBody] DeleteUserRoleDto request)
+    [HttpDelete("users/{username}/roles")]
+    public async Task<IActionResult> DeleteRole([FromBody] DeleteUserRoleDto request,  string username)
     {
         ServiceResponse<GetUserDto?> response =
             await _adminService.DeleteRole(
-                new User { Username = request.Username },
+                new User { Username = username },
                 new Role() { RoleType = request.RoleType }
             );
 

@@ -87,6 +87,15 @@ namespace mohaymen_codestar_Team02.Data {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Permissions Get Successfuly.
+        /// </summary>
+        internal static string GetPermissionsSuccessfuly {
+            get {
+                return ResourceManager.GetString("GetPermissionsSuccessfuly", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to InvalidInput.
         /// </summary>
         internal static string InvalidInpute {

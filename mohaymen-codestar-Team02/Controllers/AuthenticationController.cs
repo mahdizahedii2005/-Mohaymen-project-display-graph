@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using mohaymen_codestar_Team02.Dto.Permission;
 using mohaymen_codestar_Team02.Dto.User;
 using mohaymen_codestar_Team02.Dto.UserDtos;
 using mohaymen_codestar_Team02.Models;
@@ -29,6 +30,13 @@ public class AuthenticationController : ControllerBase
     public IActionResult Logout()
     {
         ServiceResponse<string?> response = _authenticationService.Logout();
+        return StatusCode((int)response.Type, response);
+    }
+
+    [HttpGet("permission")]
+    public async Task<IActionResult> GetPermission()
+    {
+        ServiceResponse<GetPermissionDto> response = await _authenticationService.GetPermission();
         return StatusCode((int)response.Type, response);
     }
 }

@@ -188,7 +188,7 @@ public class AdminService : IAdminService
         await _context.UserRoles.AddAsync(userRole);
         await _context.SaveChangesAsync();
 
-        var userDto = _mapper.Map<GetUserDto>(user);
+        var userDto = _mapper.Map<GetUserDto>(foundUser);
 
         return new ServiceResponse<GetUserDto?>(userDto, ApiResponseType.Success,
             Resources.RoleAddedSuccessfulyMassage);
@@ -227,7 +227,7 @@ public class AdminService : IAdminService
         _context.UserRoles.Remove(userRole);
         await _context.SaveChangesAsync();
 
-        var userDto = _mapper.Map<GetUserDto>(user);
+        var userDto = _mapper.Map<GetUserDto>(foundUser);
 
         return new ServiceResponse<GetUserDto?>(userDto, ApiResponseType.Success,
             Resources.RoleRemovedSuccessfullyMessage);
@@ -250,8 +250,8 @@ public class AdminService : IAdminService
         if (user == null) return Task.FromResult(false);
         var targetUser = _context.Users.Include(u => u.UserRoles).ThenInclude(userRole => userRole.Role)
             .SingleOrDefault(a => a.Username == user.Username);
-        var result = targetUser != null && targetUser.UserRoles.Any(userrole =>
-            userrole.Role.RoleType.ToLower() == RoleType.SystemAdmin.ToString().ToLower());
+        var result = targetUser != null && targetUser.UserRoles.Any(userRole =>
+            userRole.Role.RoleType.ToLower() == RoleType.SystemAdmin.ToString().ToLower());
         return Task.FromResult(result);
     }
 
