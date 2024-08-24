@@ -3,16 +3,11 @@ FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 
 WORKDIR /app
 
-ENV PATH="${PATH}:/root/.dotnet/tools"
-RUN dotnet tool install --global dotnet-ef
-
 COPY *.csproj .
 RUN dotnet restore
 
 COPY . .
-RUN dotnet build -c Release
-RUN dotnet ef migrations bundle --no-build -o dbmigrate
-RUN dotnet publish -c Release -o output --no-build
+RUN dotnet publish -c Release -o output
 # </Build>
 
 # <Run>
@@ -24,10 +19,9 @@ USER app
 
 WORKDIR /app
 
-COPY --chown=app:app --from=build /app/output /app/dbmigrate /app/
-COPY --chown=app:app ./entrypoint.sh /app/entrypoint.sh
+COPY --chown=app:app --from=build /app/output .
 
-ENTRYPOINT ["bash", "/app/entrypoint.sh"]
+ENTRYPOINT ["dotnet", "mohaymen-codestar-Team02.dll"]
 
 EXPOSE 8080
 
