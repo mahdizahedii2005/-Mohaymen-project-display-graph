@@ -1,7 +1,5 @@
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using mohaymen_codestar_Team02.Data;
 using mohaymen_codestar_Team02.Mapper;
@@ -18,8 +16,7 @@ using mohaymen_codestar_Team02.Services.ProfileService;
 using mohaymen_codestar_Team02.Services.StoreData;
 using mohaymen_codestar_Team02.Services.StoreData.Abstraction;
 using mohaymen_codestar_Team02.Services.TokenService;
-using ModelBuilder = mohaymen_codestar_Team02.Services.ModelBuilder;
-
+using Microsoft.EntityFrameworkCore;
 namespace mohaymen_codestar_Team02.initialProgram;
 
 public class InitialServices
@@ -59,7 +56,7 @@ public class InitialServices
             .AddScoped<IFileReader, ReadCsvFile>()
             .AddScoped<IDataAdminService, DataAdminService>()
             .AddScoped<IDisplayDataService, DisplayService>()
-            .AddScoped<IModelBuilder, ModelBuilder>()
+            .AddScoped<IModelBuilder, ModelBuilderr>()
             .AddScoped<IObjectBuilder, ObjectBuilder>();
 
         services.AddAutoMapper(typeof(AutoMapperProfile));
