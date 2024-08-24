@@ -15,7 +15,8 @@ public class DataAdminServiceTest
     {
         _storHandler = Substitute.For<IStorHandler>();
         _displayDataService = Substitute.For<IDisplayDataService>();
-        _sut = new mohaymen_codestar_Team02.Services.DataAdminService.DataAdminService(_storHandler , _displayDataService);
+        _sut = new mohaymen_codestar_Team02.Services.DataAdminService.DataAdminService(_storHandler,
+            _displayDataService);
         _storHandler.EdageStorer.StoreFileData(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<long>()).Returns(true);
         _storHandler.VertexStorer.StoreFileData(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<long>()).Returns(true);
     }

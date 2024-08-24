@@ -57,7 +57,7 @@ public class InitialServices
             .AddScoped<IFileReader, ReadCsvFile>()
             .AddScoped<IDataAdminService, DataAdminService>()
             .AddScoped<IDisplayDataService, DisplayService>()
-            .AddScoped<IModelBuilder, Services.DynamicService.ModelBuilder>()
+            .AddScoped<IModelBuilder, ModelBuilderr>()
             .AddScoped<IObjectBuilder, ObjectBuilder>();
 
         services.AddAutoMapper(typeof(AutoMapperProfile));
@@ -149,7 +149,7 @@ public class InitialServices
                     Permission.DeleteVertex,
                     Permission.DeleteGraphData,
                     Permission.DeleteVertex,
-                    Permission.DeleteEdge,
+                    Permission.DeleteEdge
                 }
             },
             new Role
@@ -202,7 +202,7 @@ public class InitialServices
                 r.RoleType.ToLower().Equals(RoleType.SystemAdmin.ToString().ToLower()));
 
             var userRole = new UserRole()
-            { RoleId = role.RoleId, UserId = admin.UserId, Role = role, User = admin };
+                { RoleId = role.RoleId, UserId = admin.UserId, Role = role, User = admin };
             _context.UserRoles.Add(userRole);
 
             _context.Users.Add(admin);
