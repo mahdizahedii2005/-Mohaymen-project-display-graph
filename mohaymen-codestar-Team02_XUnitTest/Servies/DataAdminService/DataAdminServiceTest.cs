@@ -10,13 +10,17 @@ public class DataAdminServiceTest
     private readonly IStorHandler _storHandler;
     private readonly IDisplayDataService _displayDataService;
     private readonly mohaymen_codestar_Team02.Services.DataAdminService.DataAdminService _sut;
+    private readonly IEdgeService _edgeService;
+    private readonly IVertexService _vertexService;
 
     public DataAdminServiceTest()
     {
+        _vertexService = Substitute.For<IVertexService>();
+        _edgeService = Substitute.For<IEdgeService>();
         _storHandler = Substitute.For<IStorHandler>();
         _displayDataService = Substitute.For<IDisplayDataService>();
         _sut = new mohaymen_codestar_Team02.Services.DataAdminService.DataAdminService(_storHandler,
-            _displayDataService);
+            _displayDataService, _edgeService, _vertexService);
         _storHandler.EdageStorer.StoreFileData(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<long>()).Returns(true);
         _storHandler.VertexStorer.StoreFileData(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<long>()).Returns(true);
     }

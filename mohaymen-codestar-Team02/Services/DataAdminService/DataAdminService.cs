@@ -8,11 +8,17 @@ namespace mohaymen_codestar_Team02.Services.DataAdminService;
 public class DataAdminService
     : IDataAdminService
 {
-    private readonly IStorHandler storHandler;
+    private readonly IEdgeService _edgeService;
+    private readonly IVertexService _vertexService;
+    private readonly IStorHandler _storHandler;
     private readonly IDisplayDataService _displayDataService;
-    public DataAdminService(IStorHandler storHandler, IDisplayDataService displayDataService)
+
+    public DataAdminService(IStorHandler storHandler, IDisplayDataService displayDataService, IEdgeService edgeService,
+        IVertexService vertexService)
     {
-        this.storHandler = storHandler;
+        _vertexService = vertexService;
+        _edgeService = edgeService;
+        _storHandler = storHandler;
         _displayDataService = displayDataService;
     }
 
@@ -26,16 +32,16 @@ public class DataAdminService
                 return new ServiceResponse<string>(string.Empty, ApiResponseType.BadRequest,
                     Data.Resources.InvalidInpute);
 
-            var dataGroupId = await storHandler.StoreDataSet(graphName, userName);
+            var dataGroupId = await _storHandler.StoreDataSet(graphName, userName);
             if (dataGroupId == -1)
                 return new ServiceResponse<string>(string.Empty, ApiResponseType.BadRequest,
                     Data.Resources.InvalidInpute);
 
-            if (!await storHandler.EdageStorer.StoreFileData(edgeEntityName, edgeFile, dataGroupId))
+            if (!await _storHandler.EdageStorer.StoreFileData(edgeEntityName, edgeFile, dataGroupId))
                 return new ServiceResponse<string>(string.Empty,
                     ApiResponseType.BadRequest, Data.Resources.InvalidInpute);
 
-            if (!await storHandler.VertexStorer.StoreFileData(vertexEntityName, vertexFile, dataGroupId))
+            if (!await _storHandler.VertexStorer.StoreFileData(vertexEntityName, vertexFile, dataGroupId))
                 return new ServiceResponse<string>(string.Empty,
                     ApiResponseType.BadRequest, Data.Resources.InvalidInpute);
 
@@ -47,35 +53,18 @@ public class DataAdminService
         }
     }
 
-    public Task<ServiceResponse<DisplayGraphDto>> DisplayDataSetAsGraph(string dataSetName, string vertexFieldName, string sourceField, string targetField)
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task<ServiceResponse<string>> DisplayGraph()
-    {
-        throw new NotImplementedException();
-    }
-
     public Task<ServiceResponse<string>> DisplayDataSet()
     {
         throw new NotImplementedException();
     }
 
-    /*
-    public Task<ServiceResponse<string>> DisplayGraph(string databaseName, string sourceEdgeIdentifierFieldName,
-        string destinationEdgeIdentifierFieldName, string vertexIdentifierFieldName)
-    {
-        var graph = _displayDataService.GetGraph2(databaseName, sourceEdgeIdentifierFieldName, destinationEdgeIdentifierFieldName,
-            vertexIdentifierFieldName);
-        return new Task<ServiceResponse<>>()
-    }
-*/
 
-    public async Task<ServiceResponse<DisplayGraphDto>> DisplayGeraphData(string databaseName, string sourceEdgeIdentifierFieldName,
+    public async Task<ServiceResponse<DisplayGraphDto>> DisplayGeraphData(string databaseName,
+        string sourceEdgeIdentifierFieldName,
         string destinationEdgeIdentifierFieldName, string vertexIdentifierFieldName)
     {
-        var graph = _displayDataService.GetGraph(databaseName, sourceEdgeIdentifierFieldName, destinationEdgeIdentifierFieldName,
+        var graph = _displayDataService.GetGraph(databaseName, sourceEdgeIdentifierFieldName,
+            destinationEdgeIdentifierFieldName,
             vertexIdentifierFieldName);
 
         var dto = new DisplayGraphDto()
@@ -86,8 +75,15 @@ public class DataAdminService
         return new ServiceResponse<DisplayGraphDto>(dto, ApiResponseType.Success, "");
     }
 
-    public Task<ServiceResponse<List<Edge>>> DisplayEdgeData()
+    public ServiceResponse<DetailDto> GetVertexDetail(string objectId)
     {
-        throw new NotImplementedException();
+        return new ServiceResponse<DetailDto>(_vertexService.GetVertexDetails(objectId), ApiResponseType.Success,
+            string.Empty);
+    }
+
+    public ServiceResponse<DetailDto> GetEdgeDetail(string objectId)
+    {
+        return new ServiceResponse<DetailDto>(_edgeService.GetEdgeDetails(objectId), ApiResponseType.Success,
+            string.Empty);
     }
 }
