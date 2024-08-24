@@ -4,7 +4,7 @@ using mohaymen_codestar_Team02.Services.DynamicService;
 
 namespace mohaymen_codestar_Team02.Services.DynamicService;
 
-public class ModelBuilder : IModelBuilder
+public class ModelBuilderr : IModelBuilder
 {
     public Type CreateDynamicClass(string className, Dictionary<string, Type> fieldNamesTypes, Type interfaceType)
     {

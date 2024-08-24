@@ -7,5 +7,5 @@ public class Role
     [Key] public long RoleId { get; set; }
     [Required] public string RoleType { get; set; } = string.Empty;
     public virtual ICollection<UserRole> UserRoles { get; set; } = new List<UserRole>();
-    public List<Permission> Permissions { get; init; }
+    public virtual List<Permission> Permissions { get; set; }
 }
