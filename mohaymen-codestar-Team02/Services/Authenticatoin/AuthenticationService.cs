@@ -41,11 +41,10 @@ public class AuthenticationService : IAuthenticationService
         if (!_passwordService.VerifyPasswordHash(password, user.PasswordHash, user.Salt))
             return new ServiceResponse<GetUserDto?>(null, ApiResponseType.BadRequest, Resources.WrongPasswordMessage);
 
-        Claim[] claims = new[]
+        var claims = new[]
         {
             new Claim(ClaimTypes.Name, user.Username),
-            new Claim(ClaimTypes.Role, string.Join(",", user.UserRoles.Select(ur => ur.Role.RoleType))) 
-
+            new Claim(ClaimTypes.Role, string.Join(",", user.UserRoles.Select(ur => ur.Role.RoleType)))
         };
 
         _cookieService.CreateCookie(_tokenService.CreateToken(claims));
@@ -67,43 +66,46 @@ public class AuthenticationService : IAuthenticationService
     {
         var token = _cookieService.GetCookieValue();
         if (string.IsNullOrEmpty(token))
-            return new ServiceResponse<GetPermissionDto>(null, ApiResponseType.Unauthorized, Resources.UnauthorizedMessage);
+            return new ServiceResponse<GetPermissionDto>(null, ApiResponseType.Unauthorized,
+                Resources.UnauthorizedMessage);
 
         var username = _tokenService.GetUserNameFromToken();
         var user = await GetUser(username);
 
         if (user is null)
-            return new ServiceResponse<GetPermissionDto>(null, ApiResponseType.BadRequest, Resources.UserNotFoundMessage);
+            return new ServiceResponse<GetPermissionDto>(null, ApiResponseType.BadRequest,
+                Resources.UserNotFoundMessage);
 
         var roles = _tokenService.GetRolesFromToken();
         var splitRoles = roles?.Split(",");
 
-        HashSet<Permission> permissions = new HashSet<Permission>();
+        var permissions = await UnionPermissions(splitRoles);
+
+        var permissionDto = new GetPermissionDto()
+        {
+            Permissions = permissions.ToList()
+        };
+
+        return new ServiceResponse<GetPermissionDto>(permissionDto, ApiResponseType.Success,
+            Resources.GetPermissionsSuccessfuly);
+    }
+
+    private async Task<HashSet<Permission>> UnionPermissions(string[]? splitRoles)
+    {
+        var permissions = new HashSet<Permission>();
         foreach (var userRole in splitRoles)
         {
             var role = await _context.Roles.FirstOrDefaultAsync(r => r.RoleType.ToLower() == userRole.ToLower());
             var permission = role?.Permissions;
 
             if (permission != null)
-            { 
                 foreach (var eachPermission in permission)
-                {
                     permissions.Add(eachPermission);
-                }
-            }
-
         }
 
-        var permissionDto = new GetPermissionDto()
-        {
-            Permissions = permissions.ToList()
-        };
-        
-        return new ServiceResponse<GetPermissionDto>(permissionDto, ApiResponseType.Success,
-            Resources.GetPermissionsSuccessfuly);
-        
+        return permissions;
     }
-    
+
 
     private async Task<User?> GetUser(string username)
     {

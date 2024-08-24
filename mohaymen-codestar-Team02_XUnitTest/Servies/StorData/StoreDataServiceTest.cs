@@ -37,7 +37,7 @@ public class StoreDataServiceTest
         //Arrange
         var name = "mahdi";
         mockContext.Users.Add(new User()
-        { Username = "3", UserId = 4, PasswordHash = Array.Empty<byte>(), Salt = Array.Empty<byte>() });
+            { Username = "3", UserId = 4, PasswordHash = Array.Empty<byte>(), Salt = Array.Empty<byte>() });
         mockContext.SaveChanges();
         //Act
         var bolResult = await _sut.StoreDataSet(name, "3");

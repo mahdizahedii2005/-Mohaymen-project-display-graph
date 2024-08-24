@@ -21,16 +21,17 @@ public class DisplayService : IDisplayDataService
     {
         var dataSet = _context.DataSets.Include(ds => ds.VertexEntity)
             .ThenInclude(ve => ve.VertexAttributes).ThenInclude(vv => vv.VertexValues).Include(ds => ds.EdgeEntity)
-            .ThenInclude(ee => ee.EdgeAttributes).ThenInclude(ev => ev.EdgeValues).FirstOrDefault(ds => ds.Name.ToLower().Equals(databaseName.ToLower()));
+            .ThenInclude(ee => ee.EdgeAttributes).ThenInclude(ev => ev.EdgeValues)
+            .FirstOrDefault(ds => ds.Name.ToLower().Equals(databaseName.ToLower()));
 
         var vertexRecords = dataSet.VertexEntity.VertexAttributes.Select(a => a.VertexValues).SelectMany(v => v)
             .GroupBy(v => v.ObjectId);
 
-        List<Vertex> vertices = new List<Vertex>();
+        List<Vertex> vertices = new();
         foreach (var record in vertexRecords)
         {
             var value = record.SingleOrDefault(r => r.VertexAttribute.Name == vertexIdentifierFieldName).StringValue;
-            Vertex v = new Vertex()
+            var v = new Vertex()
             {
                 Id = record.Key,
                 Value = value
@@ -41,60 +42,52 @@ public class DisplayService : IDisplayDataService
         var edgeRecords = dataSet.EdgeEntity.EdgeAttributes.Select(ea => ea.EdgeValues).SelectMany(v => v)
             .GroupBy(v => v.ObjectId);
 
-        List<Edge> edges = new List<Edge>();
+        List<Edge> edges = new();
         foreach (var record in edgeRecords)
         {
-            string sourceValue = string.Empty;
-            string destinationValue = string.Empty;
+            var sourceValue = string.Empty;
+            var destinationValue = string.Empty;
             foreach (var item in record)
             {
-                if (item.EdgeAttribute.Name == sourceEdgeIdentifierFieldName)
-                {
-                    sourceValue = item.StringValue;
-                }
-                if (item.EdgeAttribute.Name == destinationEdgeIdentifierFieldName)
-                {
-                    destinationValue = item.StringValue;
-                }
+                if (item.EdgeAttribute.Name == sourceEdgeIdentifierFieldName) sourceValue = item.StringValue;
+                if (item.EdgeAttribute.Name == destinationEdgeIdentifierFieldName) destinationValue = item.StringValue;
             }
 
-            List<Vertex> sources = new List<Vertex>();
-            List<Vertex> destinations = new List<Vertex>();
+            List<Vertex> sources = new();
+            List<Vertex> destinations = new();
 
             foreach (var record1 in vertexRecords)
+            foreach (var item in record1)
             {
-                foreach (var item in record1)
+                if (item.VertexAttribute.Name == vertexIdentifierFieldName && item.StringValue == sourceValue)
                 {
-                    if (item.VertexAttribute.Name == vertexIdentifierFieldName && item.StringValue == sourceValue)
+                    var vertex = new Vertex()
                     {
-                        Vertex vertex = new Vertex()
-                        {
-                            Id = record1.Key
-                        };
-                        sources.Add(vertex);
-                    }
-                    if (item.VertexAttribute.Name == vertexIdentifierFieldName && item.StringValue == destinationValue)
+                        Id = record1.Key
+                    };
+                    sources.Add(vertex);
+                }
+
+                if (item.VertexAttribute.Name == vertexIdentifierFieldName && item.StringValue == destinationValue)
+                {
+                    var vertex = new Vertex()
                     {
-                        Vertex vertex = new Vertex()
-                        {
-                            Id = record1.Key
-                        };
-                        destinations.Add(vertex);
-                    }
+                        Id = record1.Key
+                    };
+                    destinations.Add(vertex);
                 }
             }
+
             foreach (var source in sources)
+            foreach (var des in destinations)
             {
-                foreach (var des in destinations)
+                var edge = new Edge()
                 {
-                    Edge edge = new Edge()
-                    {
-                        Id = record.Key,
-                        Source = source.Id,
-                        Target = des.Id
-                    };
-                    edges.Add(edge);
-                }
+                    Id = record.Key,
+                    Source = source.Id,
+                    Target = des.Id
+                };
+                edges.Add(edge);
             }
         }
 

@@ -205,7 +205,7 @@ public class InitialServices
                 r.RoleType.ToLower().Equals(RoleType.SystemAdmin.ToString().ToLower()));
 
             var userRole = new UserRole()
-            { RoleId = role.RoleId, UserId = admin.UserId, Role = role, User = admin };
+                { RoleId = role.RoleId, UserId = admin.UserId, Role = role, User = admin };
             _context.UserRoles.Add(userRole);
 
             _context.Users.Add(admin);

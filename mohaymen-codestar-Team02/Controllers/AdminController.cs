@@ -75,7 +75,7 @@ public class AdminController : ControllerBase
     }
 
     [HttpPut("users/{username}/roles")]
-    public async Task<IActionResult> AddRole([FromBody] AddUserRoleDto request , string username)
+    public async Task<IActionResult> AddRole([FromBody] AddUserRoleDto request, string username)
     {
         ServiceResponse<GetUserDto?> response =
             await _adminService.AddRole(
@@ -87,7 +87,7 @@ public class AdminController : ControllerBase
     }
 
     [HttpDelete("users/{username}/roles")]
-    public async Task<IActionResult> DeleteRole([FromBody] DeleteUserRoleDto request,  string username)
+    public async Task<IActionResult> DeleteRole([FromBody] DeleteUserRoleDto request, string username)
     {
         ServiceResponse<GetUserDto?> response =
             await _adminService.DeleteRole(

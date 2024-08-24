@@ -10,6 +10,7 @@ public class DataAdminService
 {
     private readonly IStorHandler storHandler;
     private readonly IDisplayDataService _displayDataService;
+
     public DataAdminService(IStorHandler storHandler, IDisplayDataService displayDataService)
     {
         this.storHandler = storHandler;
@@ -47,7 +48,8 @@ public class DataAdminService
         }
     }
 
-    public Task<ServiceResponse<DisplayGraphDto>> DisplayDataSetAsGraph(string dataSetName, string vertexFieldName, string sourceField, string targetField)
+    public Task<ServiceResponse<DisplayGraphDto>> DisplayDataSetAsGraph(string dataSetName, string vertexFieldName,
+        string sourceField, string targetField)
     {
         throw new NotImplementedException();
     }
@@ -72,16 +74,18 @@ public class DataAdminService
     }
 */
 
-    public async Task<ServiceResponse<DisplayGraphDto>> DisplayGeraphData(string databaseName, string sourceEdgeIdentifierFieldName,
+    public async Task<ServiceResponse<DisplayGraphDto>> DisplayGeraphData(string databaseName,
+        string sourceEdgeIdentifierFieldName,
         string destinationEdgeIdentifierFieldName, string vertexIdentifierFieldName)
     {
-        var graph = _displayDataService.GetGraph(databaseName, sourceEdgeIdentifierFieldName, destinationEdgeIdentifierFieldName,
+        var graph = _displayDataService.GetGraph(databaseName, sourceEdgeIdentifierFieldName,
+            destinationEdgeIdentifierFieldName,
             vertexIdentifierFieldName);
 
         var dto = new DisplayGraphDto()
         {
             Vertices = graph.vertices,
-            Edges = graph.edges,
+            Edges = graph.edges
         };
         return new ServiceResponse<DisplayGraphDto>(dto, ApiResponseType.Success, "");
     }

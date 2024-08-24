@@ -67,15 +67,15 @@ public class AdminService : IAdminService
             return new ServiceResponse<List<GetUserDto>?>(null, ApiResponseType.Forbidden,
                 Resources.accessDeniedMessage);
 
-        List<User> users = await _context.Users.Include(u => u.UserRoles).ThenInclude(ur => ur.Role).ToListAsync();
-        List<GetUserDto> userDtos = users.Select(u => _mapper.Map<GetUserDto>(u)).ToList();
+        var users = await _context.Users.Include(u => u.UserRoles).ThenInclude(ur => ur.Role).ToListAsync();
+        var userDtos = users.Select(u => _mapper.Map<GetUserDto>(u)).ToList();
         return new ServiceResponse<List<GetUserDto>?>(userDtos, ApiResponseType.Success,
             Resources.UserRetrievedMassage);
     }
 
     public async Task<ServiceResponse<List<GetRoleDto>>> GetAllRoles()
     {
-        List<GetRoleDto> roles = await _context.Roles.Select(r => _mapper.Map<GetRoleDto>(r)).ToListAsync();
+        var roles = await _context.Roles.Select(r => _mapper.Map<GetRoleDto>(r)).ToListAsync();
         return new ServiceResponse<List<GetRoleDto>>(roles, ApiResponseType.Success, Resources.UsersRetrievedMassage);
     }
 
