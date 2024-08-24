@@ -14,7 +14,6 @@ public class DataAdminController : ControllerBase
 {
     private readonly IDataAdminService _dataAdminService;
     private readonly IFileReader _fileReader;
-    private readonly IDisplayDataService _dataService;
 
     public DataAdminController(IDataAdminService dataAdminService,
         IFileReader fileReader)
@@ -27,6 +26,7 @@ public class DataAdminController : ControllerBase
     [HttpPost("DataSets")]
     public async Task<IActionResult> StoreNewDataSet([FromForm] StoreDataDto storeDataDto)
     {
+        //Todo SystemAdmin and DataAdmin
         try
         {
             var edgeFile = _fileReader.Read(storeDataDto.EdgeFile);
@@ -44,6 +44,7 @@ public class DataAdminController : ControllerBase
     [HttpGet("DataSets")]
     public void GetDataSetsList()
     {
+        //Todo all Of Them
     }
 
     [HttpGet("DataSets/{dataSetName}")]
@@ -51,6 +52,7 @@ public class DataAdminController : ControllerBase
         [FromQuery] string sourceEdgeIdentifierFieldName, [FromQuery] string destinationEdgeIdentifierFieldName,
         [FromQuery] string vertexIdentifierFieldName)
     {
+        //Todo all Of Them
         ServiceResponse<DisplayGraphDto> response =
             await _dataAdminService.DisplayGeraphData(dataSetName, sourceEdgeIdentifierFieldName,
                 destinationEdgeIdentifierFieldName, vertexIdentifierFieldName);
@@ -62,6 +64,8 @@ public class DataAdminController : ControllerBase
     [HttpGet("DataSets/Vertices/{objectId}")]
     public async Task<IActionResult> DisplayVertexDetails(string objectId)
     {
+        //Todo all Of Them
+
         var respond = _dataAdminService.GetVertexDetail(objectId);
         return StatusCode((int)respond.Type, respond);
     }
@@ -69,6 +73,7 @@ public class DataAdminController : ControllerBase
     [HttpGet("DataSets/Edges/{objectId}")]
     public async Task<IActionResult> DisplayEdgeDetails(string objectId)
     {
+        //Todo all Of Them
         var respond = _dataAdminService.GetEdgeDetail(objectId);
         return StatusCode((int)respond.Type, respond);
     }
