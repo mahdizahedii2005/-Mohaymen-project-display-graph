@@ -48,8 +48,8 @@ public class DataAdminController : ControllerBase
 
     [HttpGet("DataSets/{dataSetName}")]
     public async Task<IActionResult> DisplayDataSetAsGraph(string dataSetName,
-    [FromQuery]string sourceEdgeIdentifierFieldName, [FromQuery]string destinationEdgeIdentifierFieldName,
-        [FromQuery]string vertexIdentifierFieldName)
+    [FromQuery] string sourceEdgeIdentifierFieldName, [FromQuery] string destinationEdgeIdentifierFieldName,
+        [FromQuery] string vertexIdentifierFieldName)
     {
         ServiceResponse<DisplayGraphDto> response =
             await _dataAdminService.DisplayGeraphData(dataSetName, sourceEdgeIdentifierFieldName, destinationEdgeIdentifierFieldName, vertexIdentifierFieldName);

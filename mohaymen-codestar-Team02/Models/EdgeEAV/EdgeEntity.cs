@@ -26,7 +26,7 @@ public class EdgeEntity
         {
             throw new ArgumentException("your name contain !");
         }
-        
+
     }
 
     [Key] public long Id { get; set; }

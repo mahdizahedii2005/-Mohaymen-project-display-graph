@@ -61,7 +61,7 @@ public class DataAdminService
     {
         throw new NotImplementedException();
     }
-    
+
     /*
     public Task<ServiceResponse<string>> DisplayGraph(string databaseName, string sourceEdgeIdentifierFieldName,
         string destinationEdgeIdentifierFieldName, string vertexIdentifierFieldName)
@@ -71,7 +71,7 @@ public class DataAdminService
         return new Task<ServiceResponse<>>()
     }
 */
-    
+
     public async Task<ServiceResponse<DisplayGraphDto>> DisplayGeraphData(string databaseName, string sourceEdgeIdentifierFieldName,
         string destinationEdgeIdentifierFieldName, string vertexIdentifierFieldName)
     {
