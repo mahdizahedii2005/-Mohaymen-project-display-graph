@@ -77,4 +77,58 @@ public class TokenServiceTests
         // Assert
         Assert.Null(username);
     }
+
+    [Fact]
+    public void GetRolesFromToken_ShouldReturnUsername_WhenTokenIsValid()
+    {
+        // Arrange
+        var claims = new ClaimsPrincipal(new ClaimsIdentity(new Claim[]
+        {
+            new(ClaimTypes.Name, "testUser"),
+            new(ClaimTypes.Role, "SystemAdmin")
+        }, "mock"));
+
+        var httpContext = Substitute.For<HttpContext>();
+        httpContext.User.Returns(claims);
+        _httpContextAccessor.HttpContext.Returns(httpContext);
+
+        // Act
+        var role = _sut.GetRolesFromToken();
+
+        // Assert
+        Assert.Equal("SystemAdmin", role);
+    }
+
+    [Fact]
+    public void GetRolesFromToken_ShouldReturnNull_WhenHttpContextIsNull()
+    {
+        // Arrange
+        _httpContextAccessor.HttpContext.Returns((HttpContext)null);
+
+        // Act
+        var role = _sut.GetRolesFromToken();
+
+        // Assert
+        Assert.Null(role);
+    }
+
+    [Fact]
+    public void GetRolesFromToken_ShouldReturnNull_WhenUserHasNoRoleClaim()
+    {
+        // Arrange
+        var claims = new ClaimsPrincipal(new ClaimsIdentity(new Claim[]
+        {
+            new(ClaimTypes.Email, "testuser@example.com")
+        }, "mock"));
+
+        var httpContext = Substitute.For<HttpContext>();
+        httpContext.User.Returns(claims);
+        _httpContextAccessor.HttpContext.Returns(httpContext);
+
+        // Act
+        var role = _sut.GetRolesFromToken();
+
+        // Assert
+        Assert.Null(role);
+    }
 }
