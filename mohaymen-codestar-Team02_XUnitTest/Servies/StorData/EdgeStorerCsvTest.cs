@@ -47,7 +47,7 @@ public class EdgeStorerCsvTests
         // Assert
         Assert.True(result);
         Assert.Equal(1, await _dataContext.EdgeEntities.CountAsync());
-        Assert.Equal(2, await _dataContext.EdgeAttributes.CountAsync());
+        Assert.Equal(1, await _dataContext.EdgeAttributes.CountAsync());
         Assert.Equal(2, await _dataContext.EdgeValues.CountAsync());
     }
 
