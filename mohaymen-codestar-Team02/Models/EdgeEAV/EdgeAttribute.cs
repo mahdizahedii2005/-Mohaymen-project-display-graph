@@ -10,6 +10,7 @@ public class EdgeAttribute
         Name = name;
         EdgeEntityId = edgeEntityId;
     }
+
     [Key] public long Id { get; set; }
     public string Name { get; set; }
     public long EdgeEntityId { get; set; }

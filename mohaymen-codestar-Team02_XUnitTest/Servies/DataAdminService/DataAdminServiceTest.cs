@@ -1,4 +1,5 @@
 using mohaymen_codestar_Team02.Models;
+using mohaymen_codestar_Team02.Services;
 using mohaymen_codestar_Team02.Services.StoreData.Abstraction;
 using NSubstitute;
 
@@ -7,12 +8,15 @@ namespace mohaymen_codestar_Team02_XUnitTest.Servies.DataAdminService;
 public class DataAdminServiceTest
 {
     private readonly IStorHandler _storHandler;
+    private readonly IDisplayDataService _displayDataService;
     private readonly mohaymen_codestar_Team02.Services.DataAdminService.DataAdminService _sut;
 
     public DataAdminServiceTest()
     {
         _storHandler = Substitute.For<IStorHandler>();
-        _sut = new mohaymen_codestar_Team02.Services.DataAdminService.DataAdminService(_storHandler);
+        _displayDataService = Substitute.For<IDisplayDataService>();
+        _sut = new mohaymen_codestar_Team02.Services.DataAdminService.DataAdminService(_storHandler,
+            _displayDataService);
         _storHandler.EdageStorer.StoreFileData(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<long>()).Returns(true);
         _storHandler.VertexStorer.StoreFileData(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<long>()).Returns(true);
     }
@@ -28,6 +32,7 @@ public class DataAdminServiceTest
         //Assert
         Assert.Equal(ApiResponseType.BadRequest, result.Type);
     }
+
     [Fact]
     public async Task StoreData_ReturnsBadRequest_WhenCreatingTheDataGroupIsFail()
     {

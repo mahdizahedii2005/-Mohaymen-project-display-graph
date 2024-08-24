@@ -57,7 +57,7 @@ public class AdminController : ControllerBase
     {
         var user = new User
         {
-            Username = request.Username,
+            Username = request.Username
         };
 
         ServiceResponse<GetUserDto?> response =

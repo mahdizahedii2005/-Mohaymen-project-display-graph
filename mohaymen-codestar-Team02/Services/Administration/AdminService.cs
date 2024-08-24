@@ -46,7 +46,7 @@ public class AdminService : IAdminService
         if (user is null)
             return new ServiceResponse<GetUserDto?>(null, ApiResponseType.NotFound, Resources.UserNotFoundMessage);
 
-        GetUserDto userDto = _mapper.Map<GetUserDto>(user);
+        var userDto = _mapper.Map<GetUserDto>(user);
         return new ServiceResponse<GetUserDto?>(userDto, ApiResponseType.Success, Resources.UserRetrievedMassage);
     }
 
@@ -83,9 +83,7 @@ public class AdminService : IAdminService
     {
         var token = _cookieService.GetCookieValue();
         if (string.IsNullOrEmpty(token))
-        {
             return new ServiceResponse<GetUserDto?>(null, ApiResponseType.Unauthorized, Resources.UnauthorizedMessage);
-        }
 
         var adminUsername = _tokenService.GetUserNameFromToken();
         var admin = await GetUser(adminUsername);
@@ -105,7 +103,7 @@ public class AdminService : IAdminService
         await _context.Users.AddAsync(user);
         await _context.SaveChangesAsync();
 
-        GetUserDto userDto = _mapper.Map<GetUserDto>(user);
+        var userDto = _mapper.Map<GetUserDto>(user);
 
         return new ServiceResponse<GetUserDto?>(userDto, ApiResponseType.Created,
             Resources.UserCreatedSuccessfullyMessage);
@@ -135,7 +133,7 @@ public class AdminService : IAdminService
         _context.Users.Remove(foundUser);
         await _context.SaveChangesAsync();
 
-        GetUserDto userDto = _mapper.Map<GetUserDto>(user);
+        var userDto = _mapper.Map<GetUserDto>(user);
 
         return new ServiceResponse<GetUserDto?>(userDto, ApiResponseType.Success, Resources.UserDeletionSuccessful);
     }
@@ -176,7 +174,7 @@ public class AdminService : IAdminService
         await _context.UserRoles.AddAsync(userRole);
         await _context.SaveChangesAsync();
 
-        GetUserDto userDto = _mapper.Map<GetUserDto>(user);
+        var userDto = _mapper.Map<GetUserDto>(user);
 
         return new ServiceResponse<GetUserDto?>(userDto, ApiResponseType.Success,
             Resources.RoleAddedSuccessfulyMassage);
@@ -212,15 +210,17 @@ public class AdminService : IAdminService
         _context.UserRoles.Remove(userRole);
         await _context.SaveChangesAsync();
 
-        GetUserDto userDto = _mapper.Map<GetUserDto>(user);
+        var userDto = _mapper.Map<GetUserDto>(user);
 
         return new ServiceResponse<GetUserDto?>(userDto, ApiResponseType.Success,
             Resources.RoleRemovedSuccessfullyMessage);
     }
 
-    private async Task<User?> GetUser(string? username) =>
-        await _context.Users.FirstOrDefaultAsync(x =>
+    private async Task<User?> GetUser(string? username)
+    {
+        return await _context.Users.FirstOrDefaultAsync(x =>
             username != null && x.Username != null && x.Username.ToLower().Equals(username.ToLower()));
+    }
 
     private Task<bool> IsAdmin(User? user)
     {
@@ -238,12 +238,16 @@ public class AdminService : IAdminService
         return await _context.Roles.FirstOrDefaultAsync(x => x.RoleType.ToLower() == roleType.ToLower());
     }
 
-    private async Task<UserRole?> GetUserRole(Role foundRole, User foundUser) =>
-        await _context.UserRoles.FirstOrDefaultAsync(x =>
+    private async Task<UserRole?> GetUserRole(Role foundRole, User foundUser)
+    {
+        return await _context.UserRoles.FirstOrDefaultAsync(x =>
             x.User.Username != null && foundUser.Username != null && x.RoleId == foundRole.RoleId &&
             x.User.Username.ToLower() == foundUser.Username.ToLower());
+    }
 
-    private async Task<bool> UserExists(string? username) =>
-        await _context.Users.AnyAsync(x =>
+    private async Task<bool> UserExists(string? username)
+    {
+        return await _context.Users.AnyAsync(x =>
             username != null && x.Username != null && x.Username.ToLower() == username.ToLower());
+    }
 }

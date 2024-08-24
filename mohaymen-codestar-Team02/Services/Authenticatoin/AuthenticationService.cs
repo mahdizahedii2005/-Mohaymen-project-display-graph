@@ -30,9 +30,7 @@ public class AuthenticationService : IAuthenticationService
     public async Task<ServiceResponse<GetUserDto?>> Login(string username, string password)
     {
         if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
-        {
             return new ServiceResponse<GetUserDto?>(null, ApiResponseType.BadRequest, Resources.InvalidInpute);
-        }
 
         var user = await GetUser(username);
 
@@ -49,23 +47,22 @@ public class AuthenticationService : IAuthenticationService
 
         _cookieService.CreateCookie(_tokenService.CreateToken(claims));
 
-        GetUserDto userDto = _mapper.Map<GetUserDto>(user);
+        var userDto = _mapper.Map<GetUserDto>(user);
 
         return new ServiceResponse<GetUserDto?>(userDto, ApiResponseType.Success, Resources.LoginSuccessfulMessage);
     }
 
     public ServiceResponse<string?> Logout()
     {
-        if (_cookieService.GetCookieValue() != null)
-        {
-            _cookieService.GetExpiredCookie();
-        }
+        if (_cookieService.GetCookieValue() != null) _cookieService.GetExpiredCookie();
 
         return new ServiceResponse<string?>(null, ApiResponseType.Success,
             Resources.LogoutSuccessfuly);
     }
 
-    private async Task<User?> GetUser(string username) =>
-        await _context.Users.FirstOrDefaultAsync(x =>
+    private async Task<User?> GetUser(string username)
+    {
+        return await _context.Users.FirstOrDefaultAsync(x =>
             x.Username != null && x.Username.ToLower().Equals(username.ToLower()));
+    }
 }

@@ -4,7 +4,7 @@ namespace mohaymen_codestar_Team02.Services;
 
 public interface IDisplayDataService
 {
-    ServiceResponse<string> DisplayGraph();
-    ServiceResponse<string> DisplayVertex();
-    ServiceResponse<string> DisplayEdge();
+    (List<Vertex> vertices, List<Edge> edges) GetGraph(string databaseName,
+        string sourceEdgeIdentifierFieldName,
+        string destinationEdgeIdentifierFieldName, string vertexIdentifierFieldName);
 }

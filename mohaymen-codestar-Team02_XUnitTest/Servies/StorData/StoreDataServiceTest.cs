@@ -18,16 +18,15 @@ public class StoreDataServiceTest
         var serviceCollection = new ServiceCollection();
 
         var options = new DbContextOptionsBuilder<DataContext>()
-            .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
+            .UseInMemoryDatabase(Guid.NewGuid().ToString())
             .Options;
 
         serviceCollection.AddScoped(_ => new DataContext(options));
 
         _serviceProvider = serviceCollection.BuildServiceProvider();
-        IEdageStorer edageStorer = Substitute.For<IEdageStorer>();
-        IVertexStorer vertexStorer = Substitute.For<IVertexStorer>();
+        var edageStorer = Substitute.For<IEdageStorer>();
+        var vertexStorer = Substitute.For<IVertexStorer>();
         _sut = new StoreDataService(_serviceProvider, edageStorer, vertexStorer);
-
     }
 
     [Fact]

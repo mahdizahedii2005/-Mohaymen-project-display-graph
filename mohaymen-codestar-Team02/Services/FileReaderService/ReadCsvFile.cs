@@ -4,7 +4,10 @@ public class ReadCsvFile : IFileReader
 {
     public string Read(IFormFile? file)
     {
-        if (file == null || file.Length == 0) return "";
+        if (file == null || file.Length == 0) throw new FormatException();
+        var supportedTypes = new[] { "csv" };
+        var fileExt = Path.GetExtension(file.FileName).Substring(1);
+        if (!supportedTypes.Contains(fileExt.ToLower())) throw new FormatException();
 
         using (var reader = new StreamReader(file.OpenReadStream()))
         {

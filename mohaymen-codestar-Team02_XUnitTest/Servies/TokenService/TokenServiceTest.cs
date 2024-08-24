@@ -31,7 +31,7 @@ public class TokenServiceTests
         // Arrange
         var claims = new ClaimsPrincipal(new ClaimsIdentity(new Claim[]
         {
-            new Claim(ClaimTypes.Name, "testUser")
+            new(ClaimTypes.Name, "testUser")
         }, "mock"));
 
         var httpContext = Substitute.For<HttpContext>();
@@ -64,7 +64,7 @@ public class TokenServiceTests
         // Arrange
         var claims = new ClaimsPrincipal(new ClaimsIdentity(new Claim[]
         {
-            new Claim(ClaimTypes.Email, "testuser@example.com")
+            new(ClaimTypes.Email, "testuser@example.com")
         }, "mock"));
 
         var httpContext = Substitute.For<HttpContext>();

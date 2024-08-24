@@ -10,6 +10,7 @@ using mohaymen_codestar_Team02.Services.Administration;
 using mohaymen_codestar_Team02.Services.Authenticatoin;
 using mohaymen_codestar_Team02.Services.CookieService;
 using mohaymen_codestar_Team02.Services.DataAdminService;
+using mohaymen_codestar_Team02.Services.DynamicService;
 using mohaymen_codestar_Team02.Services.FileReaderService;
 using mohaymen_codestar_Team02.Services.PasswordHandller;
 using mohaymen_codestar_Team02.Services.ProfileService;
@@ -38,7 +39,7 @@ public class InitialServices
         services.AddHttpContextAccessor();
 
         // Configure DbContext and Dependency Injection
-        var cs = Environment.GetEnvironmentVariable("CONNECTION_STRING");
+        var cs = builder.Configuration["CONNECTION_STRING"];
         services.AddDbContext<DataContext>(options =>
             options.UseNpgsql(cs));
 
@@ -50,11 +51,14 @@ public class InitialServices
             .AddScoped<ICookieService, CookieService>()
             .AddScoped<IPasswordService, PasswordService>()
             .AddScoped<InitialServices>()
-            .AddSingleton<IEdageStorer, EdgeStorerCsv>()
-            .AddSingleton<IVertexStorer, VertexStorerCsv>()
-            .AddTransient<IStorHandler, StoreDataService>()
-            .AddSingleton<IFileReader, ReadCsvFile>()
-            .AddSingleton<IDataAdminService, DataAdminService>();
+            .AddScoped<IEdageStorer, EdgeStorerCsv>()
+            .AddScoped<IVertexStorer, VertexStorerCsv>()
+            .AddScoped<IStorHandler, StoreDataService>()
+            .AddScoped<IFileReader, ReadCsvFile>()
+            .AddScoped<IDataAdminService, DataAdminService>()
+            .AddScoped<IDisplayDataService, DisplayService>()
+            .AddScoped<IModelBuilder, ModelBuilderr>()
+            .AddScoped<IObjectBuilder, ObjectBuilder>();
 
         services.AddAutoMapper(typeof(AutoMapperProfile));
         services.AddAuthorization();
@@ -99,20 +103,76 @@ public class InitialServices
     {
         List<Role> roles = new()
         {
-            new()
+            new Role
             {
                 RoleId = 1,
-                RoleType = "SystemAdmin"
+                RoleType = "SystemAdmin",
+                Permissions = new List<Permission>()
+                {
+                    Permission.AddRole, Permission.DeleteRole,
+                    Permission.UserRegister,
+                    Permission.DeleteUser,
+                    Permission.GetUserList,
+                    Permission.GetSingleUser,
+                    Permission.GetRoleList,
+                    Permission.Login,
+                    Permission.Logout,
+                    Permission.ChangePass,
+                    Permission.UpdateInfo,
+                    Permission.SeeAllGraphData,
+                    Permission.SeeSingleGraphData,
+                    Permission.GetInfoOfVertex,
+                    Permission.GetInfoOfEdge,
+                    Permission.AddGraphData,
+                    Permission.DeleteGraphData,
+                    Permission.DeleteVertex,
+                    Permission.DeleteEdge,
+                    Permission.DeleteGraphDataFromDatabase,
+                    Permission.DeleteVertexFromDatabase,
+                    Permission.DeleteEdgeFromDatabase
+                }
             },
-            new()
+            new Role
             {
                 RoleId = 2,
-                RoleType = "Analyst"
+                RoleType = "Analyst", Permissions = new List<Permission>()
+                {
+                    Permission.Login,
+                    Permission.Logout,
+                    Permission.ChangePass,
+                    Permission.UpdateInfo,
+                    Permission.SeeAllGraphData,
+                    Permission.SeeSingleGraphData,
+                    Permission.GetInfoOfVertex,
+                    Permission.GetInfoOfEdge,
+                    Permission.DeleteGraphData,
+                    Permission.DeleteVertex,
+                    Permission.DeleteGraphData,
+                    Permission.DeleteVertex,
+                    Permission.DeleteEdge
+                }
             },
-            new()
+            new Role
             {
                 RoleId = 3,
-                RoleType = "DataAdmin"
+                RoleType = "DataAdmin", Permissions = new List<Permission>()
+                {
+                    Permission.Login,
+                    Permission.Logout,
+                    Permission.ChangePass,
+                    Permission.UpdateInfo,
+                    Permission.SeeAllGraphData,
+                    Permission.SeeSingleGraphData,
+                    Permission.GetInfoOfVertex,
+                    Permission.GetInfoOfEdge,
+                    Permission.AddGraphData,
+                    Permission.DeleteGraphData,
+                    Permission.DeleteVertex,
+                    Permission.DeleteEdge,
+                    Permission.DeleteGraphDataFromDatabase,
+                    Permission.DeleteVertexFromDatabase,
+                    Permission.DeleteEdgeFromDatabase
+                }
             }
         };
 
@@ -141,7 +201,7 @@ public class InitialServices
             var role = _context.Roles.FirstOrDefault(r =>
                 r.RoleType.ToLower().Equals(RoleType.SystemAdmin.ToString().ToLower()));
 
-            UserRole userRole = new UserRole()
+            var userRole = new UserRole()
             { RoleId = role.RoleId, UserId = admin.UserId, Role = role, User = admin };
             _context.UserRoles.Add(userRole);
 

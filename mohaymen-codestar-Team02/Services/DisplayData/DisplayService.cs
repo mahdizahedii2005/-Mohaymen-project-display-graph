@@ -1,23 +1,107 @@
 using Microsoft.EntityFrameworkCore;
 using mohaymen_codestar_Team02.Data;
+using mohaymen_codestar_Team02.Models;
+using mohaymen_codestar_Team02.Services.DynamicService;
 using mohaymen_codestar_Team02.Services.TokenService;
 using QuikGraph;
 
 namespace mohaymen_codestar_Team02.Services;
 
-public class DisplayService
+public class DisplayService : IDisplayDataService
 {
     private readonly DataContext _context;
-    private readonly ModelBuilder _modelBuilder;
-    private readonly ObjectBuilder _objectBuilder;
 
-    public DisplayService(DataContext context, ModelBuilder modelBuilder, ObjectBuilder objectBuilder)
+    public DisplayService(DataContext context)
     {
         _context = context;
-        _modelBuilder = modelBuilder;
-        _objectBuilder = objectBuilder;
     }
 
+    public (List<Vertex> vertices, List<Edge> edges) GetGraph(string databaseName, string sourceEdgeIdentifierFieldName,
+        string destinationEdgeIdentifierFieldName, string vertexIdentifierFieldName)
+    {
+        var dataSet = _context.DataSets.Include(ds => ds.VertexEntity)
+            .ThenInclude(ve => ve.VertexAttributes).ThenInclude(vv => vv.VertexValues).Include(ds => ds.EdgeEntity)
+            .ThenInclude(ee => ee.EdgeAttributes).ThenInclude(ev => ev.EdgeValues).FirstOrDefault(ds => ds.Name.ToLower().Equals(databaseName.ToLower()));
+
+        var vertexRecords = dataSet.VertexEntity.VertexAttributes.Select(a => a.VertexValues).SelectMany(v => v)
+            .GroupBy(v => v.ObjectId);
+
+        List<Vertex> vertices = new List<Vertex>();
+        foreach (var record in vertexRecords)
+        {
+            var value = record.SingleOrDefault(r => r.VertexAttribute.Name == vertexIdentifierFieldName).StringValue;
+            Vertex v = new Vertex()
+            {
+                Id = record.Key,
+                Value = value
+            };
+            vertices.Add(v);
+        }
+
+        var edgeRecords = dataSet.EdgeEntity.EdgeAttributes.Select(ea => ea.EdgeValues).SelectMany(v => v)
+            .GroupBy(v => v.ObjectId);
+
+        List<Edge> edges = new List<Edge>();
+        foreach (var record in edgeRecords)
+        {
+            string sourceValue = string.Empty;
+            string destinationValue = string.Empty;
+            foreach (var item in record)
+            {
+                if (item.EdgeAttribute.Name == sourceEdgeIdentifierFieldName)
+                {
+                    sourceValue = item.StringValue;
+                }
+                if (item.EdgeAttribute.Name == destinationEdgeIdentifierFieldName)
+                {
+                    destinationValue = item.StringValue;
+                }
+            }
+
+            List<Vertex> sources = new List<Vertex>();
+            List<Vertex> destinations = new List<Vertex>();
+
+            foreach (var record1 in vertexRecords)
+            {
+                foreach (var item in record1)
+                {
+                    if (item.VertexAttribute.Name == vertexIdentifierFieldName && item.StringValue == sourceValue)
+                    {
+                        Vertex vertex = new Vertex()
+                        {
+                            Id = record1.Key
+                        };
+                        sources.Add(vertex);
+                    }
+                    if (item.VertexAttribute.Name == vertexIdentifierFieldName && item.StringValue == destinationValue)
+                    {
+                        Vertex vertex = new Vertex()
+                        {
+                            Id = record1.Key
+                        };
+                        destinations.Add(vertex);
+                    }
+                }
+            }
+            foreach (var source in sources)
+            {
+                foreach (var des in destinations)
+                {
+                    Edge edge = new Edge()
+                    {
+                        Id = record.Key,
+                        Source = source.Id,
+                        Target = des.Id
+                    };
+                    edges.Add(edge);
+                }
+            }
+        }
+
+        return (vertices, edges);
+    }
+
+    /*
     public void GetGraph(string databaseName, string sourceEdgeIdentifierFieldName,
         string destinationEdgeIdentifierFieldName, string vertexIdentifierFieldName, bool directed,
         out List<dynamic> vertices, List<dynamic> edges)
@@ -109,5 +193,5 @@ public class DisplayService
                 }
             }
         }
-    }
+    }*/
 }

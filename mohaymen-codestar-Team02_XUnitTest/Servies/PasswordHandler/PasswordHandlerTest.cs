@@ -15,12 +15,12 @@ public class PasswordServiceTests
     public void CreatePasswordHash_ShouldGenerateDifferentHashAndSalt_ForDifferentPasswords()
     {
         // Arrange
-        string password1 = "password1";
-        string password2 = "password2";
+        var password1 = "password1";
+        var password2 = "password2";
 
         // Act
-        _sut.CreatePasswordHash(password1, out byte[] hash1, out byte[] salt1);
-        _sut.CreatePasswordHash(password2, out byte[] hash2, out byte[] salt2);
+        _sut.CreatePasswordHash(password1, out var hash1, out var salt1);
+        _sut.CreatePasswordHash(password2, out var hash2, out var salt2);
 
         // Assert
         Assert.NotEqual(hash1, hash2);
@@ -31,11 +31,11 @@ public class PasswordServiceTests
     public void CreatePasswordHash_ShouldGenerateSameHash_ForSamePasswordAndSalt()
     {
         // Arrange
-        string password = "password";
+        var password = "password";
 
         // Act
-        _sut.CreatePasswordHash(password, out byte[] hash1, out byte[] salt);
-        _sut.CreatePasswordHash(password, out byte[] hash2, out _);
+        _sut.CreatePasswordHash(password, out var hash1, out var salt);
+        _sut.CreatePasswordHash(password, out var hash2, out _);
 
         // Assert
         Assert.NotEqual(hash1, hash2); // چون برای هر بار فراخوانی salt جدید تولید می‌شود.
@@ -45,11 +45,11 @@ public class PasswordServiceTests
     public void VerifyPasswordHash_ShouldReturnTrue_ForValidPassword()
     {
         // Arrange
-        string password = "password";
-        _sut.CreatePasswordHash(password, out byte[] hash, out byte[] salt);
+        var password = "password";
+        _sut.CreatePasswordHash(password, out var hash, out var salt);
 
         // Act
-        bool isValid = _sut.VerifyPasswordHash(password, hash, salt);
+        var isValid = _sut.VerifyPasswordHash(password, hash, salt);
 
         // Assert
         Assert.True(isValid);
@@ -59,12 +59,12 @@ public class PasswordServiceTests
     public void VerifyPasswordHash_ShouldReturnFalse_ForInvalidPassword()
     {
         // Arrange
-        string correctPassword = "password";
-        string wrongPassword = "wrongpassword";
-        _sut.CreatePasswordHash(correctPassword, out byte[] hash, out byte[] salt);
+        var correctPassword = "password";
+        var wrongPassword = "wrongpassword";
+        _sut.CreatePasswordHash(correctPassword, out var hash, out var salt);
 
         // Act
-        bool isValid = _sut.VerifyPasswordHash(wrongPassword, hash, salt);
+        var isValid = _sut.VerifyPasswordHash(wrongPassword, hash, salt);
 
         // Assert
         Assert.False(isValid);
