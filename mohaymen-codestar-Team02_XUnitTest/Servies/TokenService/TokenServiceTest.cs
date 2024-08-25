@@ -19,11 +19,28 @@ public class TokenServiceTests
         _httpContextAccessor = Substitute.For<IHttpContextAccessor>();
 
         // Setup configuration
-        _configuration.GetSection("AppSettings:Token").Value.Returns("SuperSecretKey");
+        _configuration.GetSection("AppSettings:Token").Value
+            .Returns("SuperSuperSuperSuperSuperSuperSuperSuperSuperSuperSuperSuperSuperSuperSecretKey");
 
         _sut = new TokenService(_configuration, _httpContextAccessor);
     }
 
+    [Fact]
+    public void CreateToken_ValidClaims_ReturnsToken()
+    {
+        // Arrange
+        var claims = new Claim[]
+        {
+            new(ClaimTypes.Name, "TestUser"),
+            new(ClaimTypes.Role, "Admin")
+        };
+
+        // Act
+        var token = _sut.CreateToken(claims);
+
+        // Assert
+        Assert.False(string.IsNullOrEmpty(token));
+    }
 
     [Fact]
     public void GetUserNameFromToken_ShouldReturnUsername_WhenTokenIsValid()
