@@ -70,8 +70,8 @@ public class AuthenticationService : IAuthenticationService
                 Resources.UnauthorizedMessage);
 
         var username = _tokenService.GetUserNameFromToken();
+        
         var user = await GetUser(username);
-
         if (user is null)
             return new ServiceResponse<GetPermissionDto>(null, ApiResponseType.BadRequest,
                 Resources.UserNotFoundMessage);
@@ -98,9 +98,9 @@ public class AuthenticationService : IAuthenticationService
             var role = await _context.Roles.FirstOrDefaultAsync(r => r.RoleType.ToLower() == userRole.ToLower());
             var permission = role?.Permissions;
 
-            if (permission != null)
-                foreach (var eachPermission in permission)
-                    permissions.Add(eachPermission);
+            if (permission == null) continue;
+            foreach (var eachPermission in permission)
+                permissions.Add(eachPermission);
         }
 
         return permissions;
