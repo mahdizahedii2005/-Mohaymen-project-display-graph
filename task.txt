@@ -1,0 +1,7 @@
+save data 1 
+send graph 2
+show list valid data 3 
+get target graph 3 
+vertex detail 3 
+edge detail 3
+

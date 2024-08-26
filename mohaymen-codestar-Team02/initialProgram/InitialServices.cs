@@ -40,6 +40,7 @@ public class InitialServices
 
         // Configure DbContext and Dependency Injection
         var cs = builder.Configuration["CONNECTION_STRING"];
+        Console.WriteLine("your connection string is ==>" + cs);
         services.AddDbContext<DataContext>(options =>
             options.UseNpgsql(cs));
 
@@ -58,8 +59,10 @@ public class InitialServices
             .AddScoped<IDataAdminService, DataAdminService>()
             .AddScoped<IDisplayDataService, DisplayService>()
             .AddScoped<IModelBuilder, ModelBuilderr>()
-            .AddScoped<IObjectBuilder, ObjectBuilder>();
-
+            .AddScoped<IObjectBuilder, ObjectBuilder>()
+            .AddScoped<IEdgeService, EdgeService>()
+            .AddScoped<IVertexService, VertexService>()
+            .AddScoped<IGraphService, GraphService>();
         services.AddAutoMapper(typeof(AutoMapperProfile));
         services.AddAuthorization();
 

@@ -1,0 +1,14 @@
+using mohaymen_codestar_Team02.Dto.GraphDTO;
+using mohaymen_codestar_Team02.Models;
+using QuikGraph;
+
+namespace mohaymen_codestar_Team02.Services;
+
+public interface IEdgeService
+{
+    public List<Edge> GetAllEdges(string databaseName, string vertexIdentifierFieldName,
+        string sourceEdgeIdentifierFieldName,
+        string destinationEdgeIdentifierFieldName);
+
+    DetailDto GetEdgeDetails(string objId);
+}

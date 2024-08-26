@@ -7,6 +7,10 @@ namespace mohaymen_codestar_Team02.Models.VertexEAV;
 
 public class VertexEntity
 {
+    public VertexEntity()
+    {
+    }
+
     public VertexEntity(string name, long dataGroupId)
     {
         var regex =
@@ -29,7 +33,7 @@ public class VertexEntity
         }
     }
 
-    [Key] public long Id { get; set; }
+    [Key] public long VertexEntityId { get; set; }
     private string _name;
 
     public string Name
