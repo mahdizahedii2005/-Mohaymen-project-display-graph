@@ -9,6 +9,7 @@ using mohaymen_codestar_Team02.Models;
 using mohaymen_codestar_Team02.Models.EdgeEAV;
 using mohaymen_codestar_Team02.Models.VertexEAV;
 using mohaymen_codestar_Team02.Services;
+using mohaymen_codestar_Team02.Services.CookieService;
 using mohaymen_codestar_Team02.Services.StoreData.Abstraction;
 using NSubstitute;
 
@@ -19,12 +20,20 @@ public class DataAdminServiceTest
     private readonly IStorHandler _storHandler;
     private readonly IDisplayDataService _displayDataService;
     private readonly IMapper _mapper;
-    private readonly mohaymen_codestar_Team02.Services.DataAdminService.IDataAdminService _sut;
     private readonly IServiceProvider _serviceProvider;
     private DataContext _dataContext;
+    private readonly mohaymen_codestar_Team02.Services.DataAdminService.DataAdminService _sut;
+    private readonly IEdgeService _edgeService;
+    private readonly IVertexService _vertexService;
+    private readonly ITokenService _tokenService;
+    private readonly ICookieService _cookieService;
 
     public DataAdminServiceTest()
     {
+        _cookieService = Substitute.For<ICookieService>();
+        _tokenService = Substitute.For<ITokenService>();
+        _vertexService = Substitute.For<IVertexService>();
+        _edgeService = Substitute.For<IEdgeService>();
         _storHandler = Substitute.For<IStorHandler>();
         _displayDataService = Substitute.For<IDisplayDataService>();
         _mapper = Substitute.For<IMapper>();
@@ -38,11 +47,11 @@ public class DataAdminServiceTest
         serviceCollection.AddScoped(_ => new DataContext(options));
 
         _serviceProvider = serviceCollection.BuildServiceProvider();
-        
-        
-        _sut = new mohaymen_codestar_Team02.Services.DataAdminService.DataAdminService(_storHandler,
-            _displayDataService, _mapper, _serviceProvider);
-        _storHandler.EdageStorer.StoreFileData(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<long>()).Returns(true);
+
+
+        _sut = new mohaymen_codestar_Team02.Services.DataAdminService.DataAdminService(_serviceProvider, _tokenService,
+            _cookieService, _storHandler, _displayDataService, _edgeService, _vertexService, _mapper);
+            _storHandler.EdageStorer.StoreFileData(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<long>()).Returns(true);
         _storHandler.VertexStorer.StoreFileData(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<long>()).Returns(true);
     }
 
@@ -53,7 +62,7 @@ public class DataAdminServiceTest
     {
         //Arrange
         //Action
-        var result = await _sut.StoreData("sample", "sample", "mahdddd", name, "ma", "8");
+        var result = await _sut.StoreData("sample", "sample", "mahdddd", name, "ma");
         //Assert
         Assert.Equal(ApiResponseType.BadRequest, result.Type);
     }
@@ -64,7 +73,7 @@ public class DataAdminServiceTest
         //Arrange
         _storHandler.StoreDataSet("mahdddd", "8").Returns(-1);
         //Action
-        var result = await _sut.StoreData("sample", "sample", "mahdddd", "name", "ma", "8");
+        var result = await _sut.StoreData("sample", "sample", "mahdddd", "name", "ma");
         //Assert
         Assert.Equal(ApiResponseType.BadRequest, result.Type);
     }
@@ -75,7 +84,7 @@ public class DataAdminServiceTest
         //Arrange
         _storHandler.EdageStorer.StoreFileData(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<long>()).Returns(false);
         //Action
-        var result = await _sut.StoreData("sample", "sample", "test", "mahdddd", "mahdddd", "8");
+        var result = await _sut.StoreData("sample", "sample", "test", "mahdddd", "mahdddd");
         //Assert
         Assert.Equal(ApiResponseType.BadRequest, result.Type);
     }
@@ -87,7 +96,7 @@ public class DataAdminServiceTest
         _storHandler.VertexStorer.StoreFileData(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<long>()).Returns(false);
 
         // Act
-        var result = await _sut.StoreData("sampleEdgeFile", "sampleVertexFile", "testData", "mamama", "mmm", "2");
+        var result = await _sut.StoreData("sampleEdgeFile", "sampleVertexFile", "testData", "mamama", "mmm");
 
         // Assert
         Assert.Equal(ApiResponseType.BadRequest, result.Type);
@@ -99,7 +108,7 @@ public class DataAdminServiceTest
         // Arrange
         _storHandler.StoreDataSet(Arg.Any<string>(), Arg.Any<string>()).Returns(9);
         // Act
-        var result = await _sut.StoreData("sampleEdgeFile", "sampleVertexFile", "testData", "a", "lll", "2");
+        var result = await _sut.StoreData("sampleEdgeFile", "sampleVertexFile", "testData", "a", "lll");
         // Assert
         Assert.Equal(ApiResponseType.Success, result.Type);
     }

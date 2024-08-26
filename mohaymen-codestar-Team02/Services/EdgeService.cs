@@ -1,4 +1,5 @@
-using System.Linq;
+
+
 using Microsoft.EntityFrameworkCore;
 using mohaymen_codestar_Team02.Data;
 using mohaymen_codestar_Team02.Dto.GraphDTO;
@@ -12,12 +13,12 @@ namespace mohaymen_codestar_Team02.Services;
 public class EdgeService : IEdgeService
 {
     private readonly IServiceProvider _serviceProvider;
-
+    
     public EdgeService(IServiceProvider serviceProvider)
     {
         _serviceProvider = serviceProvider;
     }
-
+    
     public List<Edge> GetAllEdges(string databaseName, string vertexIdentifierFieldName, string sourceEdgeIdentifierFieldName,
         string destinationEdgeIdentifierFieldName)
     {
@@ -112,6 +113,14 @@ public class EdgeService : IEdgeService
 
     public DetailDto GetEdgeDetails(string objId)
     {
-        throw new NotImplementedException();
+        using var scope = _serviceProvider.CreateScope();
+        var context = scope.ServiceProvider.GetRequiredService<DataContext>();
+        var validValue = context.EdgeValues.Where(value => value.ObjectId.ToLower() == objId.ToLower()).ToList();
+        var result = new DetailDto();
+        foreach (var value in validValue)
+        {
+            result.AttributeValue[context.EdgeAttributes.Find(value.EdgeAttributeId).Name] = value.StringValue;
+        }
+        return result;
     }
 }

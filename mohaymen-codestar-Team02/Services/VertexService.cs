@@ -1,4 +1,4 @@
-using System.Linq;
+
 using Microsoft.EntityFrameworkCore;
 using mohaymen_codestar_Team02.Data;
 using mohaymen_codestar_Team02.Dto.GraphDTO;
@@ -42,6 +42,20 @@ public class VertexService : IVertexService
     }
 
     public DetailDto GetVertexDetails(string objId)
+    {
+        using var scope = _serviceProvider.CreateScope();
+        var context = scope.ServiceProvider.GetRequiredService<DataContext>();
+        var validValue = context.VertexValues.Where(value => value.ObjectId.ToLower() == objId.ToLower()).ToList();
+        var result = new DetailDto();
+        foreach (var value in validValue)
+        {
+            result.AttributeValue[context.VertexAttributes.Find(value.VertexAttributeId).Name] = value.StringValue;
+        }
+
+        return result;
+    }
+
+    public List<Vertex> GetAllVertices(string datasetName)
     {
         throw new NotImplementedException();
     }
