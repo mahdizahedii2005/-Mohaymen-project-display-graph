@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using mohaymen_codestar_Team02.Dto.GraphDTO;
 using mohaymen_codestar_Team02.Dto.StoreDataDto;
@@ -8,6 +9,8 @@ using mohaymen_codestar_Team02.Services.FileReaderService;
 
 namespace mohaymen_codestar_Team02.Controllers;
 
+[ApiController]
+[Authorize(Roles = nameof(RoleType.DataAdmin))]
 public class DataAdminController : ControllerBase
 {
     private readonly IDataAdminService _dataAdminService;
