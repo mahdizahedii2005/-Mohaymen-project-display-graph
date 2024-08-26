@@ -99,8 +99,7 @@ public class AuthenticationService : IAuthenticationService
             var permission = role?.Permissions;
 
             if (permission == null) continue;
-            foreach (var eachPermission in permission)
-                permissions.Add(eachPermission);
+            permissions.UnionWith(permission);
         }
 
         return permissions;
