@@ -42,22 +42,16 @@ public class EdgeServiceTest
         att1.Id = 1;
         att2.Id = 2;
 
-        List<EdgeAttribute> att = new List<EdgeAttribute>() { att1, att2 };
+        List<EdgeAttribute> att = new() { att1, att2 };
 
-        foreach (var attribute in att)
-        {
-            mockContext.Add(attribute);
-        }
+        foreach (var attribute in att) mockContext.Add(attribute);
 
         var val1 = new EdgeValue("val1", 1, objectId2);
         var val2 = new EdgeValue("val2", 1, objectId1);
         var val3 = new EdgeValue("val3", 2, objectId1);
         var val4 = new EdgeValue("val4", 2, objectId2);
-        List<EdgeValue> vertexValues = new List<EdgeValue>() { val1, val2, val3, val4 };
-        foreach (var value in vertexValues)
-        {
-            mockContext.Add(value);
-        }
+        List<EdgeValue> vertexValues = new() { val1, val2, val3, val4 };
+        foreach (var value in vertexValues) mockContext.Add(value);
 
         mockContext.SaveChanges();
         var expected = new Dictionary<string, string>();
@@ -68,28 +62,28 @@ public class EdgeServiceTest
         //assert
         Assert.Equal(result.AttributeValue, expected);
     }
-    
-     [Fact]
+
+    [Fact]
     public void GetAllEdges_ShouldReturnAllEdges_WhenGivenCorrectDatasetAndIdentifiersName()
     {
         using var scope = _serviceProvider.CreateScope();
         var _dataContext = scope.ServiceProvider.GetRequiredService<DataContext>();
 
         // Arrange
-        string datasetName = "DataSet1";
-        string vertexIdentifierFieldName = "CardID";
-        string sourceEdgeIdentifierFieldName = "SourceAcount";
-        string destinationEdgeIdentifierFieldName = "DestiantionAccount";
+        var datasetName = "DataSet1";
+        var vertexIdentifierFieldName = "CardID";
+        var sourceEdgeIdentifierFieldName = "SourceAcount";
+        var destinationEdgeIdentifierFieldName = "DestiantionAccount";
 
         var expected = new List<Edge>()
         {
-            new Edge()
+            new()
             {
                 Id = "id1",
                 Source = "id2",
                 Target = "id3"
             },
-            new Edge()
+            new()
             {
                 Id = "id2",
                 Source = "id4",
@@ -104,21 +98,20 @@ public class EdgeServiceTest
             {
                 EdgeAttributes = new List<EdgeAttribute>
                 {
-                    new EdgeAttribute("SourceAcount", 1)
+                    new("SourceAcount", 1)
                     {
                         EdgeValues = new List<EdgeValue>
                         {
-                            new EdgeValue("value1", 1, "id1") { EdgeAttribute = new EdgeAttribute("SourceAcount", 1)},
-                            new EdgeValue("value2", 1, "id2") { EdgeAttribute = new EdgeAttribute("SourceAcount", 1)},
-
+                            new("value1", 1, "id1") { EdgeAttribute = new EdgeAttribute("SourceAcount", 1) },
+                            new("value2", 1, "id2") { EdgeAttribute = new EdgeAttribute("SourceAcount", 1) }
                         }
                     },
-                    new EdgeAttribute("DestiantionAccount", 2)
+                    new("DestiantionAccount", 2)
                     {
                         EdgeValues = new List<EdgeValue>
                         {
-                            new EdgeValue("value3", 2, "id1") { EdgeAttribute = new EdgeAttribute("DestiantionAccount", 1)},
-                            new EdgeValue("value3", 2, "id2") { EdgeAttribute = new EdgeAttribute("DestiantionAccount", 1)},
+                            new("value3", 2, "id1") { EdgeAttribute = new EdgeAttribute("DestiantionAccount", 1) },
+                            new("value3", 2, "id2") { EdgeAttribute = new EdgeAttribute("DestiantionAccount", 1) }
                         }
                     }
                 }
@@ -127,14 +120,14 @@ public class EdgeServiceTest
             {
                 VertexAttributes = new List<VertexAttribute>
                 {
-                    new VertexAttribute("CardID", 1)
+                    new("CardID", 1)
                     {
                         VertexValues = new List<VertexValue>
                         {
-                            new VertexValue("value1", 1, "id2"){ VertexAttribute = new VertexAttribute("CardID", 1)},
-                            new VertexValue("value3", 1, "id3") { VertexAttribute = new VertexAttribute("CardID", 1)},
-                            new VertexValue("value2", 1, "id4") { VertexAttribute = new VertexAttribute("CardID", 1)},
-                            new VertexValue("value3", 1, "id5") { VertexAttribute = new VertexAttribute("CardID", 1)}
+                            new("value1", 1, "id2") { VertexAttribute = new VertexAttribute("CardID", 1) },
+                            new("value3", 1, "id3") { VertexAttribute = new VertexAttribute("CardID", 1) },
+                            new("value2", 1, "id4") { VertexAttribute = new VertexAttribute("CardID", 1) },
+                            new("value3", 1, "id5") { VertexAttribute = new VertexAttribute("CardID", 1) }
                         }
                     }
                 }
@@ -144,7 +137,7 @@ public class EdgeServiceTest
         _dataContext.DataSets.Add(dataset);
         _dataContext.SaveChanges();
 
-        
+
         // Act
         var actual = _sut.GetAllEdges(datasetName, vertexIdentifierFieldName, sourceEdgeIdentifierFieldName,
             destinationEdgeIdentifierFieldName);

@@ -41,22 +41,16 @@ public class VertexServiceTest
         att1.Id = 1;
         att2.Id = 2;
 
-        List<VertexAttribute> att = new List<VertexAttribute>() { att1, att2 };
+        List<VertexAttribute> att = new() { att1, att2 };
 
-        foreach (var attribute in att)
-        {
-            mockContext.Add(attribute);
-        }
+        foreach (var attribute in att) mockContext.Add(attribute);
 
         var val1 = new VertexValue("val1", 1, objectId2);
         var val2 = new VertexValue("val2", 1, objectId1);
         var val3 = new VertexValue("val3", 2, objectId1);
         var val4 = new VertexValue("val4", 2, objectId2);
-        List<VertexValue> vertexValues = new List<VertexValue>() { val1, val2, val3, val4 };
-        foreach (var value in vertexValues)
-        {
-            mockContext.Add(value);
-        }
+        List<VertexValue> vertexValues = new() { val1, val2, val3, val4 };
+        foreach (var value in vertexValues) mockContext.Add(value);
 
         mockContext.SaveChanges();
         var expected = new Dictionary<string, string>();
@@ -67,7 +61,7 @@ public class VertexServiceTest
         //assert
         Assert.Equal(result.AttributeValue, expected);
     }
-    
+
     [Fact]
     public void GetAllVertices_ShouldReturnAllVertices_WhenGivenCorrectDatasetName()
     {
@@ -75,8 +69,8 @@ public class VertexServiceTest
         var mockContext = scope.ServiceProvider.GetRequiredService<DataContext>();
 
         // Arrange
-        string datasetName = "DataSet1";
-        string vertexIdentifierFieldName = "CardID";
+        var datasetName = "DataSet1";
+        var vertexIdentifierFieldName = "CardID";
 
         var dataset = new DataGroup(datasetName, 1)
         {
@@ -84,12 +78,12 @@ public class VertexServiceTest
             {
                 VertexAttributes = new List<VertexAttribute>
                 {
-                    new VertexAttribute("CardID", 1)
+                    new("CardID", 1)
                     {
                         VertexValues = new List<VertexValue>
                         {
-                            new VertexValue("value1", 1, "id1"){ VertexAttribute = new VertexAttribute("CardID", 1)},
-                            new VertexValue("value2", 1, "id2") { VertexAttribute = new VertexAttribute("CardID", 1)}
+                            new("value1", 1, "id1") { VertexAttribute = new VertexAttribute("CardID", 1) },
+                            new("value2", 1, "id2") { VertexAttribute = new VertexAttribute("CardID", 1) }
                         }
                     }
                 }
@@ -98,21 +92,21 @@ public class VertexServiceTest
 
         mockContext.DataSets.Add(dataset);
         mockContext.SaveChanges();
-        
-        List<Vertex> expected = new List<Vertex>()
+
+        List<Vertex> expected = new()
         {
-            new Vertex()
+            new()
             {
                 Id = "id1",
                 Value = "value1"
-            }, 
-            new Vertex()
+            },
+            new()
             {
                 Id = "id2",
                 Value = "value2"
             }
         };
-        
+
 
         // Act
         var actual = _sut.GetAllVertices(datasetName, vertexIdentifierFieldName);
@@ -120,5 +114,4 @@ public class VertexServiceTest
         // Assert
         Assert.Equivalent(expected, actual);
     }
-    
 }

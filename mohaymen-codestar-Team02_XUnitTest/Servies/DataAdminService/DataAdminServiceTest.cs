@@ -171,7 +171,7 @@ public class DataAdminServiceTest
 
         var GetDataGroupDtos = new List<GetDataGroupDto>()
         {
-            new GetDataGroupDto()
+            new()
             {
                 Name = datasetName1,
                 CreateAt = DateTime.MaxValue,
@@ -185,7 +185,7 @@ public class DataAdminServiceTest
                     Name = EdgeEntityName1
                 }
             },
-            new GetDataGroupDto()
+            new()
             {
                 Name = datasetName2,
 

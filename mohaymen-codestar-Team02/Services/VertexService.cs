@@ -1,4 +1,3 @@
-
 using Microsoft.EntityFrameworkCore;
 using mohaymen_codestar_Team02.Data;
 using mohaymen_codestar_Team02.Dto.GraphDTO;
@@ -27,11 +26,11 @@ public class VertexService : IVertexService
         var vertexRecords = dataSet.VertexEntity.VertexAttributes.Select(a => a.VertexValues).SelectMany(v => v)
             .GroupBy(v => v.ObjectId);
 
-        List<Vertex> vertices = new List<Vertex>();
+        List<Vertex> vertices = new();
         foreach (var record in vertexRecords)
         {
             var value = record.SingleOrDefault(r => r.VertexAttribute.Name == vertexIdentifierFieldName).StringValue;
-            Vertex v = new Vertex()
+            var v = new Vertex()
             {
                 Id = record.Key,
                 Value = value
@@ -49,9 +48,7 @@ public class VertexService : IVertexService
         var validValue = context.VertexValues.Where(value => value.ObjectId.ToLower() == objId.ToLower()).ToList();
         var result = new DetailDto();
         foreach (var value in validValue)
-        {
             result.AttributeValue[context.VertexAttributes.Find(value.VertexAttributeId).Name] = value.StringValue;
-        }
 
         return result;
     }

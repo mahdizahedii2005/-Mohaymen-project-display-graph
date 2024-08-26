@@ -21,14 +21,13 @@ public class AutoMapperProfile : Profile
         CreateMap<User, RegisterUserDto>();
         CreateMap<User, UpdateUserDto>();
         CreateMap<DataGroup, GetDataGroupDto>()
-            .ForMember(dest => dest.EdgeEntity, opt => 
+            .ForMember(dest => dest.EdgeEntity, opt =>
                 opt.MapFrom(src => src.EdgeEntity))
-            .ForMember(dest => dest.VertexEntity, opt => 
+            .ForMember(dest => dest.VertexEntity, opt =>
                 opt.MapFrom(src => src.VertexEntity));
         CreateMap<DataGroup, GetDataGroupDto>()
-                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name));
+            .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name));
         CreateMap<EdgeEntity, GetEdgeEntityDto>();
         CreateMap<VertexEntity, GetVertexEntityDto>();
-
     }
 }

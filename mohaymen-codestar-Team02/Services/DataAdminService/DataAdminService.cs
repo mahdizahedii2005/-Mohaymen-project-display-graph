@@ -49,29 +49,27 @@ public class DataAdminService
         {
             var token = _cookieService.GetCookieValue();
             if (string.IsNullOrEmpty(token))
-            {
                 return new ServiceResponse<string>(null, ApiResponseType.Unauthorized,
                     Resources.UnauthorizedMessage);
-            }
 
             var userName = _tokenService.GetUserNameFromToken();
             if (string.IsNullOrEmpty(edgeEntityName) || string.IsNullOrEmpty(graphName) ||
                 string.IsNullOrEmpty(vertexEntityName))
                 return new ServiceResponse<string>(string.Empty, ApiResponseType.BadRequest,
-                    Data.Resources.InvalidInpute);
+                    Resources.InvalidInpute);
 
             var dataGroupId = await _storHandler.StoreDataSet(graphName, userName);
             if (dataGroupId == -1)
                 return new ServiceResponse<string>(string.Empty, ApiResponseType.BadRequest,
-                    Data.Resources.InvalidInpute);
+                    Resources.InvalidInpute);
 
             if (!await _storHandler.EdageStorer.StoreFileData(edgeEntityName, edgeFile, dataGroupId))
                 return new ServiceResponse<string>(string.Empty,
-                    ApiResponseType.BadRequest, Data.Resources.InvalidInpute);
+                    ApiResponseType.BadRequest, Resources.InvalidInpute);
 
             if (!await _storHandler.VertexStorer.StoreFileData(vertexEntityName, vertexFile, dataGroupId))
                 return new ServiceResponse<string>(string.Empty,
-                    ApiResponseType.BadRequest, Data.Resources.InvalidInpute);
+                    ApiResponseType.BadRequest, Resources.InvalidInpute);
 
             return new ServiceResponse<string>(null, ApiResponseType.Success, string.Empty);
         }
@@ -85,7 +83,7 @@ public class DataAdminService
     {
         var scope = _serviceProvider.CreateScope();
         var context = scope.ServiceProvider.GetRequiredService<DataContext>();
-        
+
         var datasets = context.DataSets
             .Include(ds => ds.VertexEntity)
             .Include(ds => ds.EdgeEntity)
@@ -97,7 +95,7 @@ public class DataAdminService
 
     public async Task<ServiceResponse<DisplayGraphDto>> DisplayGeraphData(string databaseName,
         string sourceEdgeIdentifierFieldName,
-    string destinationEdgeIdentifierFieldName, string vertexIdentifierFieldName)
+        string destinationEdgeIdentifierFieldName, string vertexIdentifierFieldName)
     {
         var graph = _graphService.GetGraph(databaseName, sourceEdgeIdentifierFieldName,
             destinationEdgeIdentifierFieldName,
@@ -106,20 +104,20 @@ public class DataAdminService
         var dto = new DisplayGraphDto()
         {
             Vertices = graph.vertices,
-            Edges = graph.edges,
+            Edges = graph.edges
         };
         return new ServiceResponse<DisplayGraphDto>(dto, ApiResponseType.Success, Resources.GraphFetchedSuccessfully);
     }
-    
-public ServiceResponse<DetailDto> GetVertexDetail(string objectId)
-{
-    return new ServiceResponse<DetailDto>(_vertexService.GetVertexDetails(objectId), ApiResponseType.Success,
-        string.Empty);
-}
 
-public ServiceResponse<DetailDto> GetEdgeDetail(string objectId)
-{
-    return new ServiceResponse<DetailDto>(_edgeService.GetEdgeDetails(objectId), ApiResponseType.Success,
-        string.Empty);
-}
+    public ServiceResponse<DetailDto> GetVertexDetail(string objectId)
+    {
+        return new ServiceResponse<DetailDto>(_vertexService.GetVertexDetails(objectId), ApiResponseType.Success,
+            string.Empty);
+    }
+
+    public ServiceResponse<DetailDto> GetEdgeDetail(string objectId)
+    {
+        return new ServiceResponse<DetailDto>(_edgeService.GetEdgeDetails(objectId), ApiResponseType.Success,
+            string.Empty);
+    }
 }

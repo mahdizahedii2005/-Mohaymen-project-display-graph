@@ -33,11 +33,13 @@ public class GraphServiceTest
 
         var expectedVertex = new List<Vertex>()
         {
-            new Vertex(){
+            new()
+            {
                 Id = "id1",
                 Value = "value1"
             },
-            new Vertex(){
+            new()
+            {
                 Id = "id2",
                 Value = "value2"
             }
@@ -45,7 +47,8 @@ public class GraphServiceTest
 
         var expectedEdge = new List<Edge>()
         {
-            new Edge(){
+            new()
+            {
                 Id = "id1",
                 Source = "id1",
                 Target = "id2"
@@ -57,11 +60,11 @@ public class GraphServiceTest
         _vertexService.GetAllVertices(datasetName, vertexIdentifierFieldName).Returns(expectedVertex);
         _edgeService.GetAllEdges(datasetName, vertexIdentifierFieldName, sourceEdgeIdentifierFieldName,
             destinationEdgeIdentifierFieldName).Returns(expectedEdge);
-        
+
         // Act
         var actual = _sut.GetGraph(datasetName, sourceEdgeIdentifierFieldName, destinationEdgeIdentifierFieldName,
             vertexIdentifierFieldName);
-        
+
         // Assert
         Assert.Equivalent(expected, actual);
     }

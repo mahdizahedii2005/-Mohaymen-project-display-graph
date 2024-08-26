@@ -48,7 +48,7 @@ public class DataAdminController : ControllerBase
     {
         var response = _dataAdminService.DisplayDataSet();
         return StatusCode((int)response.Type, response);
-        
+
         //Todo all Of Them
     }
 
