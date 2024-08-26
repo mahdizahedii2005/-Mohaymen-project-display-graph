@@ -87,7 +87,7 @@ public class AdminService : IAdminService
     public async Task<ServiceResponse<GetUserDto?>> Register(User user, string password)
     {
         using var scope = _serviceProvider.CreateScope();
-        var _context = scope.ServiceProvider.GetRequiredService<DataContext>();
+        var context = scope.ServiceProvider.GetRequiredService<DataContext>();
 
         var token = _cookieService.GetCookieValue();
         if (string.IsNullOrEmpty(token))
@@ -101,15 +101,15 @@ public class AdminService : IAdminService
         if (!await IsAdmin(admin))
             return new ServiceResponse<GetUserDto?>(null, ApiResponseType.Forbidden, Resources.accessDeniedMessage);
 
-        if (await UserExists(user.Username))
+        if (await UserExists(user.Username , context))
             return new ServiceResponse<GetUserDto?>(null, ApiResponseType.Conflict, Resources.UserAlreadyExistsMessage);
 
         _passwordService.CreatePasswordHash(password, out var passwordHash, out var passwordSalt);
         user.PasswordHash = passwordHash;
         user.Salt = passwordSalt;
 
-        await _context.Users.AddAsync(user);
-        await _context.SaveChangesAsync();
+        await context.Users.AddAsync(user);
+        await context.SaveChangesAsync();
 
         var userDto = _mapper.Map<GetUserDto>(user);
 
@@ -152,7 +152,7 @@ public class AdminService : IAdminService
     public async Task<ServiceResponse<GetUserDto?>> AddRole(User user, Role role)
     {
         using var scope = _serviceProvider.CreateScope();
-        var _context = scope.ServiceProvider.GetRequiredService<DataContext>();
+        var context = scope.ServiceProvider.GetRequiredService<DataContext>();
 
         var token = _cookieService.GetCookieValue();
         if (string.IsNullOrEmpty(token))
@@ -174,7 +174,7 @@ public class AdminService : IAdminService
         if (foundRole is null)
             return new ServiceResponse<GetUserDto?>(null, ApiResponseType.BadRequest, Resources.RoleNotFoundMessage);
 
-        if (await GetUserRole(foundRole, foundUser) is not null)
+        if (await GetUserRole(foundRole, foundUser, context) is not null)
             return new ServiceResponse<GetUserDto?>(null, ApiResponseType.BadRequest, Resources.RoleAlreadyAssigned);
 
         var userRole = new UserRole
@@ -185,8 +185,8 @@ public class AdminService : IAdminService
             UserId = foundUser.UserId
         };
 
-        await _context.UserRoles.AddAsync(userRole);
-        await _context.SaveChangesAsync();
+        await context.UserRoles.AddAsync(userRole);
+        await context.SaveChangesAsync();
 
         var userDto = _mapper.Map<GetUserDto>(foundUser);
 
@@ -197,7 +197,7 @@ public class AdminService : IAdminService
     public async Task<ServiceResponse<GetUserDto?>> DeleteRole(User user, Role role)
     {
         using var scope = _serviceProvider.CreateScope();
-        var _context = scope.ServiceProvider.GetRequiredService<DataContext>();
+        var context = scope.ServiceProvider.GetRequiredService<DataContext>();
 
         var token = _cookieService.GetCookieValue();
         if (string.IsNullOrEmpty(token))
@@ -220,12 +220,12 @@ public class AdminService : IAdminService
             return new ServiceResponse<GetUserDto?>(null, ApiResponseType.BadRequest, Resources.RoleNotFoundMessage);
 
 
-        var userRole = await GetUserRole(foundRole, foundUser);
+        var userRole = await GetUserRole(foundRole, foundUser, context);
         if (userRole is null)
             return new ServiceResponse<GetUserDto?>(null, ApiResponseType.BadRequest, Resources.DontHaveThisRole);
 
-        _context.UserRoles.Remove(userRole);
-        await _context.SaveChangesAsync();
+        context.UserRoles.Remove(userRole);
+        await context.SaveChangesAsync();
 
         var userDto = _mapper.Map<GetUserDto>(foundUser);
 
@@ -264,22 +264,16 @@ public class AdminService : IAdminService
         return await _context.Roles.FirstOrDefaultAsync(x => x.RoleType.ToLower() == roleType.ToLower());
     }
 
-    private async Task<UserRole?> GetUserRole(Role foundRole, User foundUser)
+    private async Task<UserRole?> GetUserRole(Role foundRole, User foundUser, DataContext dataContext)
     {
-        using var scope = _serviceProvider.CreateScope();
-        var _context = scope.ServiceProvider.GetRequiredService<DataContext>();
-
-        return await _context.UserRoles.FirstOrDefaultAsync(x =>
+        return await dataContext.UserRoles.FirstOrDefaultAsync(x =>
             x.User.Username != null && foundUser.Username != null && x.RoleId == foundRole.RoleId &&
             x.User.Username.ToLower() == foundUser.Username.ToLower());
     }
 
-    private async Task<bool> UserExists(string? username)
+    private async Task<bool> UserExists(string? username, DataContext dataContext)
     {
-        using var scope = _serviceProvider.CreateScope();
-        var _context = scope.ServiceProvider.GetRequiredService<DataContext>();
-
-        return await _context.Users.AnyAsync(x =>
+        return await dataContext.Users.AnyAsync(x =>
             username != null && x.Username != null && x.Username.ToLower() == username.ToLower());
     }
 }

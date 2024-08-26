@@ -32,7 +32,7 @@ public class AuthenticationServiceTests
         var mapper = config.CreateMapper();
 
         var options = new DbContextOptionsBuilder<DataContext>()
-            .UseInMemoryDatabase(Guid.NewGuid().ToString()) // استفاده از GUID برای پایگاه داده جدید
+            .UseInMemoryDatabase(Guid.NewGuid().ToString())
             .Options;
 
         var serviceCollection = new ServiceCollection();
