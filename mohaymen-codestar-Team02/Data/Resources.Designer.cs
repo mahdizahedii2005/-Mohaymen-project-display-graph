@@ -256,5 +256,14 @@ namespace mohaymen_codestar_Team02.Data {
                 return ResourceManager.GetString("WrongPasswordMessage", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Your Password Is Not Validated.
+        /// </summary>
+        internal static string YourPasswordIsNotValidated {
+            get {
+                return ResourceManager.GetString("YourPasswordIsNotValidated", resourceCulture);
+            }
+        }
     }
 }

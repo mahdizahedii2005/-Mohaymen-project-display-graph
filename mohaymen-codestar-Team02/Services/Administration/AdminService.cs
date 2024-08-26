@@ -104,6 +104,9 @@ public class AdminService : IAdminService
         if (await UserExists(user.Username , context))
             return new ServiceResponse<GetUserDto?>(null, ApiResponseType.Conflict, Resources.UserAlreadyExistsMessage);
 
+        if (!_passwordService.ValidatePassword(password))
+            return new ServiceResponse<GetUserDto?>(null, ApiResponseType.BadRequest, Resources.YourPasswordIsNotValidated);
+
         _passwordService.CreatePasswordHash(password, out var passwordHash, out var passwordSalt);
         user.PasswordHash = passwordHash;
         user.Salt = passwordSalt;

@@ -91,4 +91,7 @@
     <data name="GetPermissionsSuccessfuly" xml:space="preserve">
         <value>Permissions Get Successfuly</value>
     </data>
+    <data name="YourPasswordIsNotValidated" xml:space="preserve">
+        <value>Your Password Is Not Validated</value>
+    </data>
 </root>

@@ -120,7 +120,8 @@ public class AdminServiceTest
                 x[1] = fakePasswordHash;
                 x[2] = fakePasswordSalt;
             });
-
+        _passwordService.ValidatePassword(Arg.Any<string>()).Returns(true);
+        
         // Act
         var result = await _sut.Register(
             new User() { UserId = 8, Username = "mamad" }, "password");
@@ -150,7 +151,7 @@ public class AdminServiceTest
                 x[1] = fakePasswordHash;
                 x[2] = fakePasswordSalt;
             });
-
+        _passwordService.ValidatePassword(Arg.Any<string>()).Returns(true);
         var newUser = new User() { UserId = 8, Username = "mamad" };
 
         // Act
@@ -407,8 +408,6 @@ public class AdminServiceTest
     {
         using var scope = _serviceProvider.CreateScope();
         var mockContext = scope.ServiceProvider.GetRequiredService<DataContext>();
-        mockContext.Database.EnsureDeleted();
-        mockContext.Database.EnsureCreated();
         
         // Arrange
         FixTheReturnOfCookies("admin");
