@@ -29,7 +29,7 @@ public class TokenServiceTests
     public void CreateToken_ValidClaims_ReturnsToken()
     {
         // Arrange
-        var claims = new Claim[]
+        var claims = new List<Claim>()
         {
             new(ClaimTypes.Name, "TestUser"),
             new(ClaimTypes.Role, "Admin")

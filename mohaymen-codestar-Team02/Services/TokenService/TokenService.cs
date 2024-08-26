@@ -17,7 +17,7 @@ public class TokenService : ITokenService
     }
 
 
-    public string CreateToken(Claim[] claims)
+    public string CreateToken(List<Claim> claims)
     {
         var key = new SymmetricSecurityKey(
             Encoding.UTF8.GetBytes(_configuration.GetSection("AppSettings:Token").Value ?? string.Empty));

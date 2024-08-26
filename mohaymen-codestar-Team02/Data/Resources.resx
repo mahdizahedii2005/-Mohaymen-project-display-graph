@@ -94,4 +94,7 @@
     <data name="YourPasswordIsNotValidated" xml:space="preserve">
         <value>Your Password Is Not Validated</value>
     </data>
+    <data name="AuthorizedMessage" xml:space="preserve">
+        <value>Authorized Message</value>
+    </data>
 </root>

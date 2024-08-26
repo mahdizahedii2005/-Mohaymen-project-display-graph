@@ -69,6 +69,15 @@ namespace mohaymen_codestar_Team02.Data {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Authorized Message.
+        /// </summary>
+        internal static string AuthorizedMessage {
+            get {
+                return ResourceManager.GetString("AuthorizedMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Can Not Delete Yourself.
         /// </summary>
         internal static string CanNotDeleteYourself {

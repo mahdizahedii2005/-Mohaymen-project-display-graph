@@ -37,7 +37,7 @@ public class ProfileService : IProfileService
             return new ServiceResponse<object>(new { }, ApiResponseType.Unauthorized, Resources.UnauthorizedMessage);
 
         var username = _tokenService.GetUserNameFromToken();
-        var user = await GetUser(username);
+        var user = await GetUser(username , _context);
 
         if (user is null)
             return new ServiceResponse<object>(new { }, ApiResponseType.BadRequest, Resources.UserNotFoundMessage);
@@ -59,7 +59,7 @@ public class ProfileService : IProfileService
     public async Task<ServiceResponse<GetUserDto?>> UpdateUser(UpdateUserDto updateUserDto)
     {
         using var scope = _serviceProvider.CreateScope();
-        var _context = scope.ServiceProvider.GetRequiredService<DataContext>();
+        var context = scope.ServiceProvider.GetRequiredService<DataContext>();
 
         var newUser = _mapper.Map<UpdateUserDto>(updateUserDto);
 
@@ -68,7 +68,7 @@ public class ProfileService : IProfileService
             return new ServiceResponse<GetUserDto?>(null, ApiResponseType.Unauthorized, Resources.UnauthorizedMessage);
 
         var username = _tokenService.GetUserNameFromToken();
-        var user = await GetUser(username);
+        var user = await GetUser(username ,context);
         if (user is null)
             return new ServiceResponse<GetUserDto?>(null, ApiResponseType.BadRequest, Resources.UserNotFoundMessage);
 
@@ -76,19 +76,16 @@ public class ProfileService : IProfileService
         user.LastName = newUser.LastName;
         user.Email = newUser.Email;
 
-        _context.Users.Update(user);
-        await _context.SaveChangesAsync();
+        context.Users.Update(user);
+        await context.SaveChangesAsync();
 
         var userDto = _mapper.Map<GetUserDto>(user);
         return new ServiceResponse<GetUserDto?>(userDto, ApiResponseType.Success,
             Resources.ProfileInfoUpdateSuccessfulyMessage);
     }
 
-    private Task<User?> GetUser(string? username)
+    private Task<User?> GetUser(string? username, DataContext dataContext)
     {
-        using var scope = _serviceProvider.CreateScope();
-        var _context = scope.ServiceProvider.GetRequiredService<DataContext>();
-
-        return _context.Users.FirstOrDefaultAsync(x => x.Username.ToLower() == username.ToLower());
+        return dataContext.Users.FirstOrDefaultAsync(x => x.Username.ToLower() == username.ToLower());
     }
 }
