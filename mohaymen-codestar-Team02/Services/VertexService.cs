@@ -1,6 +1,9 @@
 
+using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Update.Internal;
 using mohaymen_codestar_Team02.Data;
+using mohaymen_codestar_Team02.Dto;
 using mohaymen_codestar_Team02.Dto.GraphDTO;
 using mohaymen_codestar_Team02.Models;
 
@@ -9,12 +12,26 @@ namespace mohaymen_codestar_Team02.Services;
 public class VertexService : IVertexService
 {
     private readonly IServiceProvider _serviceProvider;
+    private readonly IMapper _mapper;
 
-    public VertexService(IServiceProvider serviceProvider)
+    public VertexService(IServiceProvider serviceProvider, IMapper mapper)
     {
         _serviceProvider = serviceProvider;
+        _mapper = mapper;
     }
 
+    public List<GetAttributeDto> GetVertexAttributes(long vertexEntityId)
+    {
+        var scope = _serviceProvider.CreateScope();
+        var context = scope.ServiceProvider.GetRequiredService<DataContext>();
+
+        var vertexAttribuite = context.VertexEntities.Include(ve => ve.VertexAttributes)
+            .FirstOrDefault(ve => ve.VertexEntityId == vertexEntityId)
+            ?.VertexAttributes;
+        
+        return vertexAttribuite.Select(va => _mapper.Map<GetAttributeDto>(va)).ToList();
+    }
+    
     public List<Vertex> GetAllVertices(string datasetName, string vertexIdentifierFieldName)
     {
         using var scope = _serviceProvider.CreateScope();

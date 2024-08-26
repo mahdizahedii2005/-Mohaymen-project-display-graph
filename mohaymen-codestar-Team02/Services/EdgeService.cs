@@ -1,7 +1,10 @@
 
 
+using System.Linq;
+using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using mohaymen_codestar_Team02.Data;
+using mohaymen_codestar_Team02.Dto;
 using mohaymen_codestar_Team02.Dto.GraphDTO;
 using mohaymen_codestar_Team02.Models;
 using mohaymen_codestar_Team02.Models.EdgeEAV;
@@ -13,10 +16,25 @@ namespace mohaymen_codestar_Team02.Services;
 public class EdgeService : IEdgeService
 {
     private readonly IServiceProvider _serviceProvider;
+    private readonly IMapper _mapper;
     
-    public EdgeService(IServiceProvider serviceProvider)
+    public EdgeService(IServiceProvider serviceProvider, IMapper mapper)
     {
         _serviceProvider = serviceProvider;
+        _mapper = mapper;
+    }
+    
+    
+    public List<GetAttributeDto> GetEdgeAttributes(long edgeEntityId)
+    {
+        var scope = _serviceProvider.CreateScope();
+        var context = scope.ServiceProvider.GetRequiredService<DataContext>();
+
+        var edgeAttribuite = context.EdgeEntities.Include(ve => ve.EdgeAttributes)
+            .FirstOrDefault(ve => ve.EdgeEntityId == edgeEntityId)
+            ?.EdgeAttributes;
+        
+        return edgeAttribuite.Select(va => _mapper.Map<GetAttributeDto>(va)).ToList();
     }
     
     public List<Edge> GetAllEdges(string databaseName, string vertexIdentifierFieldName, string sourceEdgeIdentifierFieldName,

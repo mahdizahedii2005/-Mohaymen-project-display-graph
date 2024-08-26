@@ -1,3 +1,4 @@
+using mohaymen_codestar_Team02.Dto;
 using mohaymen_codestar_Team02.Dto.GraphDTO;
 using mohaymen_codestar_Team02.Models;
 using QuikGraph;
@@ -10,4 +11,5 @@ public interface IEdgeService
         string sourceEdgeIdentifierFieldName,
         string destinationEdgeIdentifierFieldName);
     DetailDto GetEdgeDetails(string objId);
+    public List<GetAttributeDto> GetEdgeAttributes(long edgeEntityId);
 }
