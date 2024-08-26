@@ -64,16 +64,14 @@ public class AuthenticationService : IAuthenticationService
     }
 
     public async Task<ServiceResponse<GetPermissionDto>> GetPermission()
-    {using var scope = _serviceProvider.CreateScope();
-        var _context = scope.ServiceProvider.GetRequiredService<DataContext>();
-
+    {
         var token = _cookieService.GetCookieValue();
         if (string.IsNullOrEmpty(token))
             return new ServiceResponse<GetPermissionDto>(null, ApiResponseType.Unauthorized,
                 Resources.UnauthorizedMessage);
 
         var username = _tokenService.GetUserNameFromToken();
-        
+
         var user = await GetUser(username);
         if (user is null)
             return new ServiceResponse<GetPermissionDto>(null, ApiResponseType.BadRequest,
@@ -95,6 +93,9 @@ public class AuthenticationService : IAuthenticationService
 
     private async Task<HashSet<Permission>> UnionPermissions(string[]? splitRoles)
     {
+        using var scope = _serviceProvider.CreateScope();
+        var _context = scope.ServiceProvider.GetRequiredService<DataContext>();
+
         var permissions = new HashSet<Permission>();
         foreach (var userRole in splitRoles)
         {
