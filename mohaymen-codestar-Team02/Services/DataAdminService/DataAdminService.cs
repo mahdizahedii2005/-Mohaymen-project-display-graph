@@ -85,12 +85,10 @@ public class DataAdminService
     {
         var scope = _serviceProvider.CreateScope();
         var context = scope.ServiceProvider.GetRequiredService<DataContext>();
-
-
+        
         var datasets = context.DataSets
             .Include(ds => ds.VertexEntity)
             .Include(ds => ds.EdgeEntity)
-            .Include(ds => ds.User)
             .ToList();
 
         var dataGroupDtos = datasets.Select(ds => _mapper.Map<GetDataGroupDto>(ds)).ToList();

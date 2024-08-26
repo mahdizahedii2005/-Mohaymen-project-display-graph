@@ -164,39 +164,30 @@ public class DataAdminServiceTest
         };
         
         var expected = new ServiceResponse<List<GetDataGroupDto>>(GetDataGroupDtos, ApiResponseType.Success, "");
-        
-        var user = new User()
+
+        var dataset1 = new DataGroup
         {
+            Name = datasetName1,
             UserId = 1,
-            Username = username,
-            DataSets = new List<DataGroup>()
-            {
-                new DataGroup
-                {
-                    Name = datasetName1,
-                    UserId = 1,
-                    DataGroupId = 1,
-                    CreateAt = DateTime.MaxValue,
-                    UpdateAt = DateTime.MaxValue,
-                    VertexEntity = new VertexEntity(vertexEntityName1, 1),
-                    EdgeEntity = new EdgeEntity(EdgeEntityName1, 1)
-                },
-                new DataGroup
-                {
-                    Name = datasetName2,
-                    UserId = 1,
-                    DataGroupId = 2,
-                    CreateAt = DateTime.MaxValue,
-                    UpdateAt = DateTime.MaxValue,
-                    VertexEntity = new VertexEntity(vertexEntityName2, 2),
-                    EdgeEntity = new EdgeEntity(EdgeEntityName2, 2)
-                }
-            },
-            PasswordHash = new byte[]{},
-            Salt = new byte[]{}
+            DataGroupId = 1,
+            CreateAt = DateTime.MaxValue,
+            UpdateAt = DateTime.MaxValue,
+            VertexEntity = new VertexEntity(vertexEntityName1, 1),
+            EdgeEntity = new EdgeEntity(EdgeEntityName1, 1)
+        };
+        var dataset2 = new DataGroup
+        {
+            Name = datasetName2,
+            UserId = 1,
+            DataGroupId = 2,
+            CreateAt = DateTime.MaxValue,
+            UpdateAt = DateTime.MaxValue,
+            VertexEntity = new VertexEntity(vertexEntityName2, 2),
+            EdgeEntity = new EdgeEntity(EdgeEntityName2, 2)
         };
 
-        _dataContext.Users.Add(user);
+        _dataContext.DataSets.Add(dataset1);
+        _dataContext.DataSets.Add(dataset2);
         _dataContext.SaveChanges();
 
 
