@@ -69,4 +69,22 @@ public class PasswordServiceTests
         // Assert
         Assert.False(isValid);
     }
+    
+    [Theory]
+    [InlineData("Password1", true)]
+    [InlineData("A1bcdefg", true)]
+    [InlineData("Test1234", true)]
+    [InlineData("password", false)]
+    [InlineData("PASSWORD123", false)]
+    [InlineData("Pass1", false)]
+    [InlineData("Short1A", false)] 
+    [InlineData("Valid1234", true)]
+    public void ValidatePassword_ShouldReturnExpectedResult(string password, bool expectedResult)
+    {
+        // Act
+        var result = _sut.ValidatePassword(password);
+
+        // Assert
+        Assert.Equal(expectedResult, result);
+    }
 }
