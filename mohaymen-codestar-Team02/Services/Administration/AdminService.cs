@@ -12,16 +12,16 @@ namespace mohaymen_codestar_Team02.Services.Administration;
 
 public class AdminService : IAdminService
 {
-    private readonly DataContext _context;
     private readonly ITokenService _tokenService;
     private readonly ICookieService _cookieService;
     private readonly IPasswordService _passwordService;
     private readonly IMapper _mapper;
+    private readonly IServiceProvider _serviceProvider;
 
-    public AdminService(DataContext context, ICookieService cookieService, ITokenService tokenService,
+    public AdminService(IServiceProvider serviceProvider, ICookieService cookieService, ITokenService tokenService,
         IPasswordService passwordService, IMapper mapper)
     {
-        _context = context;
+        _serviceProvider = serviceProvider;
         _cookieService = cookieService;
         _tokenService = tokenService;
         _passwordService = passwordService;
@@ -52,6 +52,8 @@ public class AdminService : IAdminService
 
     public async Task<ServiceResponse<List<GetUserDto>?>> GetAllUsers()
     {
+        using var scope = _serviceProvider.CreateScope();
+        var _context = scope.ServiceProvider.GetRequiredService<DataContext>();
         var token = _cookieService.GetCookieValue();
         if (string.IsNullOrEmpty(token))
             return new ServiceResponse<List<GetUserDto>?>(null, ApiResponseType.Unauthorized,
@@ -67,20 +69,26 @@ public class AdminService : IAdminService
             return new ServiceResponse<List<GetUserDto>?>(null, ApiResponseType.Forbidden,
                 Resources.accessDeniedMessage);
 
-        var users = await _context.Users.Include(u => u.UserRoles).ThenInclude(ur => ur.Role).ToListAsync();
-        var userDtos = users.Select(u => _mapper.Map<GetUserDto>(u)).ToList();
+        List<User> users = await _context.Users.Include(u => u.UserRoles).ThenInclude(ur => ur.Role).ToListAsync();
+        List<GetUserDto> userDtos = users.Select(u => _mapper.Map<GetUserDto>(u)).ToList();
         return new ServiceResponse<List<GetUserDto>?>(userDtos, ApiResponseType.Success,
             Resources.UserRetrievedMassage);
     }
 
     public async Task<ServiceResponse<List<GetRoleDto>>> GetAllRoles()
     {
+        using var scope = _serviceProvider.CreateScope();
+        var _context = scope.ServiceProvider.GetRequiredService<DataContext>();
+
         var roles = await _context.Roles.Select(r => _mapper.Map<GetRoleDto>(r)).ToListAsync();
         return new ServiceResponse<List<GetRoleDto>>(roles, ApiResponseType.Success, Resources.UsersRetrievedMassage);
     }
 
     public async Task<ServiceResponse<GetUserDto?>> Register(User user, string password)
     {
+        using var scope = _serviceProvider.CreateScope();
+        var _context = scope.ServiceProvider.GetRequiredService<DataContext>();
+
         var token = _cookieService.GetCookieValue();
         if (string.IsNullOrEmpty(token))
             return new ServiceResponse<GetUserDto?>(null, ApiResponseType.Unauthorized, Resources.UnauthorizedMessage);
@@ -111,6 +119,9 @@ public class AdminService : IAdminService
 
     public async Task<ServiceResponse<GetUserDto?>> DeleteUser(User user)
     {
+        using var scope = _serviceProvider.CreateScope();
+        var _context = scope.ServiceProvider.GetRequiredService<DataContext>();
+
         var token = _cookieService.GetCookieValue();
         if (string.IsNullOrEmpty(token))
             return new ServiceResponse<GetUserDto?>(null, ApiResponseType.Unauthorized, Resources.UnauthorizedMessage);
@@ -140,6 +151,9 @@ public class AdminService : IAdminService
 
     public async Task<ServiceResponse<GetUserDto?>> AddRole(User user, Role role)
     {
+        using var scope = _serviceProvider.CreateScope();
+        var _context = scope.ServiceProvider.GetRequiredService<DataContext>();
+
         var token = _cookieService.GetCookieValue();
         if (string.IsNullOrEmpty(token))
             return new ServiceResponse<GetUserDto?>(null, ApiResponseType.Unauthorized, Resources.UnauthorizedMessage);
@@ -182,6 +196,9 @@ public class AdminService : IAdminService
 
     public async Task<ServiceResponse<GetUserDto?>> DeleteRole(User user, Role role)
     {
+        using var scope = _serviceProvider.CreateScope();
+        var _context = scope.ServiceProvider.GetRequiredService<DataContext>();
+
         var token = _cookieService.GetCookieValue();
         if (string.IsNullOrEmpty(token))
             return new ServiceResponse<GetUserDto?>(null, ApiResponseType.Unauthorized, Resources.UnauthorizedMessage);
@@ -218,12 +235,18 @@ public class AdminService : IAdminService
 
     private async Task<User?> GetUser(string? username)
     {
+        using var scope = _serviceProvider.CreateScope();
+        var _context = scope.ServiceProvider.GetRequiredService<DataContext>();
+
         return await _context.Users.FirstOrDefaultAsync(x =>
             username != null && x.Username != null && x.Username.ToLower().Equals(username.ToLower()));
     }
 
     private Task<bool> IsAdmin(User? user)
     {
+        using var scope = _serviceProvider.CreateScope();
+        var _context = scope.ServiceProvider.GetRequiredService<DataContext>();
+
         if (user == null) return Task.FromResult(false);
         var targetUser = _context.Users.Include(u => u.UserRoles).ThenInclude(userRole => userRole.Role)
             .SingleOrDefault(a => a.Username == user.Username);
@@ -234,12 +257,18 @@ public class AdminService : IAdminService
 
     private async Task<Role?> GetRole(string? roleType)
     {
+        using var scope = _serviceProvider.CreateScope();
+        var _context = scope.ServiceProvider.GetRequiredService<DataContext>();
+
         if (roleType == null) return null;
         return await _context.Roles.FirstOrDefaultAsync(x => x.RoleType.ToLower() == roleType.ToLower());
     }
 
     private async Task<UserRole?> GetUserRole(Role foundRole, User foundUser)
     {
+        using var scope = _serviceProvider.CreateScope();
+        var _context = scope.ServiceProvider.GetRequiredService<DataContext>();
+
         return await _context.UserRoles.FirstOrDefaultAsync(x =>
             x.User.Username != null && foundUser.Username != null && x.RoleId == foundRole.RoleId &&
             x.User.Username.ToLower() == foundUser.Username.ToLower());
@@ -247,6 +276,9 @@ public class AdminService : IAdminService
 
     private async Task<bool> UserExists(string? username)
     {
+        using var scope = _serviceProvider.CreateScope();
+        var _context = scope.ServiceProvider.GetRequiredService<DataContext>();
+
         return await _context.Users.AnyAsync(x =>
             username != null && x.Username != null && x.Username.ToLower() == username.ToLower());
     }

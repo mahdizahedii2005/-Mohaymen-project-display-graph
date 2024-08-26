@@ -10,17 +10,17 @@ namespace mohaymen_codestar_Team02.Services.ProfileService;
 
 public class ProfileService : IProfileService
 {
-    private readonly DataContext _context;
+    private readonly IServiceProvider _serviceProvider;
     private readonly ICookieService _cookieService;
     private readonly IPasswordService _passwordService;
     private readonly ITokenService _tokenService;
     private readonly IMapper _mapper;
 
-    public ProfileService(DataContext context, ICookieService cookieService,
+    public ProfileService(IServiceProvider serviceProvider, ICookieService cookieService,
         IPasswordService passwordService, ITokenService tokenService, IMapper mapper)
     {
         _mapper = mapper;
-        _context = context;
+        _serviceProvider = serviceProvider;
         _cookieService = cookieService;
         _passwordService = passwordService;
         _tokenService = tokenService;
@@ -29,6 +29,9 @@ public class ProfileService : IProfileService
 
     public async Task<ServiceResponse<object>> ChangePassword(string previousPassword, string newPassword)
     {
+        using var scope = _serviceProvider.CreateScope();
+        var _context = scope.ServiceProvider.GetRequiredService<DataContext>();
+
         var token = _cookieService.GetCookieValue();
         if (string.IsNullOrEmpty(token))
             return new ServiceResponse<object>(new { }, ApiResponseType.Unauthorized, Resources.UnauthorizedMessage);
@@ -55,6 +58,9 @@ public class ProfileService : IProfileService
 
     public async Task<ServiceResponse<GetUserDto?>> UpdateUser(UpdateUserDto updateUserDto)
     {
+        using var scope = _serviceProvider.CreateScope();
+        var _context = scope.ServiceProvider.GetRequiredService<DataContext>();
+
         var newUser = _mapper.Map<UpdateUserDto>(updateUserDto);
 
         var token = _cookieService.GetCookieValue();
@@ -80,6 +86,9 @@ public class ProfileService : IProfileService
 
     private Task<User?> GetUser(string? username)
     {
+        using var scope = _serviceProvider.CreateScope();
+        var _context = scope.ServiceProvider.GetRequiredService<DataContext>();
+
         return _context.Users.FirstOrDefaultAsync(x => x.Username.ToLower() == username.ToLower());
     }
 }
