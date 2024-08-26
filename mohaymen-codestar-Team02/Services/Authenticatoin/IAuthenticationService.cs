@@ -9,4 +9,5 @@ public interface IAuthenticationService
     Task<ServiceResponse<GetUserDto?>> Login(string username, string password);
     ServiceResponse<string?> Logout();
     Task<ServiceResponse<GetPermissionDto>> GetPermission();
+    Task<ServiceResponse<string>> GetAuthorized();
 }

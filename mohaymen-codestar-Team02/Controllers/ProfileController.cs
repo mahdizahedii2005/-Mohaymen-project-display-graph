@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using mohaymen_codestar_Team02.Dto.User;
 using mohaymen_codestar_Team02.Dto.UserDtos;
@@ -7,6 +8,7 @@ using mohaymen_codestar_Team02.Services.ProfileService;
 namespace mohaymen_codestar_Team02.Controllers;
 
 [ApiController]
+[Authorize]
 [Route("user")]
 public class ProfileController : ControllerBase
 {
