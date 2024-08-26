@@ -5,6 +5,6 @@ namespace mohaymen_codestar_Team02.Services;
 
 public interface IVertexService
 {
-    List<Vertex> GetAllVertices(string datasetName);
+    public List<Vertex> GetAllVertices(string datasetName, string vertexIdentifierFieldName);
     DetailDto GetVertexDetails(string objId);
 }

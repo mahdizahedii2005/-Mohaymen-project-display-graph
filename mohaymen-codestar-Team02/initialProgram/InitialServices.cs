@@ -59,7 +59,7 @@ public class InitialServices
             .AddScoped<IDisplayDataService, DisplayService>()
             .AddScoped<IModelBuilder, ModelBuilderr>()
             .AddScoped<IObjectBuilder, ObjectBuilder>();
-
+        
         services.AddAutoMapper(typeof(AutoMapperProfile));
         services.AddAuthorization();
 

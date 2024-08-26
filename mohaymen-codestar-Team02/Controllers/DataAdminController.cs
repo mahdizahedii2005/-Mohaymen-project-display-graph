@@ -41,9 +41,12 @@ public class DataAdminController : ControllerBase
         }
     }
 
-    [HttpGet("DataSets")]
-    public void GetDataSetsList()
+    [HttpGet("DataSets/jkdjf{username}")]
+    public IActionResult GetDataSetsList(string username)
     {
+        var response = _dataAdminService.DisplayDataSet(username);
+        return StatusCode((int)response.Type, response);
+        
     }
 
     [HttpGet("DataSets/{dataSetName}")]

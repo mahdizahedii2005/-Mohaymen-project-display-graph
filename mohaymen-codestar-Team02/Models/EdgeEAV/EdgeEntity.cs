@@ -6,6 +6,7 @@ namespace mohaymen_codestar_Team02.Models.EdgeEAV;
 
 public class EdgeEntity
 {
+    public EdgeEntity(){}
     public EdgeEntity(string name, long dataGroupId)
     {
         Regex regex =

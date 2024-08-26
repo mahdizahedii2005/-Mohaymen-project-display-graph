@@ -1,4 +1,13 @@
+using System.Runtime.InteropServices.JavaScript;
+using AutoMapper;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Resources;
+using mohaymen_codestar_Team02.Data;
+using mohaymen_codestar_Team02.Dto;
 using mohaymen_codestar_Team02.Models;
+using mohaymen_codestar_Team02.Models.EdgeEAV;
+using mohaymen_codestar_Team02.Models.VertexEAV;
 using mohaymen_codestar_Team02.Services;
 using mohaymen_codestar_Team02.Services.StoreData.Abstraction;
 using NSubstitute;
@@ -9,14 +18,30 @@ public class DataAdminServiceTest
 {
     private readonly IStorHandler _storHandler;
     private readonly IDisplayDataService _displayDataService;
-    private readonly mohaymen_codestar_Team02.Services.DataAdminService.DataAdminService _sut;
+    private readonly IMapper _mapper;
+    private readonly mohaymen_codestar_Team02.Services.DataAdminService.IDataAdminService _sut;
+    private readonly IServiceProvider _serviceProvider;
+    private DataContext _dataContext;
 
     public DataAdminServiceTest()
     {
         _storHandler = Substitute.For<IStorHandler>();
         _displayDataService = Substitute.For<IDisplayDataService>();
+        _mapper = Substitute.For<IMapper>();
+        
+        var serviceCollection = new ServiceCollection();
+
+        var options = new DbContextOptionsBuilder<DataContext>()
+            .UseInMemoryDatabase(Guid.NewGuid().ToString())
+            .Options;
+
+        serviceCollection.AddScoped(_ => new DataContext(options));
+
+        _serviceProvider = serviceCollection.BuildServiceProvider();
+        
+        
         _sut = new mohaymen_codestar_Team02.Services.DataAdminService.DataAdminService(_storHandler,
-            _displayDataService);
+            _displayDataService, _mapper, _serviceProvider);
         _storHandler.EdageStorer.StoreFileData(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<long>()).Returns(true);
         _storHandler.VertexStorer.StoreFileData(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<long>()).Returns(true);
     }
@@ -78,4 +103,117 @@ public class DataAdminServiceTest
         // Assert
         Assert.Equal(ApiResponseType.Success, result.Type);
     }
+    
+    [Fact]
+    public void DisplayDataSet_ShouldGetDataSet_WhenGivenCorrectUsername()
+    {
+        using var scope = _serviceProvider.CreateScope();
+        _dataContext = scope.ServiceProvider.GetRequiredService<DataContext>();
+
+        // Arrange
+        var username = "username1";
+        var datasetName1 = "Dataset1";
+        var datasetName2 = "Dataset2";
+        var vertexEntityName1 = "Account1";
+        var EdgeEntityName1 = "Transaction1";
+        var vertexEntityName2 = "Account2";
+        var EdgeEntityName2 = "Transaction2";
+
+        var GetDataGroupDtos = new List<GetDataGroupDto>()
+        {
+            new GetDataGroupDto()
+            {
+                Name = datasetName1,
+                CreateAt = DateTime.MaxValue,
+                UpdateAt = DateTime.MaxValue,
+                VertexEntity = new GetVertexEntityDto()
+                {
+                    Name = vertexEntityName1
+                },
+                EdgeEntity = new GetEdgeEntityDto()
+                {
+                    Name = EdgeEntityName1
+                }
+            },
+            new GetDataGroupDto()
+            {
+                Name = datasetName2,
+             
+                CreateAt = DateTime.MaxValue,
+                UpdateAt = DateTime.MaxValue,
+                VertexEntity = new GetVertexEntityDto()
+                {
+                    Name = vertexEntityName2
+                },
+                EdgeEntity = new GetEdgeEntityDto()
+                {
+                    Name = EdgeEntityName2
+                }
+            }
+        };
+        
+        var expected = new ServiceResponse<List<GetDataGroupDto>>(GetDataGroupDtos, ApiResponseType.Success, "");
+        
+        var user = new User()
+        {
+            UserId = 1,
+            Username = username,
+            DataSets = new List<DataGroup>()
+            {
+                new DataGroup
+                {
+                    Name = datasetName1,
+                    UserId = 1,
+                    DataGroupId = 1,
+                    CreateAt = DateTime.MaxValue,
+                    UpdateAt = DateTime.MaxValue,
+                    VertexEntity = new VertexEntity(vertexEntityName1, 1),
+                    EdgeEntity = new EdgeEntity(EdgeEntityName1, 1)
+                },
+                new DataGroup
+                {
+                    Name = datasetName2,
+                    UserId = 1,
+                    DataGroupId = 2,
+                    CreateAt = DateTime.MaxValue,
+                    UpdateAt = DateTime.MaxValue,
+                    VertexEntity = new VertexEntity(vertexEntityName2, 2),
+                    EdgeEntity = new EdgeEntity(EdgeEntityName2, 2)
+                }
+            },
+            PasswordHash = new byte[]{},
+            Salt = new byte[]{}
+        };
+
+        _dataContext.Users.Add(user);
+        _dataContext.SaveChanges();
+
+
+        _mapper.Map<GetDataGroupDto>(Arg.Is<DataGroup>(dg => dg.Name == datasetName1))
+            .Returns(new GetDataGroupDto
+            {
+                Name = datasetName1,
+                CreateAt = DateTime.MaxValue,
+                UpdateAt = DateTime.MaxValue,
+                VertexEntity = new GetVertexEntityDto { Name = vertexEntityName1 },
+                EdgeEntity = new GetEdgeEntityDto { Name = EdgeEntityName1 }
+            });
+
+        _mapper.Map<GetDataGroupDto>(Arg.Is<DataGroup>(dg => dg.Name == datasetName2))
+            .Returns(new GetDataGroupDto
+            {
+                Name = datasetName2,
+                CreateAt = DateTime.MaxValue,
+                UpdateAt = DateTime.MaxValue,
+                VertexEntity = new GetVertexEntityDto { Name = vertexEntityName2 },
+                EdgeEntity = new GetEdgeEntityDto { Name = EdgeEntityName2 }
+            });
+        
+        // Act
+        var actual = _sut.DisplayDataSet(username);
+
+        // Assert
+        Assert.Equivalent(expected, actual);
+    }
+    
 }

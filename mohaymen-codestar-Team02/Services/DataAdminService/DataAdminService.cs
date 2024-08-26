@@ -1,6 +1,11 @@
+using AutoMapper;
+using Microsoft.EntityFrameworkCore;
+using mohaymen_codestar_Team02.Data;
+using mohaymen_codestar_Team02.Dto;
 using mohaymen_codestar_Team02.Dto.GraphDTO;
 using mohaymen_codestar_Team02.Models;
 using mohaymen_codestar_Team02.Models.EdgeEAV;
+using mohaymen_codestar_Team02.Models.VertexEAV;
 using mohaymen_codestar_Team02.Services.StoreData.Abstraction;
 
 namespace mohaymen_codestar_Team02.Services.DataAdminService;
@@ -10,10 +15,14 @@ public class DataAdminService
 {
     private readonly IStorHandler storHandler;
     private readonly IDisplayDataService _displayDataService;
-    public DataAdminService(IStorHandler storHandler, IDisplayDataService displayDataService)
+    private readonly IServiceProvider _serviceProvider;
+    private readonly IMapper _mapper;
+    public DataAdminService(IStorHandler storHandler, IDisplayDataService displayDataService, IMapper mapper, IServiceProvider serviceProvider)
     {
         this.storHandler = storHandler;
         _displayDataService = displayDataService;
+        _mapper = mapper;
+        _serviceProvider = serviceProvider;
     }
 
     public async Task<ServiceResponse<string>> StoreData(string? edgeFile, string? vertexFile, string graphName
@@ -47,30 +56,23 @@ public class DataAdminService
         }
     }
 
-    public Task<ServiceResponse<DisplayGraphDto>> DisplayDataSetAsGraph(string dataSetName, string vertexFieldName, string sourceField, string targetField)
+    public ServiceResponse<List<GetDataGroupDto>> DisplayDataSet(string username)
     {
-        throw new NotImplementedException();
-    }
+        
+        var scope = _serviceProvider.CreateScope();
+        var context = scope.ServiceProvider.GetRequiredService<DataContext>();
 
-    public Task<ServiceResponse<string>> DisplayGraph()
-    {
-        throw new NotImplementedException();
-    }
+        
+        var datasets = context.DataSets
+            .Include(ds => ds.VertexEntity)
+            .Include(ds => ds.EdgeEntity)
+            .Include(ds => ds.User)
+            .Where(ds=>ds.User.Username==username)
+            .ToList();
 
-    public Task<ServiceResponse<string>> DisplayDataSet()
-    {
-        throw new NotImplementedException();
+        var dataGroupDtos = datasets.Select(ds => _mapper.Map<GetDataGroupDto>(ds)).ToList();
+        return new ServiceResponse<List<GetDataGroupDto>>(dataGroupDtos, ApiResponseType.Success, "");
     }
-
-    /*
-    public Task<ServiceResponse<string>> DisplayGraph(string databaseName, string sourceEdgeIdentifierFieldName,
-        string destinationEdgeIdentifierFieldName, string vertexIdentifierFieldName)
-    {
-        var graph = _displayDataService.GetGraph2(databaseName, sourceEdgeIdentifierFieldName, destinationEdgeIdentifierFieldName,
-            vertexIdentifierFieldName);
-        return new Task<ServiceResponse<>>()
-    }
-*/
 
     public async Task<ServiceResponse<DisplayGraphDto>> DisplayGeraphData(string databaseName, string sourceEdgeIdentifierFieldName,
         string destinationEdgeIdentifierFieldName, string vertexIdentifierFieldName)
@@ -84,10 +86,5 @@ public class DataAdminService
             Edges = graph.edges,
         };
         return new ServiceResponse<DisplayGraphDto>(dto, ApiResponseType.Success, "");
-    }
-
-    public Task<ServiceResponse<List<Edge>>> DisplayEdgeData()
-    {
-        throw new NotImplementedException();
     }
 }

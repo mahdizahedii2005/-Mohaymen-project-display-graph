@@ -13,15 +13,20 @@ public class DataGroup
         Name = name;
         UserId = userId;
     }
+    
+    public DataGroup() { } 
 
     [Key] public long DataGroupId { get; set; }
 
     public string Name { get; set; }
     public DateTime CreateAt { get; set; } = DateTime.UtcNow;
     public DateTime UpdateAt { get; set; } = DateTime.UtcNow;
-
-    public virtual EdgeEntity EdgeEntity { get; set; }
-    public virtual VertexEntity VertexEntity { get; set; }
+    
+    
+    public virtual long EdgeEntityId { get; set; }
+    [ForeignKey("EdgeEntityId")] public virtual EdgeEntity EdgeEntity { get; set; }
+    public virtual long VertexEntityId { get; set; }
+    [ForeignKey("VertexEntityId")] public virtual VertexEntity VertexEntity { get; set; }
 
     public long UserId { get; set; }
 
