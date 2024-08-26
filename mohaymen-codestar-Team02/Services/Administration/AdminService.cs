@@ -80,7 +80,7 @@ public class AdminService : IAdminService
         using var scope = _serviceProvider.CreateScope();
         var _context = scope.ServiceProvider.GetRequiredService<DataContext>();
 
-        List<GetRoleDto> roles = await _context.Roles.Select(r => _mapper.Map<GetRoleDto>(r)).ToListAsync();
+        var roles = await _context.Roles.Select(r => _mapper.Map<GetRoleDto>(r)).ToListAsync();
         return new ServiceResponse<List<GetRoleDto>>(roles, ApiResponseType.Success, Resources.UsersRetrievedMassage);
     }
 

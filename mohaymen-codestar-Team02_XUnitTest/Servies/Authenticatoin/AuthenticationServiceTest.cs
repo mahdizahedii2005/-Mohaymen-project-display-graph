@@ -168,4 +168,109 @@ public class AuthenticationServiceTests
         Assert.Equal(ApiResponseType.Success, result.Type);
         Assert.Null(result.Data);
     }
+
+    [Fact]
+    public async Task GetPermission_ShouldReturnUnauthorized_WhenTokenIsEmpty()
+    {
+        // Arrange
+        _cookieService.GetCookieValue().Returns(string.Empty);
+
+        // Act
+        var result = await _sut.GetPermission();
+
+        // Assert
+        Assert.Equal(ApiResponseType.Unauthorized, result.Type);
+    }
+
+    [Fact]
+    public async Task GetPermission_ShouldReturnNotFound_WhenUserDoesNotExist()
+    {
+        // Arrange
+        FixTheReturnOfCookies("admin");
+
+        // Act
+        var result = await _sut.GetPermission();
+
+        // Assert
+        Assert.Equal(ApiResponseType.BadRequest, result.Type);
+    }
+
+    [Fact]
+    public async Task GetPermission_ShouldReturnSuccess_WhenUserExist()
+    {
+        // Arrange
+        FixTheReturnOfCookies("admin");
+        AddUserWithRole("admin", "SystemAdmin", 3);
+
+        // Act
+        var result = await _sut.GetPermission();
+
+        // Assert
+        Assert.Equal(ApiResponseType.Success, result.Type);
+    }
+
+
+    /*[Fact]
+    public async Task GetPermission_ShouldReturnUnionPermissions_WhenUserExist()
+    {
+        // Arrange
+        FixTheReturnOfCookies("admin");
+        AddUserWithRole("admin", "SystemAdmin", 1);
+        AddUserWithRole("admin", "DataAdmin", 2);
+        _tokenService.GetRolesFromToken().Returns("SystemAdmin,DataAdmin");
+
+        var systemAdminRole = new Role
+        {
+            RoleType = "SystemAdmin",
+            Permissions = new List<Permission>
+            {
+               Permission.Login,
+               Permission.Logout,
+               Permission.UserRegister
+            }
+        };
+
+        var dataAdminRole = new Role
+        {
+            RoleType = "DataAdmin",
+            Permissions = new List<Permission>
+            {
+               Permission.Login,
+               Permission.Logout
+            }
+        };
+
+        var expected = new List<string> { "Permission1", "Permission2", "Permission3" };
+
+        // Act
+        var result = await _sut.GetPermission();
+
+        // Assert
+        Assert.Equivalent(expected, result.Data);
+    }*/
+
+
+    private void FixTheReturnOfCookies(string? returnThis)
+    {
+        _cookieService.GetCookieValue().Returns(returnThis);
+        _tokenService.GetUserNameFromToken().Returns(returnThis);
+    }
+
+    private UserRole AddUserWithRole(string userName, string roleType, long id)
+    {
+        var user = new User
+        {
+            Salt = Array.Empty<byte>(),
+            PasswordHash = Array.Empty<byte>(),
+            Username = userName,
+            UserId = id
+        };
+        var role = new Role { RoleType = roleType, RoleId = id };
+        var userRole = new UserRole { UserId = user.UserId, RoleId = role.RoleId };
+        _mockContext.Users.Add(user);
+        _mockContext.Roles.Add(role);
+        _mockContext.UserRoles.Add(userRole);
+        _mockContext.SaveChanges();
+        return new UserRole { Role = role, User = user };
+    }
 }

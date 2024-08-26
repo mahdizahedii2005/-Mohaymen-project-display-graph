@@ -147,6 +147,19 @@ public class AdminServiceTest
 
 
     [Fact]
+    public async Task GetUserByUsername_ShouldReturnUnauthorized_WhenTokenIsEmpty()
+    {
+        // Arrange
+        _cookieService.GetCookieValue().Returns(string.Empty);
+
+        // Act
+        var result = await _sut.GetUserByUsername(null);
+
+        // Assert
+        Assert.Equal(ApiResponseType.Unauthorized, result.Type);
+    }
+
+    [Fact]
     public async Task GetUserByUsername_ShouldReturnSuccess_WhenUserIsFound()
     {
         // Arrange
@@ -164,19 +177,66 @@ public class AdminServiceTest
         Assert.NotNull(result.Data);
         Assert.Equal("testUser", result.Data.Username);
     }
+        
+    [Fact]
+    public async Task GetUserByUsername_ShouldReturnBadRequest_WhenAdminNotFound()
+    {
+        // Arrange
+        FixTheReturnOfCookies("admin");
+
+        // Act
+        var response = await _sut.GetUserByUsername("testUser");
+
+        // Assert
+        Assert.Equal(ApiResponseType.BadRequest, response.Type);
+    }
 
     [Fact]
     public async Task GetUserByUsername_ShouldReturnNotFound_WhenUserDoesNotExist()
     {
+        // Arrange
+        FixTheReturnOfCookies("admin");
+        var adminUser = AddUserWithRole("admin", "SystemAdmin", 1);
+        var targetUser = AddUserWithRole("targetUser", "SystemAdmin", 2);
+        var userDto = new GetUserDto { Username = "targetUser" };
+        _mapper.Map<GetUserDto>(Arg.Any<User>()).Returns(userDto);
+
         // Act
-        var result = await _sut.GetUserByUsername("nonExistentUser");
+        var result = await _sut.GetUserByUsername("testUser");
 
         // Assert
-        Assert.Null(result.Data);
+        Assert.Equal(ApiResponseType.NotFound, result.Type);
+    }
+    
+    [Fact]
+    public async Task GetUserByUsername_ShouldReturnForbidden_WhenCommenderIsNotSystemAdmin()
+    {
+        // Arrange
+        FixTheReturnOfCookies("fakeAdmin");
+        AddUserWithRole("fakeAdmin", "Analyst", 1);
+
+        // Act
+        var result = await _sut.GetUserByUsername("testUser");
+
+        // Assert
+        Assert.Equal(ApiResponseType.Forbidden, result.Type);
+    }
+    
+    [Fact]
+    public async Task GetAllUsers_ShouldReturnUnauthorized_WhenTokenIsEmpty()
+    {
+        // Arrange
+        _cookieService.GetCookieValue().Returns(string.Empty);
+
+        // Act
+        var result = await _sut.GetAllUsers();
+
+        // Assert
+        Assert.Equal(ApiResponseType.Unauthorized, result.Type);
     }
 
     [Fact]
-    public async Task GetAllUsers_ShouldReturnAllUsersSuccessfully()
+    public async Task GetAllUsers_ShouldReturnAllUsersSuccessfully_WhenAdminExist()
     {
         // Arrange
         FixTheReturnOfCookies("admin");
@@ -192,6 +252,33 @@ public class AdminServiceTest
         // Assert
         Assert.Equal(ApiResponseType.Success, result.Type);
         Assert.Equal(3, result.Data.Count);
+    }
+    
+    [Fact]
+    public async Task GetAllUsers_ShouldReturnBadRequest_WhenAdminNotFound()
+    {
+        // Arrange
+        FixTheReturnOfCookies("admin");
+
+        // Act
+        var response = await _sut.GetAllUsers();
+
+        // Assert
+        Assert.Equal(ApiResponseType.BadRequest, response.Type);
+    }
+
+    [Fact]
+    public async Task GetAllUsers_ShouldReturnForbidden_WhenUserIsNotAdmin()
+    {
+        // Arrange
+        FixTheReturnOfCookies("fakeAdmin");
+        AddUserWithRole("fakeAdmin", "Analyst", 1);
+
+        // Act
+        var result = await _sut.GetAllUsers();
+
+        // Assert
+        Assert.Equal(ApiResponseType.Forbidden, result.Type);
     }
 
 
@@ -278,7 +365,7 @@ public class AdminServiceTest
     }
 
     [Fact]
-    public async Task AddRole_ShouldReturnSuccess_WhenCommenderIsAdmin()
+    public async Task AddRole_ShouldReturnSuccess_WhenUserAndAdminExist()
     {
         // Arrange
         FixTheReturnOfCookies("admin");
@@ -291,6 +378,51 @@ public class AdminServiceTest
 
         // Assert
         Assert.Equal(ApiResponseType.Success, result.Type);
+    }
+
+    [Fact]
+    public async Task AddRole_ShouldReturnNotFound_WhenUserDoesNotExist()
+    {
+        // Arrange
+        FixTheReturnOfCookies("admin");
+        AddUserWithRole("admin", "SystemAdmin", 1);
+        var user = AddUserWithRole("target", "DataAdmin", 2);
+
+        // Act
+        var result = await _sut.AddRole(new User() { Username = "testUser" },
+            new Role() { RoleType = RoleType.DataAdmin.ToString() });
+        // Assert
+        Assert.Equal(ApiResponseType.NotFound, result.Type);
+    }
+
+    [Fact]
+    public async Task AddRole_ShouldReturnBadRequest_WhenRoleIsNotFound()
+    {
+        // Arrange
+        FixTheReturnOfCookies("admin");
+        AddUserWithRole("admin", "SystemAdmin", 1);
+        var user = AddUserWithRole("target", "DataAdmin", 2);
+
+        // Act
+        var result = await _sut.AddRole(user.User, new Role() { RoleType = "testRole" });
+
+        // Assert
+        Assert.Equal(ApiResponseType.BadRequest, result.Type);
+    }
+
+    [Fact]
+    public async Task AddRole_ShouldReturnBadRequest_WhenRoleAlreadyAssigned()
+    {
+        // Arrange
+        FixTheReturnOfCookies("admin");
+        AddUserWithRole("admin", "SystemAdmin", 1);
+        var user = AddUserWithRole("target", "DataAdmin", 2);
+
+        // Act
+        var result = await _sut.AddRole(user.User, new Role() { RoleType = RoleType.DataAdmin.ToString() });
+
+        // Assert
+        Assert.Equal(ApiResponseType.BadRequest, result.Type);
     }
 
     [Fact]
@@ -380,7 +512,7 @@ public class AdminServiceTest
     }
 
     [Fact]
-    public async Task DeleteRole_ShouldRoleBeNullIfLoockingForIt_WhenUserRoleExistsAndUserIsAdmin()
+    public async Task DeleteRole_ShouldRoleBeNullIfLookingForIt_WhenUserRoleExistsAndUserIsAdmin()
     {
         // Arrange
         FixTheReturnOfCookies("admin");
@@ -394,6 +526,21 @@ public class AdminServiceTest
         var result = _mockContext.UserRoles.SingleOrDefault(ur =>
             ur.UserId == user.User.UserId && ur.RoleId == user.Role.RoleId);
         Assert.Null(result);
+    }
+
+    [Fact]
+    public async Task DeleteRole_ShouldReturnNotFound_WhenUserDoesNotExist()
+    {
+        // Arrange
+        FixTheReturnOfCookies("admin");
+        AddUserWithRole("admin", "SystemAdmin", 1);
+        var user = AddUserWithRole("target", "DataAdmin", 2);
+
+        // Act
+        var result = await _sut.DeleteRole(new User() { Username = "testUser" },
+            new Role() { RoleType = RoleType.DataAdmin.ToString() });
+        // Assert
+        Assert.Equal(ApiResponseType.NotFound, result.Type);
     }
 
     [Fact]
@@ -443,7 +590,6 @@ public class AdminServiceTest
         FixTheReturnOfCookies("admin");
         AddUserWithRole("admin", "SystemAdmin", 1);
         var user = AddUserWithRole("target", "DataAdmin", 2);
-        var role = AddUserWithRole("fakeUser", "Analyst", 3);
 
         // Act
         var result = await _sut.DeleteUser(new User() { Username = "testUser" });
@@ -452,7 +598,7 @@ public class AdminServiceTest
     }
 
     [Fact]
-    public async Task DeleteRole_ShouldReturnSuccess_WhenAdminAndUserExist()
+    public async Task DeleteUser_ShouldReturnSuccess_WhenAdminAndUserExist()
     {
         // Arrange
         FixTheReturnOfCookies("admin");
@@ -467,7 +613,7 @@ public class AdminServiceTest
     }
 
     [Fact]
-    public async Task DeleteRole_ShouldReturnYouCanNotDeleteYourself_WhenAdminDeleteHimself()
+    public async Task DeleteUser_ShouldReturnYouCanNotDeleteYourself_WhenAdminDeleteHimself()
     {
         // Arrange
         FixTheReturnOfCookies("admin");
