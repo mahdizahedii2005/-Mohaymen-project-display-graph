@@ -30,7 +30,7 @@ public class VertexEntity
         }
     }
 
-    [Key] public long Id { get; set; }
+    [Key] public long VertexEntityId { get; set; }
     private string _name;
 
     public string Name
