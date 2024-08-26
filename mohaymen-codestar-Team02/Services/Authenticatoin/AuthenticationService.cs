@@ -65,7 +65,9 @@ public class AuthenticationService : IAuthenticationService
     }
 
     public async Task<ServiceResponse<GetPermissionDto>> GetPermission()
-    {
+    {using var scope = _serviceProvider.CreateScope();
+        var _context = scope.ServiceProvider.GetRequiredService<DataContext>();
+
         var token = _cookieService.GetCookieValue();
         if (string.IsNullOrEmpty(token))
             return new ServiceResponse<GetPermissionDto>(null, ApiResponseType.Unauthorized, Resources.UnauthorizedMessage);
