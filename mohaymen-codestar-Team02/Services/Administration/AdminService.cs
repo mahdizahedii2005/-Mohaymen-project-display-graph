@@ -179,8 +179,6 @@ public class AdminService : IAdminService
 
         var userRole = new UserRole
         {
-            Role = foundRole,
-            User = foundUser,
             RoleId = foundRole.RoleId,
             UserId = foundUser.UserId
         };
