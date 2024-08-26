@@ -40,6 +40,7 @@ public class InitialServices
 
         // Configure DbContext and Dependency Injection
         var cs = builder.Configuration["CONNECTION_STRING"];
+        Console.WriteLine("your connection string is ==>"+cs);
         services.AddDbContext<DataContext>(options =>
             options.UseNpgsql(cs));
 

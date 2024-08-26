@@ -30,7 +30,7 @@ public class EdgeEntity
 
     }
 
-    [Key] public long Id { get; set; }
+    [Key] public long EdgeEntityId { get; set; }
     private string _name;
 
     public string Name
