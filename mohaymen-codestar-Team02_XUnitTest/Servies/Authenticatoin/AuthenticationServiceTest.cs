@@ -119,7 +119,7 @@ public class AuthenticationServiceTests
             .Returns(true);
 
         var fakeToken = "fakeToken";
-        _tokenService.CreateToken(Arg.Any<Claim[]>()).Returns(fakeToken);
+        _tokenService.CreateToken(Arg.Any<List<Claim>>()).Returns(fakeToken);
 
         // Act
         var result = await _sut.Login(username, password);

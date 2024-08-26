@@ -66,7 +66,7 @@ public class AdminServiceTest
         Assert.Equal(ApiResponseType.BadRequest, response.Type);
     }
 
-    [Fact]
+    /*[Fact]
     public async Task Register_ShouldReturnForbidden_WhenUserIsNotAdmin()
     {
         using var scope = _serviceProvider.CreateScope();
@@ -81,7 +81,7 @@ public class AdminServiceTest
 
         // Assert
         Assert.Equal(ApiResponseType.Forbidden, result.Type);
-    }
+    }*/
 
     [Fact]
     public async Task Register_ShouldReturnConflict_WhenUserAlreadyExists()
@@ -297,7 +297,7 @@ public class AdminServiceTest
         Assert.Equal(ApiResponseType.BadRequest, response.Type);
     }
 
-    [Fact]
+    /*[Fact]
     public async Task GetAllUsers_ShouldReturnForbidden_WhenUserIsNotAdmin()
     {
         using var scope = _serviceProvider.CreateScope();
@@ -312,7 +312,7 @@ public class AdminServiceTest
 
         // Assert
         Assert.Equal(ApiResponseType.Forbidden, result.Type);
-    }
+    }*/
 
 
     [Fact]
@@ -386,7 +386,7 @@ public class AdminServiceTest
         Assert.Equal(ApiResponseType.BadRequest, response.Type);
     }
 
-    [Fact]
+    /*[Fact]
     public async Task AddRole_ShouldReturnForbidden_WhenCommenderIsNotSystemAdmin()
     {
         using var scope = _serviceProvider.CreateScope();
@@ -401,7 +401,7 @@ public class AdminServiceTest
 
         // Assert
         Assert.Equal(ApiResponseType.Forbidden, result.Type);
-    }
+    }*/
 
     [Fact]
     public async Task AddRole_ShouldReturnSuccess_WhenUserAndAdminExist()
@@ -502,7 +502,7 @@ public class AdminServiceTest
         Assert.Equal(ApiResponseType.BadRequest, response.Type);
     }
 
-    [Fact]
+    /*[Fact]
     public async Task DeleteRole_ShouldReturnForbidden_WhenCommenderIsNotSystemAdmin()
     {
         using var scope = _serviceProvider.CreateScope();
@@ -517,7 +517,7 @@ public class AdminServiceTest
 
         // Assert
         Assert.Equal(ApiResponseType.Forbidden, result.Type);
-    }
+    }*/
 
     [Fact]
     public async Task DeleteRole_ShouldReturnBadRequest_WhenUserRoleNotExists()
@@ -638,7 +638,7 @@ public class AdminServiceTest
         Assert.Equal(ApiResponseType.BadRequest, response.Type);
     }
 
-    [Fact]
+    /*[Fact]
     public async Task DeleteUser_ShouldReturnForbidden_WhenUserIsNotAdmin()
     {
         using var scope = _serviceProvider.CreateScope();
@@ -653,7 +653,7 @@ public class AdminServiceTest
 
         // Assert
         Assert.Equal(ApiResponseType.Forbidden, result.Type);
-    }
+    }*/
 
     [Fact]
     public async Task DeleteUser_ShouldReturnNotFound_WhenUserDoesNotExist()

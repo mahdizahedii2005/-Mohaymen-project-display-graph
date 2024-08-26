@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using mohaymen_codestar_Team02.Dto.Role;
 using mohaymen_codestar_Team02.Dto.User;
@@ -9,6 +10,7 @@ using mohaymen_codestar_Team02.Services.Administration;
 namespace mohaymen_codestar_Team02.Controllers;
 
 [ApiController]
+[Authorize(Roles = nameof(RoleType.SystemAdmin))]
 [Route("[controller]")]
 public class AdminController : ControllerBase
 {
@@ -53,11 +55,11 @@ public class AdminController : ControllerBase
     }
 
     [HttpDelete("users/{username}")]
-    public async Task<IActionResult> Delete([FromBody] DeleteUserDto request)
+    public async Task<IActionResult> Delete(string username)
     {
         var user = new User
         {
-            Username = request.Username
+            Username = username
         };
 
         ServiceResponse<GetUserDto?> response =

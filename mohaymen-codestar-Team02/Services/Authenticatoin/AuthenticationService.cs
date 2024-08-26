@@ -18,7 +18,8 @@ public class AuthenticationService : IAuthenticationService
     private readonly IPasswordService _passwordService;
     private readonly IMapper _mapper;
 
-    public AuthenticationService(IServiceProvider serviceProvider, ICookieService cookieService, ITokenService tokenService,
+    public AuthenticationService(IServiceProvider serviceProvider, ICookieService cookieService,
+        ITokenService tokenService,
         IPasswordService passwordService, IMapper mapper)
     {
         _serviceProvider = serviceProvider;
@@ -35,7 +36,7 @@ public class AuthenticationService : IAuthenticationService
 
         using var scope = _serviceProvider.CreateScope();
         var dataContext = scope.ServiceProvider.GetRequiredService<DataContext>();
-        var user = await GetUser(username , dataContext);
+        var user = await GetUser(username, dataContext);
 
         if (user is null)
             return new ServiceResponse<GetUserDto?>(null, ApiResponseType.BadRequest, Resources.UserNotFoundMessage);
@@ -43,12 +44,13 @@ public class AuthenticationService : IAuthenticationService
         if (!_passwordService.VerifyPasswordHash(password, user.PasswordHash, user.Salt))
             return new ServiceResponse<GetUserDto?>(null, ApiResponseType.BadRequest, Resources.WrongPasswordMessage);
 
-        var claims = new[]
+        var claims = new List<Claim>()
         {
             new Claim(ClaimTypes.Name, user.Username),
-            new Claim(ClaimTypes.Role, string.Join(",", user.UserRoles.Select(ur => ur.Role.RoleType)))
         };
-
+        
+        claims.AddRange(user.UserRoles.Select(ur => new Claim(ClaimTypes.Role, ur.Role.RoleType)));
+        
         _cookieService.CreateCookie(_tokenService.CreateToken(claims));
 
         var userDto = _mapper.Map<GetUserDto>(user);
@@ -72,10 +74,10 @@ public class AuthenticationService : IAuthenticationService
                 Resources.UnauthorizedMessage);
 
         var username = _tokenService.GetUserNameFromToken();
-        
+
         using var scope = _serviceProvider.CreateScope();
         var dataContext = scope.ServiceProvider.GetRequiredService<DataContext>();
-        var user = await GetUser(username , dataContext);
+        var user = await GetUser(username, dataContext);
         if (user is null)
             return new ServiceResponse<GetPermissionDto>(null, ApiResponseType.BadRequest,
                 Resources.UserNotFoundMessage);
@@ -94,11 +96,32 @@ public class AuthenticationService : IAuthenticationService
             Resources.GetPermissionsSuccessfuly);
     }
 
+    public async Task<ServiceResponse<string>> GetAuthorized()
+    {
+        var token = _cookieService.GetCookieValue();
+        if (string.IsNullOrEmpty(token))
+            return new ServiceResponse<string>(null, ApiResponseType.Unauthorized,
+                Resources.UnauthorizedMessage);
+
+        var username = _tokenService.GetUserNameFromToken();
+
+        using var scope = _serviceProvider.CreateScope();
+        var dataContext = scope.ServiceProvider.GetRequiredService<DataContext>();
+        var user = await GetUser(username, dataContext);
+        
+        if (user is null)
+            return new ServiceResponse<string>(null, ApiResponseType.BadRequest,
+                Resources.UserNotFoundMessage);
+        
+        return new ServiceResponse<string>(user.Username, ApiResponseType.Success,
+            Resources.AuthorizedMessage);
+    }
+
     private async Task<HashSet<Permission>> UnionPermissions(string[]? splitRoles)
     {
         using var scope = _serviceProvider.CreateScope();
         var dataContext = scope.ServiceProvider.GetRequiredService<DataContext>();
-        
+
         var permissions = new HashSet<Permission>();
         foreach (var userRole in splitRoles)
         {
@@ -113,7 +136,7 @@ public class AuthenticationService : IAuthenticationService
     }
 
 
-    private async Task<User?> GetUser(string username ,DataContext dataContext)
+    private async Task<User?> GetUser(string username, DataContext dataContext)
     {
         return await dataContext.Users.FirstOrDefaultAsync(x =>
             x.Username != null && x.Username.ToLower().Equals(username.ToLower()));
