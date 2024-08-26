@@ -1,6 +1,7 @@
 using System.Text;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using mohaymen_codestar_Team02.Data;
 using mohaymen_codestar_Team02.Dto.User;
 using mohaymen_codestar_Team02.Models;
@@ -15,7 +16,7 @@ public class ProfileServiceTests
 {
     private readonly mohaymen_codestar_Team02.Services.ProfileService.ProfileService _sut;
     private readonly ICookieService _cookieService;
-    private readonly DataContext _mockContext;
+    private readonly IServiceProvider _serviceProvider;
     private readonly IPasswordService _passwordService;
     private readonly ITokenService _tokenService;
     private readonly IMapper _mapper;
@@ -32,13 +33,16 @@ public class ProfileServiceTests
             cfg.CreateMap<UpdateUserDto, User>();
         });
         _mapper = config.CreateMapper();
+        var serviceCollection = new ServiceCollection();
 
         var options = new DbContextOptionsBuilder<DataContext>()
-            .UseInMemoryDatabase("TestDatabase")
+            .UseInMemoryDatabase(Guid.NewGuid().ToString())
             .Options;
-        _mockContext = new DataContext(options);
 
-        _sut = new mohaymen_codestar_Team02.Services.ProfileService.ProfileService(_mockContext, _cookieService,
+        serviceCollection.AddScoped(_ => new DataContext(options));
+
+        _serviceProvider = serviceCollection.BuildServiceProvider();
+        _sut = new mohaymen_codestar_Team02.Services.ProfileService.ProfileService(_serviceProvider, _cookieService,
             _passwordService, _tokenService, _mapper);
     }
 
@@ -161,6 +165,9 @@ public class ProfileServiceTests
 
     private User AddUserToDatabase(string username, string password)
     {
+        
+        using var scope = _serviceProvider.CreateScope();
+        var _mockContext = scope.ServiceProvider.GetRequiredService<DataContext>();
         var user = new User
         {
             Username = username,

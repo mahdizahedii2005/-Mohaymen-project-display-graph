@@ -7,6 +7,7 @@ using mohaymen_codestar_Team02.Services.CookieService;
 using mohaymen_codestar_Team02.Services.PasswordHandller;
 using NSubstitute;
 using AutoMapper;
+using Microsoft.Extensions.DependencyInjection;
 using mohaymen_codestar_Team02.Dto.Role;
 using mohaymen_codestar_Team02.Dto.User;
 
@@ -16,7 +17,7 @@ public class AdminServiceTest
 {
     private readonly AdminService _sut;
     private readonly ICookieService _cookieService;
-    private readonly DataContext _mockContext;
+    private readonly IServiceProvider _serviceProvider;
     private readonly ITokenService _tokenService;
     private readonly IPasswordService _passwordService;
     private readonly IMapper _mapper;
@@ -27,12 +28,16 @@ public class AdminServiceTest
         _tokenService = Substitute.For<ITokenService>();
         _passwordService = Substitute.For<IPasswordService>();
         _mapper = Substitute.For<IMapper>();
+        var serviceCollection = new ServiceCollection();
 
         var options = new DbContextOptionsBuilder<DataContext>()
             .UseInMemoryDatabase(Guid.NewGuid().ToString())
             .Options;
-        _mockContext = new DataContext(options);
-        _sut = new AdminService(_mockContext, _cookieService, _tokenService, _passwordService, _mapper);
+
+        serviceCollection.AddScoped(_ => new DataContext(options));
+
+        _serviceProvider = serviceCollection.BuildServiceProvider();
+        _sut = new AdminService(_serviceProvider, _cookieService, _tokenService, _passwordService, _mapper);
     }
 
     [Fact]
@@ -286,6 +291,8 @@ public class AdminServiceTest
     public async Task GetAllRoles_ShouldReturnAllRolesSuccessfully()
     {
         // Arrange
+        using var scope = _serviceProvider.CreateScope();
+        var _mockContext = scope.ServiceProvider.GetRequiredService<DataContext>();
         _mockContext.Roles.Add(new Role { RoleId = 1, RoleType = "SystemAdmin" });
         _mockContext.Roles.Add(new Role { RoleId = 2, RoleType = "Analyst" });
         await _mockContext.SaveChangesAsync();
@@ -308,6 +315,8 @@ public class AdminServiceTest
 
     private UserRole AddUserWithRole(string userName, string roleType, long id)
     {
+        using var scope = _serviceProvider.CreateScope();
+        var _mockContext = scope.ServiceProvider.GetRequiredService<DataContext>();
         var user = new User
         {
             Salt = Array.Empty<byte>(),
@@ -515,6 +524,8 @@ public class AdminServiceTest
     public async Task DeleteRole_ShouldRoleBeNullIfLookingForIt_WhenUserRoleExistsAndUserIsAdmin()
     {
         // Arrange
+        using var scope = _serviceProvider.CreateScope();
+        var _mockContext = scope.ServiceProvider.GetRequiredService<DataContext>();
         FixTheReturnOfCookies("admin");
         AddUserWithRole("admin", "SystemAdmin", 1);
         var user = AddUserWithRole("target", "DataAdmin", 2);
