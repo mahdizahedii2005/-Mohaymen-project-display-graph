@@ -10,6 +10,7 @@ public interface IEdgeService
     public List<Edge> GetAllEdges(string databaseName, string vertexIdentifierFieldName,
         string sourceEdgeIdentifierFieldName,
         string destinationEdgeIdentifierFieldName);
+
     DetailDto GetEdgeDetails(string objId);
     public List<GetAttributeDto> GetEdgeAttributes(long edgeEntityId);
 }

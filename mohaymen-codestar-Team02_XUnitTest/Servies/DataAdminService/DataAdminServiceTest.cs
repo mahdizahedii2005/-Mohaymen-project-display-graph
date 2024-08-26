@@ -39,7 +39,7 @@ public class DataAdminServiceTest
         _storHandler = Substitute.For<IStorHandler>();
         _displayDataService = Substitute.For<IDisplayDataService>();
         _mapper = Substitute.For<IMapper>();
-        
+
         var serviceCollection = new ServiceCollection();
 
         var options = new DbContextOptionsBuilder<DataContext>()
@@ -53,8 +53,35 @@ public class DataAdminServiceTest
 
         _sut = new mohaymen_codestar_Team02.Services.DataAdminService.DataAdminService(_serviceProvider, _tokenService,
             _cookieService, _storHandler, _displayDataService, _edgeService, _vertexService, _mapper, _graphService);
-            _storHandler.EdageStorer.StoreFileData(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<long>()).Returns(true);
+        _storHandler.EdageStorer.StoreFileData(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<long>()).Returns(true);
         _storHandler.VertexStorer.StoreFileData(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<long>()).Returns(true);
+    }
+
+    private void FixTheReturnOfCookies(string? returnThis)
+    {
+        _cookieService.GetCookieValue().Returns(returnThis);
+        _tokenService.GetUserNameFromToken().Returns(returnThis);
+    }
+
+    private UserRole AddUserWithRole(string userName, string roleType, long id)
+    {
+        using var scope = _serviceProvider.CreateScope();
+        var _mockContext = scope.ServiceProvider.GetRequiredService<DataContext>();
+
+        var user = new User
+        {
+            Salt = Array.Empty<byte>(),
+            PasswordHash = Array.Empty<byte>(),
+            Username = userName,
+            UserId = id
+        };
+        var role = new Role { RoleType = roleType, RoleId = id };
+        var userRole = new UserRole { UserId = user.UserId, RoleId = role.RoleId };
+        _mockContext.Users.Add(user);
+        _mockContext.Roles.Add(role);
+        _mockContext.UserRoles.Add(userRole);
+        _mockContext.SaveChanges();
+        return new UserRole { Role = role, User = user };
     }
 
     [Theory]
@@ -62,6 +89,8 @@ public class DataAdminServiceTest
     [InlineData(null)]
     public async Task StoreData_ReturnsBadRequest_WhenNameIsNullOrEmpty(string? name)
     {
+        FixTheReturnOfCookies("admin");
+        AddUserWithRole("admin", "SustemAdmin", 1);
         //Arrange
         //Action
         var result = await _sut.StoreData("sample", "sample", "mahdddd", name, "ma");
@@ -73,7 +102,9 @@ public class DataAdminServiceTest
     public async Task StoreData_ReturnsBadRequest_WhenCreatingTheDataGroupIsFail()
     {
         //Arrange
-        _storHandler.StoreDataSet("mahdddd", "8").Returns(-1);
+        FixTheReturnOfCookies("admin");
+        AddUserWithRole("admin", "SustemAdmin", 1);
+        _storHandler.StoreDataSet("mahdddd", Arg.Any<string>()).Returns(-1);
         //Action
         var result = await _sut.StoreData("sample", "sample", "mahdddd", "name", "ma");
         //Assert
@@ -84,6 +115,8 @@ public class DataAdminServiceTest
     public async Task StoreData_ReturnsBadRequest_WhenEdageStorerStoreValuesReturnFalse()
     {
         //Arrange
+        FixTheReturnOfCookies("admin");
+        AddUserWithRole("admin", "SustemAdmin", 1);
         _storHandler.EdageStorer.StoreFileData(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<long>()).Returns(false);
         //Action
         var result = await _sut.StoreData("sample", "sample", "test", "mahdddd", "mahdddd");
@@ -95,6 +128,8 @@ public class DataAdminServiceTest
     public async Task StoreData_ReturnsBadRequest_WhenVertexStorerStoreValuesReturnFalse()
     {
         // Arrange
+        FixTheReturnOfCookies("admin");
+        AddUserWithRole("admin", "SustemAdmin", 1);
         _storHandler.VertexStorer.StoreFileData(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<long>()).Returns(false);
 
         // Act
@@ -108,13 +143,15 @@ public class DataAdminServiceTest
     public async Task StoreData_ReturnsSuccess_WhenInputAreValid()
     {
         // Arrange
+        FixTheReturnOfCookies("admin");
+        AddUserWithRole("admin", "SustemAdmin", 1);
         _storHandler.StoreDataSet(Arg.Any<string>(), Arg.Any<string>()).Returns(9);
         // Act
         var result = await _sut.StoreData("sampleEdgeFile", "sampleVertexFile", "testData", "a", "lll");
         // Assert
         Assert.Equal(ApiResponseType.Success, result.Type);
     }
-    
+
     [Fact]
     public void DisplayDataSet_ShouldGetDataSet_WhenGivenCorrectUsername()
     {
@@ -122,6 +159,8 @@ public class DataAdminServiceTest
         _dataContext = scope.ServiceProvider.GetRequiredService<DataContext>();
 
         // Arrange
+        FixTheReturnOfCookies("admin");
+        AddUserWithRole("admin", "SustemAdmin", 1);
         var username = "username1";
         var datasetName1 = "Dataset1";
         var datasetName2 = "Dataset2";
@@ -132,7 +171,7 @@ public class DataAdminServiceTest
 
         var GetDataGroupDtos = new List<GetDataGroupDto>()
         {
-            new GetDataGroupDto()
+            new()
             {
                 Name = datasetName1,
                 CreateAt = DateTime.MaxValue,
@@ -146,10 +185,10 @@ public class DataAdminServiceTest
                     Name = EdgeEntityName1
                 }
             },
-            new GetDataGroupDto()
+            new()
             {
                 Name = datasetName2,
-             
+
                 CreateAt = DateTime.MaxValue,
                 UpdateAt = DateTime.MaxValue,
                 VertexEntity = new GetVertexEntityDto()
@@ -162,7 +201,7 @@ public class DataAdminServiceTest
                 }
             }
         };
-        
+
         var expected = new ServiceResponse<List<GetDataGroupDto>>(GetDataGroupDtos, ApiResponseType.Success, "");
 
         var dataset1 = new DataGroup
@@ -210,12 +249,11 @@ public class DataAdminServiceTest
                 VertexEntity = new GetVertexEntityDto { Name = vertexEntityName2 },
                 EdgeEntity = new GetEdgeEntityDto { Name = EdgeEntityName2 }
             });
-        
+
         // Act
         var actual = _sut.DisplayDataSet();
 
         // Assert
         Assert.Equivalent(expected, actual);
     }
-    
 }

@@ -6,10 +6,13 @@ namespace mohaymen_codestar_Team02.Models.EdgeEAV;
 
 public class EdgeEntity
 {
-    public EdgeEntity(){}
+    public EdgeEntity()
+    {
+    }
+
     public EdgeEntity(string name, long dataGroupId)
     {
-        Regex regex =
+        var regex =
             new Regex(
                 "^[^!]+!Edge![0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}!$");
         var match = regex.Match(name);
@@ -27,7 +30,6 @@ public class EdgeEntity
         {
             throw new ArgumentException("your name contain !");
         }
-
     }
 
     [Key] public long EdgeEntityId { get; set; }
