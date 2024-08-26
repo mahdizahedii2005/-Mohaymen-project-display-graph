@@ -2,6 +2,7 @@ using System.Security.Claims;
 using System.Text;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using mohaymen_codestar_Team02.Data;
 using mohaymen_codestar_Team02.Dto.User;
 using mohaymen_codestar_Team02.Models;
@@ -18,8 +19,8 @@ public class AuthenticationServiceTests
     private readonly AuthenticationService _sut;
     private readonly ITokenService _tokenService;
     private readonly ICookieService _cookieService;
-    private readonly DataContext _mockContext;
     private readonly IPasswordService _passwordService;
+    private IServiceProvider _serviceProvider;
 
     public AuthenticationServiceTests()
     {
@@ -31,10 +32,14 @@ public class AuthenticationServiceTests
         var mapper = config.CreateMapper();
 
         var options = new DbContextOptionsBuilder<DataContext>()
-            .UseInMemoryDatabase("TestDatabase")
+            .UseInMemoryDatabase(Guid.NewGuid().ToString()) // استفاده از GUID برای پایگاه داده جدید
             .Options;
-        _mockContext = new DataContext(options);
-        _sut = new AuthenticationService(_mockContext, _cookieService, _tokenService, _passwordService, mapper);
+
+        var serviceCollection = new ServiceCollection();
+        serviceCollection.AddScoped(_ => new DataContext(options));
+        _serviceProvider = serviceCollection.BuildServiceProvider();
+
+        _sut = new AuthenticationService(_serviceProvider, _cookieService, _tokenService, _passwordService, mapper);
     }
 
     [Theory]
@@ -44,6 +49,7 @@ public class AuthenticationServiceTests
     {
         // Arrange
         var password = "password123";
+
         // Act
         var result = await _sut.Login(username, password);
 
@@ -58,6 +64,7 @@ public class AuthenticationServiceTests
     {
         // Arrange
         var username = "username123";
+
         // Act
         var result = await _sut.Login(username, password);
 
@@ -124,6 +131,9 @@ public class AuthenticationServiceTests
 
     private void AddUserToDatabase(string username, string password)
     {
+        using var scope = _serviceProvider.CreateScope();
+        var mockContext = scope.ServiceProvider.GetRequiredService<DataContext>();
+
         var user = new User
         {
             Username = username,
@@ -135,8 +145,8 @@ public class AuthenticationServiceTests
             user.PasswordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(password));
         }
 
-        _mockContext.Users.Add(user);
-        _mockContext.SaveChanges();
+        mockContext.Users.Add(user);
+        mockContext.SaveChanges();
     }
 
     [Fact]
@@ -200,7 +210,7 @@ public class AuthenticationServiceTests
     {
         // Arrange
         FixTheReturnOfCookies("admin");
-        AddUserWithRole("admin", "SystemAdmin", 3);
+        AddUserWithRole("admin", "SystemAdmin", 3, new List<Permission>());
 
         // Act
         var result = await _sut.GetPermission();
@@ -210,44 +220,39 @@ public class AuthenticationServiceTests
     }
 
 
-    /*[Fact]
+    [Fact]
     public async Task GetPermission_ShouldReturnUnionPermissions_WhenUserExist()
     {
         // Arrange
         FixTheReturnOfCookies("admin");
-        AddUserWithRole("admin", "SystemAdmin", 1);
-        AddUserWithRole("admin", "DataAdmin", 2);
+        var systemAdminPermission = new List<Permission>
+        {
+            Permission.Login,
+            Permission.Logout,
+            Permission.UserRegister
+        };
+        AddUserWithRole("admin", "SystemAdmin", 4, systemAdminPermission);
+        var dataAdminPermission = new List<Permission>
+        {
+            Permission.Login,
+            Permission.Logout
+        };
+        AddUserWithRole("admin", "DataAdmin", 5, dataAdminPermission);
         _tokenService.GetRolesFromToken().Returns("SystemAdmin,DataAdmin");
 
-        var systemAdminRole = new Role
+        var expected = new List<Permission>
         {
-            RoleType = "SystemAdmin",
-            Permissions = new List<Permission>
-            {
-               Permission.Login,
-               Permission.Logout,
-               Permission.UserRegister
-            }
+            Permission.Login,
+            Permission.Logout,
+            Permission.UserRegister
         };
-
-        var dataAdminRole = new Role
-        {
-            RoleType = "DataAdmin",
-            Permissions = new List<Permission>
-            {
-               Permission.Login,
-               Permission.Logout
-            }
-        };
-
-        var expected = new List<string> { "Permission1", "Permission2", "Permission3" };
 
         // Act
         var result = await _sut.GetPermission();
 
         // Assert
-        Assert.Equivalent(expected, result.Data);
-    }*/
+        Assert.Equal(expected.Count, result.Data?.Permissions.Count);
+    }
 
 
     private void FixTheReturnOfCookies(string? returnThis)
@@ -256,8 +261,11 @@ public class AuthenticationServiceTests
         _tokenService.GetUserNameFromToken().Returns(returnThis);
     }
 
-    private UserRole AddUserWithRole(string userName, string roleType, long id)
+    private UserRole AddUserWithRole(string userName, string roleType, long id, List<Permission> permissions)
     {
+        using var scope = _serviceProvider.CreateScope();
+        var mockContext = scope.ServiceProvider.GetRequiredService<DataContext>();
+
         var user = new User
         {
             Salt = Array.Empty<byte>(),
@@ -265,12 +273,14 @@ public class AuthenticationServiceTests
             Username = userName,
             UserId = id
         };
-        var role = new Role { RoleType = roleType, RoleId = id };
+
+        var role = new Role { RoleType = roleType, RoleId = id, Permissions = permissions };
         var userRole = new UserRole { UserId = user.UserId, RoleId = role.RoleId };
-        _mockContext.Users.Add(user);
-        _mockContext.Roles.Add(role);
-        _mockContext.UserRoles.Add(userRole);
-        _mockContext.SaveChanges();
+
+        mockContext.Users.Add(user);
+        mockContext.Roles.Add(role);
+        mockContext.UserRoles.Add(userRole);
+        mockContext.SaveChanges();
         return new UserRole { Role = role, User = user };
     }
 }

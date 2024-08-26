@@ -177,7 +177,7 @@ public class AdminServiceTest
         Assert.NotNull(result.Data);
         Assert.Equal("testUser", result.Data.Username);
     }
-        
+
     [Fact]
     public async Task GetUserByUsername_ShouldReturnBadRequest_WhenAdminNotFound()
     {
@@ -207,7 +207,7 @@ public class AdminServiceTest
         // Assert
         Assert.Equal(ApiResponseType.NotFound, result.Type);
     }
-    
+
     [Fact]
     public async Task GetUserByUsername_ShouldReturnForbidden_WhenCommenderIsNotSystemAdmin()
     {
@@ -221,7 +221,7 @@ public class AdminServiceTest
         // Assert
         Assert.Equal(ApiResponseType.Forbidden, result.Type);
     }
-    
+
     [Fact]
     public async Task GetAllUsers_ShouldReturnUnauthorized_WhenTokenIsEmpty()
     {
@@ -253,7 +253,7 @@ public class AdminServiceTest
         Assert.Equal(ApiResponseType.Success, result.Type);
         Assert.Equal(3, result.Data.Count);
     }
-    
+
     [Fact]
     public async Task GetAllUsers_ShouldReturnBadRequest_WhenAdminNotFound()
     {

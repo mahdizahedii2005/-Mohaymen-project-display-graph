@@ -12,16 +12,16 @@ namespace mohaymen_codestar_Team02.Services.Authenticatoin;
 
 public class AuthenticationService : IAuthenticationService
 {
-    private readonly DataContext _context;
+    private readonly IServiceProvider _serviceProvider;
     private readonly ITokenService _tokenService;
     private readonly ICookieService _cookieService;
     private readonly IPasswordService _passwordService;
     private readonly IMapper _mapper;
 
-    public AuthenticationService(DataContext context, ICookieService cookieService, ITokenService tokenService,
+    public AuthenticationService(IServiceProvider serviceProvider, ICookieService cookieService, ITokenService tokenService,
         IPasswordService passwordService, IMapper mapper)
     {
-        _context = context;
+        _serviceProvider = serviceProvider;
         _cookieService = cookieService;
         _tokenService = tokenService;
         _passwordService = passwordService;
@@ -33,7 +33,9 @@ public class AuthenticationService : IAuthenticationService
         if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
             return new ServiceResponse<GetUserDto?>(null, ApiResponseType.BadRequest, Resources.InvalidInpute);
 
-        var user = await GetUser(username);
+        using var scope = _serviceProvider.CreateScope();
+        var dataContext = scope.ServiceProvider.GetRequiredService<DataContext>();
+        var user = await GetUser(username , dataContext);
 
         if (user is null)
             return new ServiceResponse<GetUserDto?>(null, ApiResponseType.BadRequest, Resources.UserNotFoundMessage);
@@ -71,7 +73,9 @@ public class AuthenticationService : IAuthenticationService
 
         var username = _tokenService.GetUserNameFromToken();
         
-        var user = await GetUser(username);
+        using var scope = _serviceProvider.CreateScope();
+        var dataContext = scope.ServiceProvider.GetRequiredService<DataContext>();
+        var user = await GetUser(username , dataContext);
         if (user is null)
             return new ServiceResponse<GetPermissionDto>(null, ApiResponseType.BadRequest,
                 Resources.UserNotFoundMessage);
@@ -92,10 +96,13 @@ public class AuthenticationService : IAuthenticationService
 
     private async Task<HashSet<Permission>> UnionPermissions(string[]? splitRoles)
     {
+        using var scope = _serviceProvider.CreateScope();
+        var dataContext = scope.ServiceProvider.GetRequiredService<DataContext>();
+        
         var permissions = new HashSet<Permission>();
         foreach (var userRole in splitRoles)
         {
-            var role = await _context.Roles.FirstOrDefaultAsync(r => r.RoleType.ToLower() == userRole.ToLower());
+            var role = await dataContext.Roles.FirstOrDefaultAsync(r => r.RoleType.ToLower() == userRole.ToLower());
             var permission = role?.Permissions;
 
             if (permission == null) continue;
@@ -106,9 +113,9 @@ public class AuthenticationService : IAuthenticationService
     }
 
 
-    private async Task<User?> GetUser(string username)
+    private async Task<User?> GetUser(string username ,DataContext dataContext)
     {
-        return await _context.Users.FirstOrDefaultAsync(x =>
+        return await dataContext.Users.FirstOrDefaultAsync(x =>
             x.Username != null && x.Username.ToLower().Equals(username.ToLower()));
     }
 }
