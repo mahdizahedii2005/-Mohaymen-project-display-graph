@@ -33,15 +33,15 @@ public class ProfileServiceTests
             cfg.CreateMap<UpdateUserDto, User>();
         });
         _mapper = config.CreateMapper();
-        var serviceCollection = new ServiceCollection();
 
         var options = new DbContextOptionsBuilder<DataContext>()
             .UseInMemoryDatabase(Guid.NewGuid().ToString())
             .Options;
 
+        var serviceCollection = new ServiceCollection();
         serviceCollection.AddScoped(_ => new DataContext(options));
-
         _serviceProvider = serviceCollection.BuildServiceProvider();
+
         _sut = new mohaymen_codestar_Team02.Services.ProfileService.ProfileService(_serviceProvider, _cookieService,
             _passwordService, _tokenService, _mapper);
     }
@@ -165,9 +165,9 @@ public class ProfileServiceTests
 
     private User AddUserToDatabase(string username, string password)
     {
-        
         using var scope = _serviceProvider.CreateScope();
-        var _mockContext = scope.ServiceProvider.GetRequiredService<DataContext>();
+        var mockContext = scope.ServiceProvider.GetRequiredService<DataContext>();
+
         var user = new User
         {
             Username = username,
@@ -180,8 +180,8 @@ public class ProfileServiceTests
             user.PasswordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(password));
         }
 
-        _mockContext.Users.Add(user);
-        _mockContext.SaveChanges();
+        mockContext.Users.Add(user);
+        mockContext.SaveChanges();
         return user;
     }
 }
