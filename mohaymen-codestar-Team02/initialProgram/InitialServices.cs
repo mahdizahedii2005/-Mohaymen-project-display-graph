@@ -60,7 +60,8 @@ public class InitialServices
             .AddScoped<IModelBuilder, ModelBuilderr>()
             .AddScoped<IObjectBuilder, ObjectBuilder>()
             .AddScoped<IEdgeService, EdgeService>()
-            .AddScoped<IVertexService, VertexService>();
+            .AddScoped<IVertexService, VertexService>()
+            .AddScoped<IGraphService, GraphService>();
         services.AddAutoMapper(typeof(AutoMapperProfile));
         services.AddAuthorization();
 

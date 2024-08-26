@@ -20,6 +20,7 @@ public class DataAdminService
     private readonly IDisplayDataService _displayDataService;
     private readonly IServiceProvider _serviceProvider;
     private readonly IMapper _mapper;
+    private readonly IGraphService _graphService;
 
     public DataAdminService(
         IServiceProvider serviceProvider,
@@ -28,7 +29,7 @@ public class DataAdminService
         IStorHandler storHandler,
         IDisplayDataService displayDataService,
         IEdgeService edgeService,
-        IVertexService vertexService, IMapper mapper)
+        IVertexService vertexService, IMapper mapper, IGraphService graphService)
     {
         _tokenService = tokenService;
         _cookieService = cookieService;
@@ -37,6 +38,7 @@ public class DataAdminService
         _storHandler = storHandler;
         _displayDataService = displayDataService;
         _mapper = mapper;
+        _graphService = graphService;
         _serviceProvider = serviceProvider;
     }
 
@@ -106,7 +108,7 @@ public class DataAdminService
         string sourceEdgeIdentifierFieldName,
     string destinationEdgeIdentifierFieldName, string vertexIdentifierFieldName)
     {
-        var graph = _displayDataService.GetGraph(databaseName, sourceEdgeIdentifierFieldName,
+        var graph = _graphService.GetGraph(databaseName, sourceEdgeIdentifierFieldName,
             destinationEdgeIdentifierFieldName,
             vertexIdentifierFieldName);
 
@@ -115,7 +117,7 @@ public class DataAdminService
             Vertices = graph.vertices,
             Edges = graph.edges,
         };
-        return new ServiceResponse<DisplayGraphDto>(dto, ApiResponseType.Success, "");
+        return new ServiceResponse<DisplayGraphDto>(dto, ApiResponseType.Success, Resources.GraphFetchedSuccessfully);
     }
     
 public ServiceResponse<DetailDto> GetVertexDetail(string objectId)

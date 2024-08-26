@@ -27,9 +27,11 @@ public class DataAdminServiceTest
     private readonly IVertexService _vertexService;
     private readonly ITokenService _tokenService;
     private readonly ICookieService _cookieService;
+    private readonly IGraphService _graphService;
 
     public DataAdminServiceTest()
     {
+        _graphService = Substitute.For<IGraphService>();
         _cookieService = Substitute.For<ICookieService>();
         _tokenService = Substitute.For<ITokenService>();
         _vertexService = Substitute.For<IVertexService>();
@@ -50,7 +52,7 @@ public class DataAdminServiceTest
 
 
         _sut = new mohaymen_codestar_Team02.Services.DataAdminService.DataAdminService(_serviceProvider, _tokenService,
-            _cookieService, _storHandler, _displayDataService, _edgeService, _vertexService, _mapper);
+            _cookieService, _storHandler, _displayDataService, _edgeService, _vertexService, _mapper, _graphService);
             _storHandler.EdageStorer.StoreFileData(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<long>()).Returns(true);
         _storHandler.VertexStorer.StoreFileData(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<long>()).Returns(true);
     }

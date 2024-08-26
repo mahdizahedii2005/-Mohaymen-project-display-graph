@@ -14,12 +14,14 @@ public class DataAdminController : ControllerBase
 {
     private readonly IDataAdminService _dataAdminService;
     private readonly IFileReader _fileReader;
+    private readonly IGraphService _graphService;
 
     public DataAdminController(IDataAdminService dataAdminService,
-        IFileReader fileReader)
+        IFileReader fileReader, IGraphService graphService)
     {
         _dataAdminService = dataAdminService;
         _fileReader = fileReader;
+        _graphService = graphService;
         _dataAdminService = dataAdminService;
     }
 

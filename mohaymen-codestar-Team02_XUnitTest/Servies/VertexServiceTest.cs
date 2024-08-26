@@ -72,7 +72,7 @@ public class VertexServiceTest
     public void GetAllVertices_ShouldReturnAllVertices_WhenGivenCorrectDatasetName()
     {
         using var scope = _serviceProvider.CreateScope();
-        var _dataContext = scope.ServiceProvider.GetRequiredService<DataContext>();
+        var mockContext = scope.ServiceProvider.GetRequiredService<DataContext>();
 
         // Arrange
         string datasetName = "DataSet1";
@@ -96,8 +96,8 @@ public class VertexServiceTest
             }
         };
 
-        _dataContext.DataSets.Add(dataset);
-        _dataContext.SaveChanges();
+        mockContext.DataSets.Add(dataset);
+        mockContext.SaveChanges();
         
         List<Vertex> expected = new List<Vertex>()
         {

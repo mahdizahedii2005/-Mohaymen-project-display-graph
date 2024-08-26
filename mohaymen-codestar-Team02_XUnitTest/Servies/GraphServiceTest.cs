@@ -4,20 +4,22 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 using mohaymen_codestar_Team02.Data;
 using mohaymen_codestar_Team02.Models;
 using mohaymen_codestar_Team02.Services;
+using NSubstitute;
+using QuikGraph;
 
 namespace mohaymen_codestar_Team02_XUnitTest.Servies;
 
 public class GraphServiceTest
 {
-    private IGraphService _sut;
+    private GraphService _sut;
     private readonly IVertexService _vertexService;
     private readonly IEdgeService _edgeService;
 
-    public GraphServiceTest(IVertexService vertexService, IEdgeService edgeService)
+    public GraphServiceTest()
     {
-        _vertexService = vertexService;
-        _edgeService = edgeService;
-        _sut = new GraphService(vertexService, edgeService);
+        _vertexService = Substitute.For<IVertexService>();
+        _edgeService = Substitute.For<IEdgeService>();
+        _sut = new GraphService(_vertexService, _edgeService);
     }
 
     [Fact]
@@ -50,14 +52,17 @@ public class GraphServiceTest
             }
         };
 
+        var expected = (expectedVertex, expectedEdge);
+
+        _vertexService.GetAllVertices(datasetName, vertexIdentifierFieldName).Returns(expectedVertex);
+        _edgeService.GetAllEdges(datasetName, vertexIdentifierFieldName, sourceEdgeIdentifierFieldName,
+            destinationEdgeIdentifierFieldName).Returns(expectedEdge);
+        
         // Act
         var actual = _sut.GetGraph(datasetName, sourceEdgeIdentifierFieldName, destinationEdgeIdentifierFieldName,
             vertexIdentifierFieldName);
-        var actualVertex = actual.vertices;
-        var actualEdge = actual.edges;
-
+        
         // Assert
-        Assert.Equivalent(expectedVertex, actualVertex);
-        Assert.Equivalent(expectedEdge, actualEdge);
+        Assert.Equivalent(expected, actual);
     }
 }

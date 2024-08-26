@@ -88,4 +88,7 @@
     <data name="RolesRetrievedMassage" xml:space="preserve">
         <value>Roles Retrieved Successfully</value>
     </data>
+    <data name="GraphFetchedSuccessfully" xml:space="preserve">
+        <value>GraphFetchedSuccessfully</value>
+    </data>
 </root>
