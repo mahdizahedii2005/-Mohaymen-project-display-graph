@@ -9,7 +9,7 @@ public interface IDataAdminService
     Task<ServiceResponse<string>> StoreData(string? edgeFile, string? vertexFile, string graphName
         , string? edgeEntityName, string vertexEntityName);
 
-    ServiceResponse<List<GetDataGroupDto>> DisplayDataSet(string username);
+    ServiceResponse<List<GetDataGroupDto>> DisplayDataSet();
 
     Task<ServiceResponse<DisplayGraphDto>> DisplayGeraphData(string databaseName, string sourceEdgeIdentifierFieldName,
         string destinationEdgeIdentifierFieldName, string vertexIdentifierFieldName);

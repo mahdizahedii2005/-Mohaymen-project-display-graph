@@ -81,7 +81,7 @@ public class DataAdminService
         }
     }
 
-    public ServiceResponse<List<GetDataGroupDto>> DisplayDataSet(string username)
+    public ServiceResponse<List<GetDataGroupDto>> DisplayDataSet()
     {
         var scope = _serviceProvider.CreateScope();
         var context = scope.ServiceProvider.GetRequiredService<DataContext>();
@@ -91,18 +91,11 @@ public class DataAdminService
             .Include(ds => ds.VertexEntity)
             .Include(ds => ds.EdgeEntity)
             .Include(ds => ds.User)
-            .Where(ds => ds.User.Username == username)
             .ToList();
 
         var dataGroupDtos = datasets.Select(ds => _mapper.Map<GetDataGroupDto>(ds)).ToList();
         return new ServiceResponse<List<GetDataGroupDto>>(dataGroupDtos, ApiResponseType.Success, "");
     }
-    
-    public Task<ServiceResponse<string>> DisplayDataSet()
-    {
-        throw new NotImplementedException();
-    }
-
 
     public async Task<ServiceResponse<DisplayGraphDto>> DisplayGeraphData(string databaseName,
         string sourceEdgeIdentifierFieldName,

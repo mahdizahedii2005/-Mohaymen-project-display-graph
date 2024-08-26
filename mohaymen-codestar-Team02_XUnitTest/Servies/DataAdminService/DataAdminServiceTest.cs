@@ -221,7 +221,7 @@ public class DataAdminServiceTest
             });
         
         // Act
-        var actual = _sut.DisplayDataSet(username);
+        var actual = _sut.DisplayDataSet();
 
         // Assert
         Assert.Equivalent(expected, actual);
