@@ -6,13 +6,13 @@ using mohaymen_codestar_Team02.Models.EdgeEAV;
 using mohaymen_codestar_Team02.Models.VertexEAV;
 using mohaymen_codestar_Team02.Services;
 
-public class EdgeServiceTest
+public class EdgeServiceTest1
 {
     private IEdgeService _sut;
     private DataContext _dataContext;
     private ServiceProvider _serviceProvider;
 
-    public EdgeServiceTest()
+    public EdgeServiceTest1()
     {
         var serviceCollection = new ServiceCollection();
 
