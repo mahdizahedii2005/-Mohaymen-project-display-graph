@@ -38,7 +38,7 @@ public class PasswordServiceTests
         _sut.CreatePasswordHash(password, out var hash2, out _);
 
         // Assert
-        Assert.NotEqual(hash1, hash2); // چون برای هر بار فراخوانی salt جدید تولید می‌شود.
+        Assert.NotEqual(hash1, hash2);
     }
 
     [Fact]
@@ -69,7 +69,7 @@ public class PasswordServiceTests
         // Assert
         Assert.False(isValid);
     }
-    
+
     [Theory]
     [InlineData("Password1", true)]
     [InlineData("A1bcdefg", true)]
@@ -77,7 +77,7 @@ public class PasswordServiceTests
     [InlineData("password", false)]
     [InlineData("PASSWORD123", false)]
     [InlineData("Pass1", false)]
-    [InlineData("Short1A", false)] 
+    [InlineData("Short1A", false)]
     [InlineData("Valid1234", true)]
     public void ValidatePassword_ShouldReturnExpectedResult(string password, bool expectedResult)
     {

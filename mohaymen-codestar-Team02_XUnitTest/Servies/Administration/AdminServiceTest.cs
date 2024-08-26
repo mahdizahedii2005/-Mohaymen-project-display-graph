@@ -74,7 +74,7 @@ public class AdminServiceTest
 
         // Arrange
         FixTheReturnOfCookies("fakeAdmin");
-        AddUserWithRole("fakeAdmin", "Analyst", 1 , mockContext);
+        AddUserWithRole("fakeAdmin", "Analyst", 1, mockContext);
 
         // Act
         var result = await _sut.Register(new User(), "password");
@@ -121,7 +121,7 @@ public class AdminServiceTest
                 x[2] = fakePasswordSalt;
             });
         _passwordService.ValidatePassword(Arg.Any<string>()).Returns(true);
-        
+
         // Act
         var result = await _sut.Register(
             new User() { UserId = 8, Username = "mamad" }, "password");
@@ -391,7 +391,7 @@ public class AdminServiceTest
     {
         using var scope = _serviceProvider.CreateScope();
         var mockContext = scope.ServiceProvider.GetRequiredService<DataContext>();
-        
+
         // Arrange
         FixTheReturnOfCookies("fakeAdmin");
         AddUserWithRole("fakeAdmin", "Analyst", 1, mockContext);
@@ -408,12 +408,12 @@ public class AdminServiceTest
     {
         using var scope = _serviceProvider.CreateScope();
         var mockContext = scope.ServiceProvider.GetRequiredService<DataContext>();
-        
+
         // Arrange
         FixTheReturnOfCookies("admin");
         AddUserWithRole("admin", "SystemAdmin", 1, mockContext);
         var user = AddUserWithRole("target", "DataAdmin", 2, mockContext);
-        var role = AddUserWithRole("fakeUser", "Analyst", 3 , mockContext);
+        var role = AddUserWithRole("fakeUser", "Analyst", 3, mockContext);
 
         // Act
         var result = await _sut.AddRole(user.User, role.Role);
@@ -430,7 +430,7 @@ public class AdminServiceTest
 
         // Arrange
         FixTheReturnOfCookies("admin");
-        AddUserWithRole("admin", "SystemAdmin", 1 , mockContext);
+        AddUserWithRole("admin", "SystemAdmin", 1, mockContext);
         var user = AddUserWithRole("target", "DataAdmin", 2, mockContext);
 
         // Act
