@@ -37,7 +37,7 @@ public class ProfileService : IProfileService
             return new ServiceResponse<object>(new { }, ApiResponseType.Unauthorized, Resources.UnauthorizedMessage);
 
         var username = _tokenService.GetUserNameFromToken();
-        var user = await GetUser(username , _context);
+        var user = await GetUser(username, _context);
 
         if (user is null)
             return new ServiceResponse<object>(new { }, ApiResponseType.BadRequest, Resources.UserNotFoundMessage);
@@ -68,7 +68,7 @@ public class ProfileService : IProfileService
             return new ServiceResponse<GetUserDto?>(null, ApiResponseType.Unauthorized, Resources.UnauthorizedMessage);
 
         var username = _tokenService.GetUserNameFromToken();
-        var user = await GetUser(username ,context);
+        var user = await GetUser(username, context);
         if (user is null)
             return new ServiceResponse<GetUserDto?>(null, ApiResponseType.BadRequest, Resources.UserNotFoundMessage);
 

@@ -32,13 +32,13 @@ public class AdminService : IAdminService
     {
         using var scope = _serviceProvider.CreateScope();
         var context = scope.ServiceProvider.GetRequiredService<DataContext>();
-        
+
         var token = _cookieService.GetCookieValue();
         if (string.IsNullOrEmpty(token))
             return new ServiceResponse<GetUserDto?>(null, ApiResponseType.Unauthorized, Resources.UnauthorizedMessage);
 
         var adminId = _tokenService.GetUserNameFromToken();
-        var admin = await GetUser(adminId ,context );
+        var admin = await GetUser(adminId, context);
         if (admin is null)
             return new ServiceResponse<GetUserDto?>(null, ApiResponseType.BadRequest, Resources.UserNotFoundMessage);
 
@@ -63,7 +63,7 @@ public class AdminService : IAdminService
                 Resources.UnauthorizedMessage);
 
         var adminId = _tokenService.GetUserNameFromToken();
-        var admin = await GetUser(adminId , context);
+        var admin = await GetUser(adminId, context);
         if (admin is null)
             return new ServiceResponse<List<GetUserDto>?>(null, ApiResponseType.BadRequest,
                 Resources.UserNotFoundMessage);
@@ -97,7 +97,7 @@ public class AdminService : IAdminService
             return new ServiceResponse<GetUserDto?>(null, ApiResponseType.Unauthorized, Resources.UnauthorizedMessage);
 
         var adminUsername = _tokenService.GetUserNameFromToken();
-        var admin = await GetUser(adminUsername , context);
+        var admin = await GetUser(adminUsername, context);
         if (admin is null)
             return new ServiceResponse<GetUserDto?>(null, ApiResponseType.BadRequest, Resources.UserNotFoundMessage);
 
@@ -135,7 +135,7 @@ public class AdminService : IAdminService
             return new ServiceResponse<GetUserDto?>(null, ApiResponseType.Unauthorized, Resources.UnauthorizedMessage);
 
         var adminId = _tokenService.GetUserNameFromToken();
-        var admin = await GetUser(adminId , context);
+        var admin = await GetUser(adminId, context);
         if (admin is null)
             return new ServiceResponse<GetUserDto?>(null, ApiResponseType.BadRequest, Resources.UserNotFoundMessage);
 
@@ -144,7 +144,7 @@ public class AdminService : IAdminService
             return new ServiceResponse<GetUserDto?>(null, ApiResponseType.Forbidden, Resources.accessDeniedMessage);
             */
 
-        var foundUser = await GetUser(user.Username , context);
+        var foundUser = await GetUser(user.Username, context);
         if (foundUser is null)
             return new ServiceResponse<GetUserDto?>(null, ApiResponseType.NotFound, Resources.UserNotFoundMessage);
 
@@ -212,7 +212,7 @@ public class AdminService : IAdminService
             return new ServiceResponse<GetUserDto?>(null, ApiResponseType.Unauthorized, Resources.UnauthorizedMessage);
 
         var adminId = _tokenService.GetUserNameFromToken();
-        var admin = await GetUser(adminId ,context);
+        var admin = await GetUser(adminId, context);
         if (admin is null)
             return new ServiceResponse<GetUserDto?>(null, ApiResponseType.BadRequest, Resources.UserNotFoundMessage);
 
@@ -220,7 +220,7 @@ public class AdminService : IAdminService
             return new ServiceResponse<GetUserDto?>(null, ApiResponseType.Forbidden, Resources.accessDeniedMessage);
             */
 
-        var foundUser = await GetUser(user.Username , context);
+        var foundUser = await GetUser(user.Username, context);
         if (foundUser is null)
             return new ServiceResponse<GetUserDto?>(null, ApiResponseType.NotFound, Resources.UserNotFoundMessage);
 
@@ -231,8 +231,8 @@ public class AdminService : IAdminService
 
         var userRole = await GetUserRole(foundRole, foundUser, context);
         if (userRole is null)
-            return new ServiceResponse<GetUserDto?>(null, ApiResponseType.BadRequest, Resources.DontHaveThisRole); 
-        
+            return new ServiceResponse<GetUserDto?>(null, ApiResponseType.BadRequest, Resources.DontHaveThisRole);
+
         context.UserRoles.Remove(userRole);
         await context.SaveChangesAsync();
 
@@ -242,7 +242,7 @@ public class AdminService : IAdminService
             Resources.RoleRemovedSuccessfullyMessage);
     }
 
-    private async Task<User?> GetUser(string? username , DataContext dataContext)
+    private async Task<User?> GetUser(string? username, DataContext dataContext)
     {
         return await dataContext.Users.FirstOrDefaultAsync(x =>
             username != null && x.Username != null && x.Username.ToLower().Equals(username.ToLower()));

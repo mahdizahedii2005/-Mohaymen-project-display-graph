@@ -46,11 +46,11 @@ public class AuthenticationService : IAuthenticationService
 
         var claims = new List<Claim>()
         {
-            new Claim(ClaimTypes.Name, user.Username),
+            new(ClaimTypes.Name, user.Username)
         };
-        
+
         claims.AddRange(user.UserRoles.Select(ur => new Claim(ClaimTypes.Role, ur.Role.RoleType)));
-        
+
         _cookieService.CreateCookie(_tokenService.CreateToken(claims));
 
         var userDto = _mapper.Map<GetUserDto>(user);
@@ -108,11 +108,11 @@ public class AuthenticationService : IAuthenticationService
         using var scope = _serviceProvider.CreateScope();
         var dataContext = scope.ServiceProvider.GetRequiredService<DataContext>();
         var user = await GetUser(username, dataContext);
-        
+
         if (user is null)
             return new ServiceResponse<string>(null, ApiResponseType.BadRequest,
                 Resources.UserNotFoundMessage);
-        
+
         return new ServiceResponse<string>(user.Username, ApiResponseType.Success,
             Resources.AuthorizedMessage);
     }
