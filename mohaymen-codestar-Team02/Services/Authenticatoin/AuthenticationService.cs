@@ -32,7 +32,7 @@ public class AuthenticationService : IAuthenticationService
     public async Task<ServiceResponse<GetUserDto?>> Login(string username, string password)
     {
         if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
-            return new ServiceResponse<GetUserDto?>(null, ApiResponseType.BadRequest, Resources.InvalidInpute);
+            return new ServiceResponse<GetUserDto?>(null, ApiResponseType.BadRequest, Resources.InvalidInputeMessage);
 
         using var scope = _serviceProvider.CreateScope();
         var dataContext = scope.ServiceProvider.GetRequiredService<DataContext>();
@@ -63,7 +63,7 @@ public class AuthenticationService : IAuthenticationService
         if (_cookieService.GetCookieValue() != null) _cookieService.GetExpiredCookie();
 
         return new ServiceResponse<string?>(null, ApiResponseType.Success,
-            Resources.LogoutSuccessfuly);
+            Resources.LogoutSuccessfulyMessage);
     }
 
     public async Task<ServiceResponse<GetPermissionDto>> GetPermission()
@@ -93,7 +93,7 @@ public class AuthenticationService : IAuthenticationService
         };
 
         return new ServiceResponse<GetPermissionDto>(permissionDto, ApiResponseType.Success,
-            Resources.GetPermissionsSuccessfuly);
+            Resources.GetPermissionsSuccessfulyMessage);
     }
 
     public async Task<ServiceResponse<string>> GetAuthorized()
