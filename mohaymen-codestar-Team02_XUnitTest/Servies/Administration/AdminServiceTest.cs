@@ -65,7 +65,7 @@ public class AdminServiceTest
         // Assert
         Assert.Equal(ApiResponseType.BadRequest, response.Type);
     }
-    
+
     [Fact]
     public async Task Register_ShouldReturnConflict_WhenUserAlreadyExists()
     {
@@ -350,7 +350,7 @@ public class AdminServiceTest
         // Assert
         Assert.Equal(ApiResponseType.BadRequest, response.Type);
     }
-    
+
     [Fact]
     public async Task AddRole_ShouldReturnSuccess_WhenUserAndAdminExist()
     {
