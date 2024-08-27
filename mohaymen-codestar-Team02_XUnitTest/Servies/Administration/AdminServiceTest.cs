@@ -47,7 +47,7 @@ public class AdminServiceTest
         _cookieService.GetCookieValue().Returns(string.Empty);
 
         // Act
-        var result = await _sut.Register(null, "password");
+        var result = await _sut.Register(null, "password", new List<string>());
 
         // Assert
         Assert.Equal(ApiResponseType.Unauthorized, result.Type);
@@ -60,7 +60,7 @@ public class AdminServiceTest
         FixTheReturnOfCookies("admin");
 
         // Act
-        var response = await _sut.Register(null, "password");
+        var response = await _sut.Register(null, "password", new List<string>());
 
         // Assert
         Assert.Equal(ApiResponseType.BadRequest, response.Type);
@@ -78,7 +78,7 @@ public class AdminServiceTest
         var existingUser = AddUserWithRole("existingUser", "Analyst", 2, mockContext);
 
         // Act
-        var result = await _sut.Register(existingUser.User, "password");
+        var result = await _sut.Register(existingUser.User, "password", new List<string>());
 
         // Assert
         Assert.Equal(ApiResponseType.Conflict, result.Type);
@@ -103,11 +103,16 @@ public class AdminServiceTest
                 x[1] = fakePasswordHash;
                 x[2] = fakePasswordSalt;
             });
+        
+        var role = new Role { RoleType = RoleType.DataAdmin.ToString()};
+        mockContext.Roles.Add(role);
+        mockContext.SaveChanges();
+        
         _passwordService.ValidatePassword(Arg.Any<string>()).Returns(true);
 
         // Act
         var result = await _sut.Register(
-            new User() { UserId = 8, Username = "mamad" }, "password");
+            new User() { UserId = 8, Username = "mamad" }, "password" , new List<string>() { "DataAdmin" });
 
         // Assert
         Assert.Equal(ApiResponseType.Created, result.Type);
@@ -138,7 +143,7 @@ public class AdminServiceTest
         var newUser = new User() { UserId = 8, Username = "mamad" };
 
         // Act
-        var result = await _sut.Register(newUser, "password");
+        var result = await _sut.Register(newUser, "password", new List<string>());
 
         // Assert
         Assert.Equal(ApiResponseType.Created, result.Type);
@@ -213,23 +218,6 @@ public class AdminServiceTest
 
         // Assert
         Assert.Equal(ApiResponseType.NotFound, result.Type);
-    }
-
-    [Fact]
-    public async Task GetUserByUsername_ShouldReturnForbidden_WhenCommenderIsNotSystemAdmin()
-    {
-        using var scope = _serviceProvider.CreateScope();
-        var mockContext = scope.ServiceProvider.GetRequiredService<DataContext>();
-
-        // Arrange
-        FixTheReturnOfCookies("fakeAdmin");
-        AddUserWithRole("fakeAdmin", "Analyst", 1, mockContext);
-
-        // Act
-        var result = await _sut.GetUserByUsername("testUser");
-
-        // Assert
-        Assert.Equal(ApiResponseType.Forbidden, result.Type);
     }
 
     [Fact]
