@@ -1,6 +1,10 @@
+using AutoMapper;
+using Microsoft.EntityFrameworkCore;
+using mohaymen_codestar_Team02.Data;
+using mohaymen_codestar_Team02.Dto;
 using mohaymen_codestar_Team02.Dto.GraphDTO;
 using mohaymen_codestar_Team02.Models;
-using mohaymen_codestar_Team02.Models.EdgeEAV;
+using mohaymen_codestar_Team02.Services.CookieService;
 using mohaymen_codestar_Team02.Services.StoreData.Abstraction;
 
 namespace mohaymen_codestar_Team02.Services.DataAdminService;
@@ -8,37 +12,64 @@ namespace mohaymen_codestar_Team02.Services.DataAdminService;
 public class DataAdminService
     : IDataAdminService
 {
-    private readonly IStorHandler storHandler;
+    private readonly ITokenService _tokenService;
+    private readonly ICookieService _cookieService;
+    private readonly IEdgeService _edgeService;
+    private readonly IVertexService _vertexService;
+    private readonly IStorHandler _storHandler;
     private readonly IDisplayDataService _displayDataService;
+    private readonly IServiceProvider _serviceProvider;
+    private readonly IMapper _mapper;
+    private readonly IGraphService _graphService;
 
-    public DataAdminService(IStorHandler storHandler, IDisplayDataService displayDataService)
+    public DataAdminService(
+        IServiceProvider serviceProvider,
+        ITokenService tokenService,
+        ICookieService cookieService,
+        IStorHandler storHandler,
+        IDisplayDataService displayDataService,
+        IEdgeService edgeService,
+        IVertexService vertexService, IMapper mapper, IGraphService graphService)
     {
-        this.storHandler = storHandler;
+        _tokenService = tokenService;
+        _cookieService = cookieService;
+        _vertexService = vertexService;
+        _edgeService = edgeService;
+        _storHandler = storHandler;
         _displayDataService = displayDataService;
+        _mapper = mapper;
+        _graphService = graphService;
+        _serviceProvider = serviceProvider;
     }
 
     public async Task<ServiceResponse<string>> StoreData(string? edgeFile, string? vertexFile, string graphName
-        , string? edgeEntityName, string vertexEntityName, string userName)
+        , string? edgeEntityName, string vertexEntityName)
     {
         try
         {
+            var token = _cookieService.GetCookieValue();
+            if (string.IsNullOrEmpty(token))
+                return new ServiceResponse<string>(null, ApiResponseType.Unauthorized,
+                    Resources.UnauthorizedMessage);
+
+            var userName = _tokenService.GetUserNameFromToken();
             if (string.IsNullOrEmpty(edgeEntityName) || string.IsNullOrEmpty(graphName) ||
                 string.IsNullOrEmpty(vertexEntityName))
                 return new ServiceResponse<string>(string.Empty, ApiResponseType.BadRequest,
-                    Data.Resources.InvalidInpute);
+                    Resources.InvalidInpute);
 
-            var dataGroupId = await storHandler.StoreDataSet(graphName, userName);
+            var dataGroupId = await _storHandler.StoreDataSet(graphName, userName);
             if (dataGroupId == -1)
                 return new ServiceResponse<string>(string.Empty, ApiResponseType.BadRequest,
-                    Data.Resources.InvalidInpute);
+                    Resources.InvalidInpute);
 
-            if (!await storHandler.EdageStorer.StoreFileData(edgeEntityName, edgeFile, dataGroupId))
+            if (!await _storHandler.EdageStorer.StoreFileData(edgeEntityName, edgeFile, dataGroupId))
                 return new ServiceResponse<string>(string.Empty,
-                    ApiResponseType.BadRequest, Data.Resources.InvalidInpute);
+                    ApiResponseType.BadRequest, Resources.InvalidInpute);
 
-            if (!await storHandler.VertexStorer.StoreFileData(vertexEntityName, vertexFile, dataGroupId))
+            if (!await _storHandler.VertexStorer.StoreFileData(vertexEntityName, vertexFile, dataGroupId))
                 return new ServiceResponse<string>(string.Empty,
-                    ApiResponseType.BadRequest, Data.Resources.InvalidInpute);
+                    ApiResponseType.BadRequest, Resources.InvalidInpute);
 
             return new ServiceResponse<string>(null, ApiResponseType.Success, string.Empty);
         }
@@ -48,37 +79,25 @@ public class DataAdminService
         }
     }
 
-    public Task<ServiceResponse<DisplayGraphDto>> DisplayDataSetAsGraph(string dataSetName, string vertexFieldName,
-        string sourceField, string targetField)
+    public ServiceResponse<List<GetDataGroupDto>> DisplayDataSet()
     {
-        throw new NotImplementedException();
-    }
+        var scope = _serviceProvider.CreateScope();
+        var context = scope.ServiceProvider.GetRequiredService<DataContext>();
 
-    public Task<ServiceResponse<string>> DisplayGraph()
-    {
-        throw new NotImplementedException();
-    }
+        var datasets = context.DataSets
+            .Include(ds => ds.VertexEntity)
+            .Include(ds => ds.EdgeEntity)
+            .ToList();
 
-    public Task<ServiceResponse<string>> DisplayDataSet()
-    {
-        throw new NotImplementedException();
+        var dataGroupDtos = datasets.Select(ds => _mapper.Map<GetDataGroupDto>(ds)).ToList();
+        return new ServiceResponse<List<GetDataGroupDto>>(dataGroupDtos, ApiResponseType.Success, "");
     }
-
-    /*
-    public Task<ServiceResponse<string>> DisplayGraph(string databaseName, string sourceEdgeIdentifierFieldName,
-        string destinationEdgeIdentifierFieldName, string vertexIdentifierFieldName)
-    {
-        var graph = _displayDataService.GetGraph2(databaseName, sourceEdgeIdentifierFieldName, destinationEdgeIdentifierFieldName,
-            vertexIdentifierFieldName);
-        return new Task<ServiceResponse<>>()
-    }
-*/
 
     public async Task<ServiceResponse<DisplayGraphDto>> DisplayGeraphData(string databaseName,
         string sourceEdgeIdentifierFieldName,
         string destinationEdgeIdentifierFieldName, string vertexIdentifierFieldName)
     {
-        var graph = _displayDataService.GetGraph(databaseName, sourceEdgeIdentifierFieldName,
+        var graph = _graphService.GetGraph(databaseName, sourceEdgeIdentifierFieldName,
             destinationEdgeIdentifierFieldName,
             vertexIdentifierFieldName);
 
@@ -87,11 +106,18 @@ public class DataAdminService
             Vertices = graph.vertices,
             Edges = graph.edges
         };
-        return new ServiceResponse<DisplayGraphDto>(dto, ApiResponseType.Success, "");
+        return new ServiceResponse<DisplayGraphDto>(dto, ApiResponseType.Success, Resources.GraphFetchedSuccessfully);
     }
 
-    public Task<ServiceResponse<List<Edge>>> DisplayEdgeData()
+    public ServiceResponse<DetailDto> GetVertexDetail(string objectId)
     {
-        throw new NotImplementedException();
+        return new ServiceResponse<DetailDto>(_vertexService.GetVertexDetails(objectId), ApiResponseType.Success,
+            string.Empty);
+    }
+
+    public ServiceResponse<DetailDto> GetEdgeDetail(string objectId)
+    {
+        return new ServiceResponse<DetailDto>(_edgeService.GetEdgeDetails(objectId), ApiResponseType.Success,
+            string.Empty);
     }
 }

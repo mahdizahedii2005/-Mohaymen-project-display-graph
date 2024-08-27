@@ -10,15 +10,15 @@ using mohaymen_codestar_Team02.Services.FileReaderService;
 namespace mohaymen_codestar_Team02.Controllers;
 
 [ApiController]
-[Authorize(Roles = nameof(RoleType.DataAdmin))]
+[Authorize]
 public class DataAdminController : ControllerBase
 {
     private readonly IDataAdminService _dataAdminService;
     private readonly IFileReader _fileReader;
-    private readonly IDisplayDataService _dataService;
+    private readonly IGraphService _graphService;
 
-    public DataAdminController(IDataAdminService dataAdminService, IFileReader fileReader,
-        IDisplayDataService dataService)
+    public DataAdminController(IDataAdminService dataAdminService,
+        IFileReader fileReader)
     {
         _dataAdminService = dataAdminService;
         _fileReader = fileReader;
@@ -33,8 +33,7 @@ public class DataAdminController : ControllerBase
             var edgeFile = _fileReader.Read(storeDataDto.EdgeFile);
             var vertexFile = _fileReader.Read(storeDataDto.VertexFile);
             var response = await _dataAdminService.StoreData(edgeFile, vertexFile, storeDataDto.DataName,
-                Path.GetFileName(storeDataDto.EdgeFile.FileName), Path.GetFileName(storeDataDto.VertexFile.FileName),
-                storeDataDto.CreatorUserName);
+                Path.GetFileName(storeDataDto.EdgeFile.FileName), Path.GetFileName(storeDataDto.VertexFile.FileName));
             return StatusCode((int)response.Type, response);
         }
         catch (FormatException e)
@@ -44,8 +43,10 @@ public class DataAdminController : ControllerBase
     }
 
     [HttpGet("DataSets")]
-    public void GetDataSetsList()
+    public IActionResult GetDataSetsList()
     {
+        var response = _dataAdminService.DisplayDataSet();
+        return StatusCode((int)response.Type, response);
     }
 
     [HttpGet("DataSets/{dataSetName}")]
@@ -61,15 +62,17 @@ public class DataAdminController : ControllerBase
     }
 
 
-    [HttpGet("DataSets/{dataSetName}/Vertices/{vertexId}")]
-    public async Task<IActionResult> DisplayVertexDetails(string datasetName, int vertexId)
+    [HttpGet("DataSets/Vertices/{objectId}")]
+    public async Task<IActionResult> DisplayVertexDetails(string objectId)
     {
-        return BadRequest();
+        var respond = _dataAdminService.GetVertexDetail(objectId);
+        return StatusCode((int)respond.Type, respond);
     }
 
-    [HttpGet("DataSets/{dataSetName}/Edges/{edgeId}")]
-    public async Task<IActionResult> DisplayEdgeDetails(string datasetName, int edgeId)
+    [HttpGet("DataSets/Edges/{objectId}")]
+    public async Task<IActionResult> DisplayEdgeDetails(string objectId)
     {
-        return BadRequest();
+        var respond = _dataAdminService.GetEdgeDetail(objectId);
+        return StatusCode((int)respond.Type, respond);
     }
 }

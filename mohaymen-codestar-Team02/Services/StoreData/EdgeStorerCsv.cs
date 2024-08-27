@@ -36,7 +36,7 @@ public class EdgeStorerCsv : IEdageStorer
             headers[headers.Length - 1] = lastWodrd.Substring(0, lastWodrd.Length - 1);
 
 
-            foreach (var att in headers) edgeAttributes.Add(new EdgeAttribute(att, edgeEntity.Id));
+            foreach (var att in headers) edgeAttributes.Add(new EdgeAttribute(att, edgeEntity.EdgeEntityId));
 
             foreach (var attribute in edgeAttributes) await dataContext.EdgeAttributes.AddAsync(attribute);
 
