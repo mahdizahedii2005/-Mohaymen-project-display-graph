@@ -1,6 +1,5 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.IdentityModel.Protocols;
 using mohaymen_codestar_Team02.Data;
 using mohaymen_codestar_Team02.Models;
 using mohaymen_codestar_Team02.Models.VertexEAV;
@@ -95,12 +94,12 @@ public class VertexServiceTest
 
         List<Vertex> expected = new()
         {
-            new()
+            new Vertex
             {
                 Id = "id1",
                 Value = "value1"
             },
-            new()
+            new Vertex
             {
                 Id = "id2",
                 Value = "value2"
