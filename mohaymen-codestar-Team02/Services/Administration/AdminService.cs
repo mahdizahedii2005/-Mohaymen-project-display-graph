@@ -42,9 +42,6 @@ public class AdminService : IAdminService
         if (admin is null)
             return new ServiceResponse<GetUserDto?>(null, ApiResponseType.BadRequest, Resources.UserNotFoundMessage);
 
-        if (!await IsAdmin(admin))
-            return new ServiceResponse<GetUserDto?>(null, ApiResponseType.Forbidden, Resources.accessDeniedMessage);
-
         var user = await GetUser(username, context);
         if (user is null)
             return new ServiceResponse<GetUserDto?>(null, ApiResponseType.NotFound, Resources.UserNotFoundMessage);
@@ -68,12 +65,8 @@ public class AdminService : IAdminService
             return new ServiceResponse<List<GetUserDto>?>(null, ApiResponseType.BadRequest,
                 Resources.UserNotFoundMessage);
 
-        /*if (!await IsAdmin(admin))
-            return new ServiceResponse<List<GetUserDto>?>(null, ApiResponseType.Forbidden,
-                Resources.accessDeniedMessage);*/
-
-        List<User> users = await context.Users.Include(u => u.UserRoles).ThenInclude(ur => ur.Role).ToListAsync();
-        List<GetUserDto> userDtos = users.Select(u => _mapper.Map<GetUserDto>(u)).ToList();
+        var users = await context.Users.Include(u => u.UserRoles).ThenInclude(ur => ur.Role).ToListAsync();
+        var userDtos = users.Select(u => _mapper.Map<GetUserDto>(u)).ToList();
         return new ServiceResponse<List<GetUserDto>?>(userDtos, ApiResponseType.Success,
             Resources.UserRetrievedMassage);
     }
@@ -87,7 +80,7 @@ public class AdminService : IAdminService
         return new ServiceResponse<List<GetRoleDto>>(roles, ApiResponseType.Success, Resources.UsersRetrievedMassage);
     }
 
-    public async Task<ServiceResponse<GetUserDto?>> Register(User user, string password)
+    public async Task<ServiceResponse<GetUserDto?>> Register(User user, string password, List<string> roles)
     {
         using var scope = _serviceProvider.CreateScope();
         var context = scope.ServiceProvider.GetRequiredService<DataContext>();
@@ -101,16 +94,16 @@ public class AdminService : IAdminService
         if (admin is null)
             return new ServiceResponse<GetUserDto?>(null, ApiResponseType.BadRequest, Resources.UserNotFoundMessage);
 
-        /*if (!await IsAdmin(admin))
-            return new ServiceResponse<GetUserDto?>(null, ApiResponseType.Forbidden, Resources.accessDeniedMessage);
-            */
-
         if (await UserExists(user.Username, context))
             return new ServiceResponse<GetUserDto?>(null, ApiResponseType.Conflict, Resources.UserAlreadyExistsMessage);
 
         if (!_passwordService.ValidatePassword(password))
             return new ServiceResponse<GetUserDto?>(null, ApiResponseType.BadRequest,
                 Resources.YourPasswordIsNotValidated);
+
+        if (!IsRoleMatching(roles, context))
+            return new ServiceResponse<GetUserDto?>(null, ApiResponseType.BadRequest,
+                Resources.SomeRolesAreInvalid);
 
         _passwordService.CreatePasswordHash(password, out var passwordHash, out var passwordSalt);
         user.PasswordHash = passwordHash;
@@ -119,10 +112,23 @@ public class AdminService : IAdminService
         await context.Users.AddAsync(user);
         await context.SaveChangesAsync();
 
-        var userDto = _mapper.Map<GetUserDto>(user);
+        foreach (var role in roles)
+            await AddRole(
+                new User { Username = user.Username },
+                new Role() { RoleType = role }
+            );
+
+        var foundUser = await GetUser(user.Username, context);
+        var userDto = _mapper.Map<GetUserDto>(foundUser);
 
         return new ServiceResponse<GetUserDto?>(userDto, ApiResponseType.Created,
             Resources.UserCreatedSuccessfullyMessage);
+    }
+
+    private bool IsRoleMatching(List<string> roles, DataContext context)
+    {
+        var matchingRoles = roles.All(r => context.Roles.Any(dbRole => dbRole.RoleType.ToLower() == r.ToLower()));
+        return matchingRoles;
     }
 
     public async Task<ServiceResponse<GetUserDto?>> DeleteUser(User user)
@@ -138,11 +144,6 @@ public class AdminService : IAdminService
         var admin = await GetUser(adminId, context);
         if (admin is null)
             return new ServiceResponse<GetUserDto?>(null, ApiResponseType.BadRequest, Resources.UserNotFoundMessage);
-
-        /*
-        if (!await IsAdmin(admin))
-            return new ServiceResponse<GetUserDto?>(null, ApiResponseType.Forbidden, Resources.accessDeniedMessage);
-            */
 
         var foundUser = await GetUser(user.Username, context);
         if (foundUser is null)
@@ -171,10 +172,6 @@ public class AdminService : IAdminService
         var admin = await GetUser(adminId, context);
         if (admin is null)
             return new ServiceResponse<GetUserDto?>(null, ApiResponseType.BadRequest, Resources.UserNotFoundMessage);
-
-        /*if (!await IsAdmin(admin))
-            return new ServiceResponse<GetUserDto?>(null, ApiResponseType.Forbidden, Resources.accessDeniedMessage);
-            */
 
         var foundUser = await GetUser(user.Username, context);
         if (foundUser is null)
@@ -216,10 +213,6 @@ public class AdminService : IAdminService
         if (admin is null)
             return new ServiceResponse<GetUserDto?>(null, ApiResponseType.BadRequest, Resources.UserNotFoundMessage);
 
-        /*if (!await IsAdmin(admin))
-            return new ServiceResponse<GetUserDto?>(null, ApiResponseType.Forbidden, Resources.accessDeniedMessage);
-            */
-
         var foundUser = await GetUser(user.Username, context);
         if (foundUser is null)
             return new ServiceResponse<GetUserDto?>(null, ApiResponseType.NotFound, Resources.UserNotFoundMessage);
@@ -246,19 +239,6 @@ public class AdminService : IAdminService
     {
         return await dataContext.Users.FirstOrDefaultAsync(x =>
             username != null && x.Username != null && x.Username.ToLower().Equals(username.ToLower()));
-    }
-
-    private Task<bool> IsAdmin(User? user)
-    {
-        using var scope = _serviceProvider.CreateScope();
-        var context = scope.ServiceProvider.GetRequiredService<DataContext>();
-
-        if (user == null) return Task.FromResult(false);
-        var targetUser = context.Users.Include(u => u.UserRoles).ThenInclude(userRole => userRole.Role)
-            .SingleOrDefault(a => a.Username == user.Username);
-        var result = targetUser != null && targetUser.UserRoles.Any(userRole =>
-            userRole.Role.RoleType.ToLower() == RoleType.SystemAdmin.ToString().ToLower());
-        return Task.FromResult(result);
     }
 
     private async Task<Role?> GetRole(string? roleType)

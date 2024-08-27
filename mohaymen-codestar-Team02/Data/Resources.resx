@@ -100,4 +100,7 @@
     <data name="GraphFetchedSuccessfully" xml:space="preserve">
         <value>GraphFetchedSuccessfully</value>
     </data>
+    <data name="SomeRolesAreInvalid" xml:space="preserve">
+        <value>Some Roles Are Invalid</value>
+    </data>
 </root>

@@ -49,7 +49,7 @@ public class AdminController : ControllerBase
         };
 
         ServiceResponse<GetUserDto?> response =
-            await _adminService.Register(user, request.Password);
+            await _adminService.Register(user, request.Password, request.Roles);
 
         return StatusCode((int)response.Type, response);
     }
