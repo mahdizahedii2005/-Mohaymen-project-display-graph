@@ -50,10 +50,11 @@ public class AdminService : IAdminService
         return new ServiceResponse<GetUserDto?>(userDto, ApiResponseType.Success, Resources.UserRetrievedMassage);
     }
 
-    public async Task<ServiceResponse<List<GetUserDto>?>> GetAllUsers()
+    public async Task<ServiceResponse<List<GetUserDto>?>> GetUsersPaginated(int pageNumber)
     {
         using var scope = _serviceProvider.CreateScope();
         var context = scope.ServiceProvider.GetRequiredService<DataContext>();
+        
         var token = _cookieService.GetCookieValue();
         if (string.IsNullOrEmpty(token))
             return new ServiceResponse<List<GetUserDto>?>(null, ApiResponseType.Unauthorized,
@@ -65,9 +66,13 @@ public class AdminService : IAdminService
             return new ServiceResponse<List<GetUserDto>?>(null, ApiResponseType.BadRequest,
                 Resources.UserNotFoundMessage);
 
-        var users = await context.Users.Include(u => u.UserRoles).ThenInclude(ur => ur.Role).ToListAsync();
-        var userDtos = users.Select(u => _mapper.Map<GetUserDto>(u)).ToList();
-        return new ServiceResponse<List<GetUserDto>?>(userDtos, ApiResponseType.Success,
+        var users = await context.Users.Include(u => u.UserRoles)
+            .ThenInclude(ur => ur.Role).Skip((pageNumber - 1) * 10)
+            .Take(10)
+            .ToListAsync();
+
+        var usersDto = users.Select(u => _mapper.Map<GetUserDto>(u)).ToList();
+        return new ServiceResponse<List<GetUserDto>?>(usersDto, ApiResponseType.Success,
             Resources.UserRetrievedMassage);
     }
 

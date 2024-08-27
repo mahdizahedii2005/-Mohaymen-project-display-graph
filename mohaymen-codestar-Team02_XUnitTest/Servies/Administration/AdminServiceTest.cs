@@ -103,16 +103,16 @@ public class AdminServiceTest
                 x[1] = fakePasswordHash;
                 x[2] = fakePasswordSalt;
             });
-        
-        var role = new Role { RoleType = RoleType.DataAdmin.ToString()};
+
+        var role = new Role { RoleType = RoleType.DataAdmin.ToString() };
         mockContext.Roles.Add(role);
         mockContext.SaveChanges();
-        
+
         _passwordService.ValidatePassword(Arg.Any<string>()).Returns(true);
 
         // Act
         var result = await _sut.Register(
-            new User() { UserId = 8, Username = "mamad" }, "password" , new List<string>() { "DataAdmin" });
+            new User() { UserId = 8, Username = "mamad" }, "password", new List<string>() { "DataAdmin" });
 
         // Assert
         Assert.Equal(ApiResponseType.Created, result.Type);
@@ -227,7 +227,7 @@ public class AdminServiceTest
         _cookieService.GetCookieValue().Returns(string.Empty);
 
         // Act
-        var result = await _sut.GetAllUsers();
+        var result = await _sut.GetUsersPaginated(1);
 
         // Assert
         Assert.Equal(ApiResponseType.Unauthorized, result.Type);
@@ -248,7 +248,7 @@ public class AdminServiceTest
         _mapper.Map<GetUserDto>(Arg.Any<User>()).Returns(new GetUserDto());
 
         // Act
-        var result = await _sut.GetAllUsers();
+        var result = await _sut.GetUsersPaginated(1);
 
         // Assert
         Assert.Equal(ApiResponseType.Success, result.Type);
@@ -262,7 +262,7 @@ public class AdminServiceTest
         FixTheReturnOfCookies("admin");
 
         // Act
-        var response = await _sut.GetAllUsers();
+        var response = await _sut.GetUsersPaginated(1);
 
         // Assert
         Assert.Equal(ApiResponseType.BadRequest, response.Type);

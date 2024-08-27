@@ -20,10 +20,10 @@ public class AdminController : ControllerBase
     }
 
     [HttpGet("users")]
-    public async Task<IActionResult> GetAllUsers()
+    public async Task<IActionResult> GetAllUsers([FromQuery] int pageNumber)
     {
         var response =
-            await _adminService.GetAllUsers();
+            await _adminService.GetUsersPaginated(pageNumber);
         return StatusCode((int)response.Type, response);
     }
 

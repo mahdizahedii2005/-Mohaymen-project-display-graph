@@ -6,7 +6,7 @@ namespace mohaymen_codestar_Team02.Services.Administration;
 
 public interface IAdminService
 {
-    Task<ServiceResponse<List<GetUserDto>?>> GetAllUsers();
+    Task<ServiceResponse<List<GetUserDto>?>> GetUsersPaginated(int pageNumber);
     Task<ServiceResponse<GetUserDto?>> GetUserByUsername(string? username);
     Task<ServiceResponse<GetUserDto?>> Register(User user, string password, List<string> roles);
     Task<ServiceResponse<GetUserDto?>> DeleteUser(User user);
