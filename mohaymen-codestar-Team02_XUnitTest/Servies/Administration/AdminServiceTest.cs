@@ -65,24 +65,7 @@ public class AdminServiceTest
         // Assert
         Assert.Equal(ApiResponseType.BadRequest, response.Type);
     }
-
-    /*[Fact]
-    public async Task Register_ShouldReturnForbidden_WhenUserIsNotAdmin()
-    {
-        using var scope = _serviceProvider.CreateScope();
-        var mockContext = scope.ServiceProvider.GetRequiredService<DataContext>();
-
-        // Arrange
-        FixTheReturnOfCookies("fakeAdmin");
-        AddUserWithRole("fakeAdmin", "Analyst", 1, mockContext);
-
-        // Act
-        var result = await _sut.Register(new User(), "password");
-
-        // Assert
-        Assert.Equal(ApiResponseType.Forbidden, result.Type);
-    }*/
-
+    
     [Fact]
     public async Task Register_ShouldReturnConflict_WhenUserAlreadyExists()
     {
@@ -297,24 +280,6 @@ public class AdminServiceTest
         Assert.Equal(ApiResponseType.BadRequest, response.Type);
     }
 
-    /*[Fact]
-    public async Task GetAllUsers_ShouldReturnForbidden_WhenUserIsNotAdmin()
-    {
-        using var scope = _serviceProvider.CreateScope();
-        var mockContext = scope.ServiceProvider.GetRequiredService<DataContext>();
-
-        // Arrange
-        FixTheReturnOfCookies("fakeAdmin");
-        AddUserWithRole("fakeAdmin", "Analyst", 1, mockContext);
-
-        // Act
-        var result = await _sut.GetAllUsers();
-
-        // Assert
-        Assert.Equal(ApiResponseType.Forbidden, result.Type);
-    }*/
-
-
     [Fact]
     public async Task GetAllRoles_ShouldReturnAllRolesSuccessfully()
     {
@@ -385,24 +350,7 @@ public class AdminServiceTest
         // Assert
         Assert.Equal(ApiResponseType.BadRequest, response.Type);
     }
-
-    /*[Fact]
-    public async Task AddRole_ShouldReturnForbidden_WhenCommenderIsNotSystemAdmin()
-    {
-        using var scope = _serviceProvider.CreateScope();
-        var mockContext = scope.ServiceProvider.GetRequiredService<DataContext>();
-
-        // Arrange
-        FixTheReturnOfCookies("fakeAdmin");
-        AddUserWithRole("fakeAdmin", "Analyst", 1, mockContext);
-
-        // Act
-        var result = await _sut.AddRole(null, null);
-
-        // Assert
-        Assert.Equal(ApiResponseType.Forbidden, result.Type);
-    }*/
-
+    
     [Fact]
     public async Task AddRole_ShouldReturnSuccess_WhenUserAndAdminExist()
     {
@@ -501,23 +449,6 @@ public class AdminServiceTest
         // Assert
         Assert.Equal(ApiResponseType.BadRequest, response.Type);
     }
-
-    /*[Fact]
-    public async Task DeleteRole_ShouldReturnForbidden_WhenCommenderIsNotSystemAdmin()
-    {
-        using var scope = _serviceProvider.CreateScope();
-        var mockContext = scope.ServiceProvider.GetRequiredService<DataContext>();
-
-        // Arrange
-        FixTheReturnOfCookies("fakeAdmin");
-        AddUserWithRole("fakeAdmin", "Analyst", 1, mockContext);
-
-        // Act
-        var result = await _sut.DeleteRole(null, null);
-
-        // Assert
-        Assert.Equal(ApiResponseType.Forbidden, result.Type);
-    }*/
 
     [Fact]
     public async Task DeleteRole_ShouldReturnBadRequest_WhenUserRoleNotExists()
