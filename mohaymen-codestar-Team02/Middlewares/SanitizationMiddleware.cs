@@ -33,7 +33,7 @@ public class SanitizationMiddleware
                     var buffer = Encoding.UTF8.GetBytes(sanitizedBody);
 
                     context.Request.Body = new MemoryStream(buffer);
-                    context.Request.Body.Position = 0; 
+                    context.Request.Body.Position = 0;
                 }
             }
         }
@@ -48,9 +48,11 @@ public class SanitizationMiddleware
         if (actionDescriptor != null)
         {
             var parameters = actionDescriptor.Parameters;
-            var dtoParameter = parameters.FirstOrDefault(p => p.ParameterType.IsClass && p.ParameterType != typeof(string));
+            var dtoParameter =
+                parameters.FirstOrDefault(p => p.ParameterType.IsClass && p.ParameterType != typeof(string));
             return dtoParameter?.ParameterType;
         }
+
         return null;
     }
 
@@ -78,18 +80,15 @@ public class SanitizationMiddleware
 
     private object SanitizeDto(object dto)
     {
-        var properties = dto.GetType().GetProperties().Where(p => p.PropertyType == typeof(string) && p.CanWrite && p.CanRead);
+        var properties = dto.GetType().GetProperties()
+            .Where(p => p.PropertyType == typeof(string) && p.CanWrite && p.CanRead);
 
         foreach (var property in properties)
         {
             var value = (string)property.GetValue(dto);
-            if (value != null)
-            {
-                property.SetValue(dto, _sanitizer.Sanitize(value));
-            }
+            if (value != null) property.SetValue(dto, _sanitizer.Sanitize(value));
         }
 
-        return dto; 
+        return dto;
     }
 }
-
