@@ -153,7 +153,7 @@ public class DataAdminServiceTest
     }
 
     [Fact]
-    public void DisplayDataSet_ShouldGetDataSet_WhenGivenCorrectUsername()
+    public void DisplayDataSet_ShouldReturnDataSet_WhenGivenCorrectUsername()
     {
         using var scope = _serviceProvider.CreateScope();
         _dataContext = scope.ServiceProvider.GetRequiredService<DataContext>();
@@ -255,5 +255,46 @@ public class DataAdminServiceTest
 
         // Assert
         Assert.Equivalent(expected, actual);
+    }
+    
+    public ServiceResponse<List<GetAttributeDto>> GetVertexAttributes(long vertexEntityId)
+    {
+        var att = _vertexService.GetVertexAttributes(vertexEntityId);
+        return new ServiceResponse<List<GetAttributeDto>>(att, ApiResponseType.Success, "");
+    }
+
+
+    [Fact]
+    public void DisplayVertexAttributes_ShouldReturnListOfVertexAttributes_WhenGivenCorrectEntityId()
+    {
+        // Arrange
+        long vertexEntityId = 1;
+        var attName1 = "att1";
+        var attName2 = "att2";
+
+        var id1 = 1;
+        var id2 = 2;
+
+        var vertexAtts = new List<GetAttributeDto>()
+        {
+            new GetAttributeDto()
+            {
+                Id = id1,
+                Name = attName1
+            },
+            new GetAttributeDto()
+            {
+                Id = id2,
+                Name = attName2
+            }
+        };
+
+        var expected = _vertexService.GetVertexAttributes(vertexEntityId).Returns(vertexAtts);
+
+        // Act
+        var actual = _sut.GetVertexAttributes(vertexEntityId);
+
+        // Assert
+        Assert.Equivalent(actual, expected);
     }
 }

@@ -22,4 +22,5 @@ public class GraphService : IGraphService
             destinationEdgeIdentifierFieldName);
         return (vertices, edges);
     }
+    
 }

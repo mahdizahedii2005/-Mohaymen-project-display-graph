@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Mvc;
-using mohaymen_codestar_Team02.Data;
 using mohaymen_codestar_Team02.Dto;
 using mohaymen_codestar_Team02.Dto.GraphDTO;
 using mohaymen_codestar_Team02.Dto.StoreDataDto;
@@ -14,14 +13,12 @@ public class DataAdminController : ControllerBase
 {
     private readonly IDataAdminService _dataAdminService;
     private readonly IFileReader _fileReader;
-    private readonly IGraphService _graphService;
 
     public DataAdminController(IDataAdminService dataAdminService,
         IFileReader fileReader, IGraphService graphService)
     {
         _dataAdminService = dataAdminService;
         _fileReader = fileReader;
-        _graphService = graphService;
         _dataAdminService = dataAdminService;
     }
 
@@ -53,15 +50,12 @@ public class DataAdminController : ControllerBase
     }
 
     [HttpGet("DataSets/{dataSetName}")]
-    public async Task<IActionResult> DisplayDataSetAsGraph(string dataSetName,
-        [FromQuery] string sourceEdgeIdentifierFieldName, [FromQuery] string destinationEdgeIdentifierFieldName,
-        [FromQuery] string vertexIdentifierFieldName)
+    public async Task<IActionResult> DisplayDataSetAsGraph([FromQuery] GraphQueryInfoDto graphQueryInfoDto)
     {
         //Todo all Of Them
         ServiceResponse<DisplayGraphDto> response =
-            await _dataAdminService.DisplayGeraphData(dataSetName, sourceEdgeIdentifierFieldName,
-                destinationEdgeIdentifierFieldName, vertexIdentifierFieldName);
-        response.Data.GraphName = dataSetName;
+            await _dataAdminService.DisplayGeraphData(graphQueryInfoDto.datasetId, graphQueryInfoDto.sourceIdentifier, graphQueryInfoDto.targetIdentifier, graphQueryInfoDto.vertexIdentifier);
+        response.Data.GraphName = graphQueryInfoDto.datasetId;
         return StatusCode((int)response.Type, response);
     }
 
@@ -81,5 +75,19 @@ public class DataAdminController : ControllerBase
         //Todo all Of Them
         var respond = _dataAdminService.GetEdgeDetail(objectId);
         return StatusCode((int)respond.Type, respond);
+    }
+
+    [HttpGet("DataSets/Vertex/{id}")]
+    public async Task<IActionResult> DisplayVertexAttributes(long id)
+    {
+        var response = _dataAdminService.GetVertexAttributes(id);
+        return StatusCode((int)response.Type, response);
+    }
+    
+    [HttpGet("DataSets/Edge/{id}")]
+    public async Task<IActionResult> DisplayEdgeAttributes(long id)
+    {
+        var response = _dataAdminService.GetEdgeAttributes(id);
+        return StatusCode((int)response.Type, response);
     }
 }
