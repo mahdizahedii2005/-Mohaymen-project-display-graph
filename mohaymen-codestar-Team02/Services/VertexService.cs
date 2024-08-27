@@ -1,4 +1,3 @@
-
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Update.Internal;
@@ -28,18 +27,18 @@ public class VertexService : IVertexService
         var vertexAttribuite = context.VertexEntities.Include(ve => ve.VertexAttributes)
             .FirstOrDefault(ve => ve.VertexEntityId == vertexEntityId)
             ?.VertexAttributes;
-        
+
         return vertexAttribuite.Select(va => _mapper.Map<GetAttributeDto>(va)).ToList();
     }
-    
-    public List<Vertex> GetAllVertices(string datasetName, string vertexIdentifierFieldName)
+
+    public List<Vertex> GetAllVertices(long dataSetId, string vertexIdentifierFieldName)
     {
         using var scope = _serviceProvider.CreateScope();
         var context = scope.ServiceProvider.GetRequiredService<DataContext>();
 
-        var dataSet = context.DataSets.Include(ds => ds.VertexEntity)
+        var dataSet = context.DataSets.Where(ds => ds.DataGroupId == dataSetId).Include(ds => ds.VertexEntity)
             .ThenInclude(ve => ve.VertexAttributes).ThenInclude(vv => vv.VertexValues)
-            .FirstOrDefault(ds => ds.Name.ToLower().Equals(datasetName.ToLower()));
+            .FirstOrDefault(ds => ds != null);
 
         var vertexRecords = dataSet.VertexEntity.VertexAttributes.Select(a => a.VertexValues).SelectMany(v => v)
             .GroupBy(v => v.ObjectId);

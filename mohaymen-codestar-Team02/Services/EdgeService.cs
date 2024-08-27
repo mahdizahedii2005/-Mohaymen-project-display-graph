@@ -35,18 +35,16 @@ public class EdgeService : IEdgeService
         return edgeAttribuite.Select(va => _mapper.Map<GetAttributeDto>(va)).ToList();
     }
 
-    public List<Edge> GetAllEdges(string databaseName, string vertexIdentifierFieldName,
+    public List<Edge> GetAllEdges(long dataSetId, string vertexIdentifierFieldName,
         string sourceEdgeIdentifierFieldName,
         string destinationEdgeIdentifierFieldName)
     {
         var scope = _serviceProvider.CreateScope();
         var context = scope.ServiceProvider.GetRequiredService<DataContext>();
-        var vertexSet = context.DataSets.Include(ds => ds.VertexEntity)
-            .ThenInclude(ve => ve.VertexAttributes).ThenInclude(vv => vv.VertexValues)
-            .FirstOrDefault(ds => ds.Name.ToLower().Equals(databaseName.ToLower()));
-        var edgeSet = context.DataSets.Include(ds => ds.EdgeEntity)
-            .ThenInclude(ee => ee.EdgeAttributes).ThenInclude(ev => ev.EdgeValues)
-            .FirstOrDefault(ds => ds.Name.ToLower().Equals(databaseName.ToLower()));
+        var vertexSet = context.DataSets.Where(ds => ds.DataGroupId == dataSetId).Include(ds => ds.VertexEntity)
+            .ThenInclude(ve => ve.VertexAttributes).ThenInclude(vv => vv.VertexValues).FirstOrDefault(ds => ds != null);
+        var edgeSet = context.DataSets.Where(ds => ds.DataGroupId == dataSetId).Include(ds => ds.EdgeEntity)
+            .ThenInclude(ee => ee.EdgeAttributes).ThenInclude(ev => ev.EdgeValues).FirstOrDefault(ds => ds != null);;
 
         var vertexRecords = vertexSet.VertexEntity.VertexAttributes.Select(a => a.VertexValues).SelectMany(v => v)
             .GroupBy(v => v.ObjectId);

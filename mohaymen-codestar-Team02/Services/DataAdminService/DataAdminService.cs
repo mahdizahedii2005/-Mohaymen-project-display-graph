@@ -93,7 +93,7 @@ public class DataAdminService
         return new ServiceResponse<List<GetDataGroupDto>>(dataGroupDtos, ApiResponseType.Success, "");
     }
 
-    public async Task<ServiceResponse<DisplayGraphDto>> DisplayGeraphData(string databaseName,
+    public async Task<ServiceResponse<DisplayGraphDto>> DisplayGeraphData(long databaseName,
         string sourceEdgeIdentifierFieldName,
         string destinationEdgeIdentifierFieldName, string vertexIdentifierFieldName)
     {

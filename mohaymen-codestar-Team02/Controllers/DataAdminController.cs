@@ -49,13 +49,15 @@ public class DataAdminController : ControllerBase
         //Todo all Of Them
     }
 
-    [HttpGet("DataSets/{dataSetName}")]
-    public async Task<IActionResult> DisplayDataSetAsGraph([FromQuery] GraphQueryInfoDto graphQueryInfoDto)
+    [HttpGet("DataSets/{dataSetId}")]
+    public async Task<IActionResult> DisplayDataSetAsGraph(long dataSetId, [FromQuery] string vertexIdentifier,
+        [FromQuery] string sourceIdentifier, [FromQuery] string targetIdentifier)
     {
         //Todo all Of Them
         ServiceResponse<DisplayGraphDto> response =
-            await _dataAdminService.DisplayGeraphData(graphQueryInfoDto.datasetId, graphQueryInfoDto.sourceIdentifier, graphQueryInfoDto.targetIdentifier, graphQueryInfoDto.vertexIdentifier);
-        response.Data.GraphName = graphQueryInfoDto.datasetId;
+            await _dataAdminService.DisplayGeraphData(dataSetId, sourceIdentifier,
+                targetIdentifier, vertexIdentifier);
+        response.Data.GraphId = dataSetId;
         return StatusCode((int)response.Type, response);
     }
 
@@ -83,7 +85,7 @@ public class DataAdminController : ControllerBase
         var response = _dataAdminService.GetVertexAttributes(id);
         return StatusCode((int)response.Type, response);
     }
-    
+
     [HttpGet("DataSets/Edge/{id}")]
     public async Task<IActionResult> DisplayEdgeAttributes(long id)
     {

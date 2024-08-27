@@ -11,7 +11,7 @@ public interface IDataAdminService
 
     ServiceResponse<List<GetDataGroupDto>> DisplayDataSet();
 
-    Task<ServiceResponse<DisplayGraphDto>> DisplayGeraphData(string databaseName, string sourceEdgeIdentifierFieldName,
+    Task<ServiceResponse<DisplayGraphDto>> DisplayGeraphData(long dataSetId, string sourceEdgeIdentifierFieldName,
         string destinationEdgeIdentifierFieldName, string vertexIdentifierFieldName);
 
     ServiceResponse<DetailDto> GetVertexDetail(string objectId);

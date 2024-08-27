@@ -14,13 +14,12 @@ public class GraphService : IGraphService
         _edgeService = edgeService;
     }
 
-    public (List<Vertex> vertices, List<Edge> edges) GetGraph(string databaseName, string sourceEdgeIdentifierFieldName,
+    public (List<Vertex> vertices, List<Edge> edges) GetGraph(long dataSetID, string sourceEdgeIdentifierFieldName,
         string destinationEdgeIdentifierFieldName, string vertexIdentifierFieldName)
     {
-        var vertices = _vertexService.GetAllVertices(databaseName, vertexIdentifierFieldName);
-        var edges = _edgeService.GetAllEdges(databaseName, vertexIdentifierFieldName, sourceEdgeIdentifierFieldName,
+        var vertices = _vertexService.GetAllVertices(dataSetID, vertexIdentifierFieldName);
+        var edges = _edgeService.GetAllEdges(dataSetID, vertexIdentifierFieldName, sourceEdgeIdentifierFieldName,
             destinationEdgeIdentifierFieldName);
         return (vertices, edges);
     }
-    
 }

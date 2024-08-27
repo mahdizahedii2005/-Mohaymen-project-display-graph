@@ -22,7 +22,10 @@ public class AnalystController : ControllerBase
     [HttpGet("Analyst/{vertexId}")]
     public Task<IActionResult> ExpandVertex([FromQuery] GraphQueryInfoDto graphQueryInfoDto, string vertexId)
     {
+        // var dataResponse = AnalystService.
         return null;
     }
+    
+    
 
 }
