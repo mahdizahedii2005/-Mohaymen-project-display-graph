@@ -16,6 +16,7 @@
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
             <PrivateAssets>all</PrivateAssets>
         </PackageReference>
+        <PackageReference Include="HtmlSanitizer" Version="8.1.870" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="8.0.7"/>
         <PackageReference Include="Microsoft.Extensions.Options" Version="8.0.2"/>
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0"/>
