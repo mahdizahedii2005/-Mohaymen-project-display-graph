@@ -36,12 +36,12 @@ public class GraphServiceTest
             new()
             {
                 Id = "id1",
-                Value = "value1"
+                Label = "value1"
             },
             new()
             {
                 Id = "id2",
-                Value = "value2"
+                Label = "value2"
             }
         };
 

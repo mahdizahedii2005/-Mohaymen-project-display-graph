@@ -51,7 +51,7 @@ public class VertexService : IVertexService
             Vertex v = new Vertex()
             {
                 Id = record.Key,
-                Value = value
+                Label = value
             };
             vertices.Add(v);
         }

@@ -1,5 +1,3 @@
-
-
 using System.Linq;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
@@ -17,14 +15,14 @@ public class EdgeService : IEdgeService
 {
     private readonly IServiceProvider _serviceProvider;
     private readonly IMapper _mapper;
-    
+
     public EdgeService(IServiceProvider serviceProvider, IMapper mapper)
     {
         _serviceProvider = serviceProvider;
         _mapper = mapper;
     }
-    
-    
+
+
     public List<GetAttributeDto> GetEdgeAttributes(long edgeEntityId)
     {
         var scope = _serviceProvider.CreateScope();
@@ -33,34 +31,38 @@ public class EdgeService : IEdgeService
         var edgeAttribuite = context.EdgeEntities.Include(ve => ve.EdgeAttributes)
             .FirstOrDefault(ve => ve.EdgeEntityId == edgeEntityId)
             ?.EdgeAttributes;
-        
+
         return edgeAttribuite.Select(va => _mapper.Map<GetAttributeDto>(va)).ToList();
     }
-    
-    public List<Edge> GetAllEdges(string databaseName, string vertexIdentifierFieldName, string sourceEdgeIdentifierFieldName,
+
+    public List<Edge> GetAllEdges(string databaseName, string vertexIdentifierFieldName,
+        string sourceEdgeIdentifierFieldName,
         string destinationEdgeIdentifierFieldName)
     {
-        
         var scope = _serviceProvider.CreateScope();
         var context = scope.ServiceProvider.GetRequiredService<DataContext>();
-        var dataSet = context.DataSets.Include(ds => ds.VertexEntity)
-            .ThenInclude(ve => ve.VertexAttributes).ThenInclude(vv => vv.VertexValues).Include(ds => ds.EdgeEntity)
-            .ThenInclude(ee => ee.EdgeAttributes).ThenInclude(ev => ev.EdgeValues).FirstOrDefault(ds => ds.Name.ToLower().Equals(databaseName.ToLower()));
+        var vertexSet = context.DataSets.Include(ds => ds.VertexEntity)
+            .ThenInclude(ve => ve.VertexAttributes).ThenInclude(vv => vv.VertexValues)
+            .FirstOrDefault(ds => ds.Name.ToLower().Equals(databaseName.ToLower()));
+        var edgeSet = context.DataSets.Include(ds => ds.EdgeEntity)
+            .ThenInclude(ee => ee.EdgeAttributes).ThenInclude(ev => ev.EdgeValues)
+            .FirstOrDefault(ds => ds.Name.ToLower().Equals(databaseName.ToLower()));
 
-        var vertexRecords = dataSet.VertexEntity.VertexAttributes.Select(a => a.VertexValues).SelectMany(v => v)
+        var vertexRecords = vertexSet.VertexEntity.VertexAttributes.Select(a => a.VertexValues).SelectMany(v => v)
             .GroupBy(v => v.ObjectId);
 
-        var edgeRecords = dataSet.EdgeEntity.EdgeAttributes.Select(ea => ea.EdgeValues).SelectMany(v => v)
+        var edgeRecords = edgeSet.EdgeEntity.EdgeAttributes.Select(ea => ea.EdgeValues).SelectMany(v => v)
             .GroupBy(v => v.ObjectId);
 
         List<Edge> edges = new List<Edge>();
         foreach (var record in edgeRecords)
         {
+            GetSourceAndDerstinationValues(sourceEdgeIdentifierFieldName, destinationEdgeIdentifierFieldName, record,
+                out var sourceValue, out var destinationValue);
 
-            GetSourceAndDerstinationValues(sourceEdgeIdentifierFieldName, destinationEdgeIdentifierFieldName, record, out var sourceValue, out var destinationValue);
-            
-            GetSourcesAndDestinations(vertexIdentifierFieldName, vertexRecords, sourceValue, destinationValue, out var sources, out var destinations);
-            
+            GetSourcesAndDestinations(vertexIdentifierFieldName, vertexRecords, sourceValue, destinationValue,
+                out var sources, out var destinations);
+
             foreach (var source in sources)
             {
                 foreach (var des in destinations)
@@ -79,12 +81,13 @@ public class EdgeService : IEdgeService
         return edges;
     }
 
-    private void GetSourcesAndDestinations(string vertexIdentifierFieldName, IEnumerable<IGrouping<string, VertexValue>> vertexRecords,
+    private void GetSourcesAndDestinations(string vertexIdentifierFieldName,
+        IEnumerable<IGrouping<string, VertexValue>> vertexRecords,
         string sourceValue, string destinationValue, out List<Vertex> sources, out List<Vertex> destinations)
     {
         sources = new List<Vertex>();
         destinations = new List<Vertex>();
-        
+
         foreach (var record1 in vertexRecords)
         {
             foreach (var item in record1)
@@ -111,7 +114,8 @@ public class EdgeService : IEdgeService
     }
 
     private void GetSourceAndDerstinationValues(string sourceEdgeIdentifierFieldName,
-        string destinationEdgeIdentifierFieldName, IGrouping<string, EdgeValue> record, out string sourceValue, out string destinationValue)
+        string destinationEdgeIdentifierFieldName, IGrouping<string, EdgeValue> record, out string sourceValue,
+        out string destinationValue)
     {
         sourceValue = string.Empty;
         destinationValue = string.Empty;
@@ -126,7 +130,7 @@ public class EdgeService : IEdgeService
             {
                 destinationValue = item.StringValue;
             }
-        } 
+        }
     }
 
     public DetailDto GetEdgeDetails(string objId)
@@ -139,6 +143,7 @@ public class EdgeService : IEdgeService
         {
             result.AttributeValue[context.EdgeAttributes.Find(value.EdgeAttributeId).Name] = value.StringValue;
         }
+
         return result;
     }
 }

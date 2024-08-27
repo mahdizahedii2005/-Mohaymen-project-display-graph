@@ -175,12 +175,12 @@ public class VertexServiceTest
             new Vertex()
             {
                 Id = "id1",
-                Value = "val1"
+                Label = "val1"
             }, 
             new Vertex()
             {
                 Id = "id2",
-                Value = "val2"
+                Label = "val2"
             }
         };
         
