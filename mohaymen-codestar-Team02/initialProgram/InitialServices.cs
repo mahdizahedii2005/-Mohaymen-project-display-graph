@@ -195,7 +195,10 @@ public class InitialServices
         {
             var admin = new User()
             {
-                Username = "admin"
+                Username = "admin",
+                FirstName = "admin",
+                LastName = "admin",
+                Email = "admin@gmail.com"
             };
             _passwordService.CreatePasswordHash("admin", out var passwordHash, out var passwordSalt);
             admin.PasswordHash = passwordHash;
@@ -205,7 +208,7 @@ public class InitialServices
                 r.RoleType.ToLower().Equals(RoleType.SystemAdmin.ToString().ToLower()));
 
             var userRole = new UserRole()
-            { RoleId = role.RoleId, UserId = admin.UserId, Role = role, User = admin };
+                { RoleId = role.RoleId, UserId = admin.UserId, Role = role, User = admin };
             _context.UserRoles.Add(userRole);
 
             _context.Users.Add(admin);

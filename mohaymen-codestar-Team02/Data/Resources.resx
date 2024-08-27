@@ -88,6 +88,15 @@
     <data name="RolesRetrievedMassage" xml:space="preserve">
         <value>Roles Retrieved Successfully</value>
     </data>
+    <data name="GetPermissionsSuccessfuly" xml:space="preserve">
+        <value>Permissions Get Successfuly</value>
+    </data>
+    <data name="YourPasswordIsNotValidated" xml:space="preserve">
+        <value>Your Password Is Not Validated</value>
+    </data>
+    <data name="AuthorizedMessage" xml:space="preserve">
+        <value>Authorized Message</value>
+    </data>
     <data name="GraphFetchedSuccessfully" xml:space="preserve">
         <value>GraphFetchedSuccessfully</value>
     </data>

@@ -1,6 +1,7 @@
 using System.Text;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using mohaymen_codestar_Team02.Data;
 using mohaymen_codestar_Team02.Dto.User;
 using mohaymen_codestar_Team02.Models;
@@ -15,7 +16,7 @@ public class ProfileServiceTests
 {
     private readonly mohaymen_codestar_Team02.Services.ProfileService.ProfileService _sut;
     private readonly ICookieService _cookieService;
-    private readonly DataContext _mockContext;
+    private readonly IServiceProvider _serviceProvider;
     private readonly IPasswordService _passwordService;
     private readonly ITokenService _tokenService;
     private readonly IMapper _mapper;
@@ -34,11 +35,14 @@ public class ProfileServiceTests
         _mapper = config.CreateMapper();
 
         var options = new DbContextOptionsBuilder<DataContext>()
-            .UseInMemoryDatabase("TestDatabase")
+            .UseInMemoryDatabase(Guid.NewGuid().ToString())
             .Options;
-        _mockContext = new DataContext(options);
 
-        _sut = new mohaymen_codestar_Team02.Services.ProfileService.ProfileService(_mockContext, _cookieService,
+        var serviceCollection = new ServiceCollection();
+        serviceCollection.AddScoped(_ => new DataContext(options));
+        _serviceProvider = serviceCollection.BuildServiceProvider();
+
+        _sut = new mohaymen_codestar_Team02.Services.ProfileService.ProfileService(_serviceProvider, _cookieService,
             _passwordService, _tokenService, _mapper);
     }
 
@@ -115,7 +119,7 @@ public class ProfileServiceTests
     {
         // Arrange
         var updateUserDto = new UpdateUserDto
-        { FirstName = "NewFirstName", LastName = "NewLastName", Email = "newemail@example.com" };
+            { FirstName = "NewFirstName", LastName = "NewLastName", Email = "newemail@example.com" };
         _cookieService.GetCookieValue().Returns(string.Empty);
 
         // Act
@@ -130,7 +134,7 @@ public class ProfileServiceTests
     {
         // Arrange
         var updateUserDto = new UpdateUserDto
-        { FirstName = "NewFirstName", LastName = "NewLastName", Email = "newemail@example.com" };
+            { FirstName = "NewFirstName", LastName = "NewLastName", Email = "newemail@example.com" };
         _cookieService.GetCookieValue().Returns("validToken");
         _tokenService.GetUserNameFromToken().Returns("nonexistentUser");
 
@@ -150,7 +154,7 @@ public class ProfileServiceTests
         _tokenService.GetUserNameFromToken().Returns("existingUser");
 
         var updateUserDto = new UpdateUserDto
-        { FirstName = "NewFirstName", LastName = "NewLastName", Email = "newemail@example.com" };
+            { FirstName = "NewFirstName", LastName = "NewLastName", Email = "newemail@example.com" };
 
         // Act
         var result = await _sut.UpdateUser(updateUserDto);
@@ -161,6 +165,9 @@ public class ProfileServiceTests
 
     private User AddUserToDatabase(string username, string password)
     {
+        using var scope = _serviceProvider.CreateScope();
+        var mockContext = scope.ServiceProvider.GetRequiredService<DataContext>();
+
         var user = new User
         {
             Username = username,
@@ -173,8 +180,8 @@ public class ProfileServiceTests
             user.PasswordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(password));
         }
 
-        _mockContext.Users.Add(user);
-        _mockContext.SaveChanges();
+        mockContext.Users.Add(user);
+        mockContext.SaveChanges();
         return user;
     }
 }

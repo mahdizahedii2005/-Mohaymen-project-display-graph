@@ -1,6 +1,5 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using mohaymen_codestar_Team02.Data;
-using mohaymen_codestar_Team02.Dto;
 using mohaymen_codestar_Team02.Dto.GraphDTO;
 using mohaymen_codestar_Team02.Dto.StoreDataDto;
 using mohaymen_codestar_Team02.Models;
@@ -10,6 +9,8 @@ using mohaymen_codestar_Team02.Services.FileReaderService;
 
 namespace mohaymen_codestar_Team02.Controllers;
 
+[ApiController]
+[Authorize]
 public class DataAdminController : ControllerBase
 {
     private readonly IDataAdminService _dataAdminService;
@@ -17,18 +18,16 @@ public class DataAdminController : ControllerBase
     private readonly IGraphService _graphService;
 
     public DataAdminController(IDataAdminService dataAdminService,
-        IFileReader fileReader, IGraphService graphService)
+        IFileReader fileReader)
     {
         _dataAdminService = dataAdminService;
         _fileReader = fileReader;
-        _graphService = graphService;
         _dataAdminService = dataAdminService;
     }
 
     [HttpPost("DataSets")]
     public async Task<IActionResult> StoreNewDataSet([FromForm] StoreDataDto storeDataDto)
     {
-        //Todo SystemAdmin and DataAdmin
         try
         {
             var edgeFile = _fileReader.Read(storeDataDto.EdgeFile);
@@ -48,8 +47,6 @@ public class DataAdminController : ControllerBase
     {
         var response = _dataAdminService.DisplayDataSet();
         return StatusCode((int)response.Type, response);
-
-        //Todo all Of Them
     }
 
     [HttpGet("DataSets/{dataSetName}")]
@@ -57,7 +54,6 @@ public class DataAdminController : ControllerBase
         [FromQuery] string sourceEdgeIdentifierFieldName, [FromQuery] string destinationEdgeIdentifierFieldName,
         [FromQuery] string vertexIdentifierFieldName)
     {
-        //Todo all Of Them
         ServiceResponse<DisplayGraphDto> response =
             await _dataAdminService.DisplayGeraphData(dataSetName, sourceEdgeIdentifierFieldName,
                 destinationEdgeIdentifierFieldName, vertexIdentifierFieldName);
@@ -69,8 +65,6 @@ public class DataAdminController : ControllerBase
     [HttpGet("DataSets/Vertices/{objectId}")]
     public async Task<IActionResult> DisplayVertexDetails(string objectId)
     {
-        //Todo all Of Them
-
         var respond = _dataAdminService.GetVertexDetail(objectId);
         return StatusCode((int)respond.Type, respond);
     }
@@ -78,7 +72,6 @@ public class DataAdminController : ControllerBase
     [HttpGet("DataSets/Edges/{objectId}")]
     public async Task<IActionResult> DisplayEdgeDetails(string objectId)
     {
-        //Todo all Of Them
         var respond = _dataAdminService.GetEdgeDetail(objectId);
         return StatusCode((int)respond.Type, respond);
     }

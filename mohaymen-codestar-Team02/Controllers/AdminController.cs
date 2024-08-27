@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using mohaymen_codestar_Team02.Dto.Role;
 using mohaymen_codestar_Team02.Dto.User;
@@ -9,6 +10,7 @@ using mohaymen_codestar_Team02.Services.Administration;
 namespace mohaymen_codestar_Team02.Controllers;
 
 [ApiController]
+[Authorize(Roles = nameof(RoleType.SystemAdmin))]
 [Route("[controller]")]
 public class AdminController : ControllerBase
 {
@@ -53,11 +55,11 @@ public class AdminController : ControllerBase
     }
 
     [HttpDelete("users/{username}")]
-    public async Task<IActionResult> Delete([FromBody] DeleteUserDto request)
+    public async Task<IActionResult> Delete(string username)
     {
         var user = new User
         {
-            Username = request.Username
+            Username = username
         };
 
         ServiceResponse<GetUserDto?> response =
@@ -75,23 +77,23 @@ public class AdminController : ControllerBase
     }
 
     [HttpPut("users/{username}/roles")]
-    public async Task<IActionResult> AddRole([FromBody] AddUserRoleDto request)
+    public async Task<IActionResult> AddRole([FromBody] AddUserRoleDto request, string username)
     {
         ServiceResponse<GetUserDto?> response =
             await _adminService.AddRole(
-                new User { Username = request.Username },
+                new User { Username = username },
                 new Role() { RoleType = request.RoleType }
             );
 
         return StatusCode((int)response.Type, response);
     }
 
-    [HttpDelete("users/{username}/roles/{roleType}")]
-    public async Task<IActionResult> DeleteRole([FromBody] DeleteUserRoleDto request)
+    [HttpDelete("users/{username}/roles")]
+    public async Task<IActionResult> DeleteRole([FromBody] DeleteUserRoleDto request, string username)
     {
         ServiceResponse<GetUserDto?> response =
             await _adminService.DeleteRole(
-                new User { Username = request.Username },
+                new User { Username = username },
                 new Role() { RoleType = request.RoleType }
             );
 

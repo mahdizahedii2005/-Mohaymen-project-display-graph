@@ -15,17 +15,17 @@ public class StoreDataServiceTest
 
     public StoreDataServiceTest()
     {
-        var serviceCollection = new ServiceCollection();
-
         var options = new DbContextOptionsBuilder<DataContext>()
             .UseInMemoryDatabase(Guid.NewGuid().ToString())
             .Options;
 
+        var serviceCollection = new ServiceCollection();
         serviceCollection.AddScoped(_ => new DataContext(options));
-
         _serviceProvider = serviceCollection.BuildServiceProvider();
+
         var edageStorer = Substitute.For<IEdageStorer>();
         var vertexStorer = Substitute.For<IVertexStorer>();
+
         _sut = new StoreDataService(_serviceProvider, edageStorer, vertexStorer);
     }
 
@@ -37,7 +37,7 @@ public class StoreDataServiceTest
         //Arrange
         var name = "mahdi";
         mockContext.Users.Add(new User()
-        { Username = "3", UserId = 4, PasswordHash = Array.Empty<byte>(), Salt = Array.Empty<byte>() });
+            { Username = "3", UserId = 4, PasswordHash = Array.Empty<byte>(), Salt = Array.Empty<byte>() });
         mockContext.SaveChanges();
         //Act
         var bolResult = await _sut.StoreDataSet(name, "3");

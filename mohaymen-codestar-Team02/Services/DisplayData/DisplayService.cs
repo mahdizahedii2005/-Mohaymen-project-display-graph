@@ -9,41 +9,19 @@ namespace mohaymen_codestar_Team02.Services;
 
 public class DisplayService : IDisplayDataService
 {
-    private readonly DataContext _context;
+    private readonly IServiceProvider _serviceProvider;
 
-    public DisplayService(DataContext context)
+    public DisplayService(IServiceProvider serviceProvider)
     {
-        _context = context;
-    }
-
-    public List<Vertex> GetVertices(string databaseName, string vertexIdentifierFieldName)
-    {
-        var dataSet = _context.DataSets.Include(ds => ds.VertexEntity)
-            .ThenInclude(ve => ve.VertexAttributes).ThenInclude(vv => vv.VertexValues).Include(ds => ds.EdgeEntity)
-            .ThenInclude(ee => ee.EdgeAttributes).ThenInclude(ev => ev.EdgeValues)
-            .FirstOrDefault(ds => ds.Name.ToLower().Equals(databaseName.ToLower()));
-
-        var vertexRecords = dataSet.VertexEntity.VertexAttributes.Select(a => a.VertexValues).SelectMany(v => v)
-            .GroupBy(v => v.ObjectId);
-
-        List<Vertex> vertices = new();
-        foreach (var record in vertexRecords)
-        {
-            var value = record.SingleOrDefault(r => r.VertexAttribute.Name == vertexIdentifierFieldName).StringValue;
-            var v = new Vertex()
-            {
-                Id = record.Key,
-                Value = value
-            };
-            vertices.Add(v);
-        }
-
-        return vertices;
+        _serviceProvider = serviceProvider;
     }
 
     public (List<Vertex> vertices, List<Edge> edges) GetGraph(string databaseName, string sourceEdgeIdentifierFieldName,
         string destinationEdgeIdentifierFieldName, string vertexIdentifierFieldName)
     {
+        using var scope = _serviceProvider.CreateScope();
+        var _context = scope.ServiceProvider.GetRequiredService<DataContext>();
+
         var dataSet = _context.DataSets.Include(ds => ds.VertexEntity)
             .ThenInclude(ve => ve.VertexAttributes).ThenInclude(vv => vv.VertexValues).Include(ds => ds.EdgeEntity)
             .ThenInclude(ee => ee.EdgeAttributes).ThenInclude(ev => ev.EdgeValues)
