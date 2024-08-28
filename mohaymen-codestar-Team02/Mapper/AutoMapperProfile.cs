@@ -17,7 +17,7 @@ public class AutoMapperProfile : Profile
             .ForMember(dto => dto.Roles, c =>
                 c.MapFrom(u => u.UserRoles.Select(ur => ur.Role)));
         CreateMap<Role, GetRoleDto>();
-        CreateMap<User, RegisterUserDto>();
+        CreateMap<User, CreateUserDto>();
         CreateMap<User, UpdateUserDto>();
         CreateMap<DataGroup, GetDataGroupDto>()
             .ForMember(dest => dest.EdgeEntity, opt =>

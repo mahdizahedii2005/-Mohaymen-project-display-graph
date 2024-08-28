@@ -37,7 +37,7 @@ public class AdminController : ControllerBase
     }
 
     [HttpPost("users")]
-    public async Task<IActionResult> CreateUser([FromBody] RegisterUserDto request)
+    public async Task<IActionResult> CreateUser([FromBody] CreateUserDto request)
     {
         var user = new User
         {
