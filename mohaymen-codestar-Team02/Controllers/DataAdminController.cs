@@ -10,7 +10,7 @@ using mohaymen_codestar_Team02.Services.FileReaderService;
 namespace mohaymen_codestar_Team02.Controllers;
 
 [ApiController]
-[Authorize]
+[Authorize(Roles = $"{nameof(RoleType.DataAdmin)},{nameof(RoleType.SystemAdmin)}")]
 public class DataAdminController : ControllerBase
 {
     private readonly IDataAdminService _dataAdminService;

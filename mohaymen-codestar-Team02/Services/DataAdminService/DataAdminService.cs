@@ -56,20 +56,20 @@ public class DataAdminService
             if (string.IsNullOrEmpty(edgeEntityName) || string.IsNullOrEmpty(graphName) ||
                 string.IsNullOrEmpty(vertexEntityName))
                 return new ServiceResponse<string>(string.Empty, ApiResponseType.BadRequest,
-                    Resources.InvalidInpute);
+                    Resources.InvalidInputeMessage);
 
             var dataGroupId = await _storHandler.StoreDataSet(graphName, userName);
             if (dataGroupId == -1)
                 return new ServiceResponse<string>(string.Empty, ApiResponseType.BadRequest,
-                    Resources.InvalidInpute);
+                    Resources.InvalidInputeMessage);
 
             if (!await _storHandler.EdageStorer.StoreFileData(edgeEntityName, edgeFile, dataGroupId))
                 return new ServiceResponse<string>(string.Empty,
-                    ApiResponseType.BadRequest, Resources.InvalidInpute);
+                    ApiResponseType.BadRequest, Resources.InvalidInputeMessage);
 
             if (!await _storHandler.VertexStorer.StoreFileData(vertexEntityName, vertexFile, dataGroupId))
                 return new ServiceResponse<string>(string.Empty,
-                    ApiResponseType.BadRequest, Resources.InvalidInpute);
+                    ApiResponseType.BadRequest, Resources.InvalidInputeMessage);
 
             return new ServiceResponse<string>(null, ApiResponseType.Success, string.Empty);
         }
@@ -106,7 +106,8 @@ public class DataAdminService
             Vertices = graph.vertices,
             Edges = graph.edges
         };
-        return new ServiceResponse<DisplayGraphDto>(dto, ApiResponseType.Success, Resources.GraphFetchedSuccessfully);
+        return new ServiceResponse<DisplayGraphDto>(dto, ApiResponseType.Success,
+            Resources.GraphFetchedSuccessfullyMessage);
     }
 
     public ServiceResponse<DetailDto> GetVertexDetail(string objectId)

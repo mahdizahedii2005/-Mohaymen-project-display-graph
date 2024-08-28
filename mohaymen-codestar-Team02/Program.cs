@@ -1,4 +1,3 @@
-using DotNetEnv;
 using mohaymen_codestar_Team02.initialProgram;
 using mohaymen_codestar_Team02.Middlewares;
 

@@ -1,9 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using mohaymen_codestar_Team02.Data;
 using mohaymen_codestar_Team02.Models;
-using mohaymen_codestar_Team02.Services.DynamicService;
-using mohaymen_codestar_Team02.Services.TokenService;
-using QuikGraph;
 
 namespace mohaymen_codestar_Team02.Services;
 
@@ -60,38 +57,38 @@ public class DisplayService : IDisplayDataService
             List<Vertex> destinations = new();
 
             foreach (var record1 in vertexRecords)
-                foreach (var item in record1)
+            foreach (var item in record1)
+            {
+                if (item.VertexAttribute.Name == vertexIdentifierFieldName && item.StringValue == sourceValue)
                 {
-                    if (item.VertexAttribute.Name == vertexIdentifierFieldName && item.StringValue == sourceValue)
+                    var vertex = new Vertex()
                     {
-                        var vertex = new Vertex()
-                        {
-                            Id = record1.Key
-                        };
-                        sources.Add(vertex);
-                    }
-
-                    if (item.VertexAttribute.Name == vertexIdentifierFieldName && item.StringValue == destinationValue)
-                    {
-                        var vertex = new Vertex()
-                        {
-                            Id = record1.Key
-                        };
-                        destinations.Add(vertex);
-                    }
+                        Id = record1.Key
+                    };
+                    sources.Add(vertex);
                 }
+
+                if (item.VertexAttribute.Name == vertexIdentifierFieldName && item.StringValue == destinationValue)
+                {
+                    var vertex = new Vertex()
+                    {
+                        Id = record1.Key
+                    };
+                    destinations.Add(vertex);
+                }
+            }
 
             foreach (var source in sources)
-                foreach (var des in destinations)
+            foreach (var des in destinations)
+            {
+                var edge = new Edge()
                 {
-                    var edge = new Edge()
-                    {
-                        Id = record.Key,
-                        Source = source.Id,
-                        Target = des.Id
-                    };
-                    edges.Add(edge);
-                }
+                    Id = record.Key,
+                    Source = source.Id,
+                    Target = des.Id
+                };
+                edges.Add(edge);
+            }
         }
 
         return (vertices, edges);

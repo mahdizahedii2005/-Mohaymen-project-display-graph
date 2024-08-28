@@ -2,6 +2,6 @@ namespace mohaymen_codestar_Team02.Dto.Role;
 
 public class GetRoleDto
 {
-    //public long RoleId { get; set; }
-    public string RoleType { get; set; } = string.Empty;
+    //public long RoleId { get; init; }
+    public string RoleType { get; init; } = string.Empty;
 }

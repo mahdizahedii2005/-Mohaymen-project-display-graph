@@ -61,7 +61,7 @@ public class ProfileService : IProfileService
         using var scope = _serviceProvider.CreateScope();
         var context = scope.ServiceProvider.GetRequiredService<DataContext>();
 
-        var newUser = _mapper.Map<UpdateUserDto>(updateUserDto);
+        var updateUser = _mapper.Map<UpdateUserDto>(updateUserDto);
 
         var token = _cookieService.GetCookieValue();
         if (string.IsNullOrEmpty(token))
@@ -72,9 +72,9 @@ public class ProfileService : IProfileService
         if (user is null)
             return new ServiceResponse<GetUserDto?>(null, ApiResponseType.BadRequest, Resources.UserNotFoundMessage);
 
-        user.FirstName = newUser.FirstName;
-        user.LastName = newUser.LastName;
-        user.Email = newUser.Email;
+        user.FirstName = updateUser.FirstName;
+        user.LastName = updateUser.LastName;
+        user.Email = updateUser.Email;
 
         context.Users.Update(user);
         await context.SaveChangesAsync();

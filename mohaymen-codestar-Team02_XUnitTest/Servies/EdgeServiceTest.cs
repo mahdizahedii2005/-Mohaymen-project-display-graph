@@ -1,6 +1,5 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.IdentityModel.Protocols;
 using mohaymen_codestar_Team02.Data;
 using mohaymen_codestar_Team02.Models;
 using mohaymen_codestar_Team02.Models.EdgeEAV;
