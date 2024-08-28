@@ -20,7 +20,7 @@ public class ProfileController : ControllerBase
     }
 
     [HttpPatch("password")]
-    public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordUserDto request)
+    public async Task<IActionResult> ChangePassword([FromQuery] ChangePasswordUserDto request)
     {
         ServiceResponse<object> response =
             await _profileService.ChangePassword(request.PreviousPassword, request.NewPassword);
@@ -28,7 +28,7 @@ public class ProfileController : ControllerBase
     }
 
     [HttpPut("update")]
-    public async Task<IActionResult> UpdateUser([FromBody] UpdateUserDto request)
+    public async Task<IActionResult> UpdateUser([FromQuery] UpdateUserDto request)
     {
         ServiceResponse<GetUserDto?> response = await _profileService.UpdateUser(request);
         return StatusCode((int)response.Type, response);
