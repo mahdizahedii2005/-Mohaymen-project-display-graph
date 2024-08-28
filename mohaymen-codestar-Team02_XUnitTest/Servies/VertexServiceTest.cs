@@ -16,6 +16,7 @@ public class VertexServiceTest
     private IServiceProvider _serviceProvider;
     private VertexService _sut;
     private readonly IMapper _mapper;
+
     public VertexServiceTest()
     {
         _mapper = Substitute.For<IMapper>();
@@ -30,7 +31,7 @@ public class VertexServiceTest
         _serviceProvider = serviceCollection.BuildServiceProvider();
         _sut = new VertexService(_serviceProvider, _mapper);
     }
-    
+
     [Fact]
     public void GetVertexAttribute_ShouldReturnAllAttributes_WhenGivenCorrectVertexId()
     {
@@ -44,29 +45,29 @@ public class VertexServiceTest
 
         var expected = new List<GetAttributeDto>()
         {
-            new GetAttributeDto()
+            new()
             {
                 Id = 1,
                 Name = AttName1
             },
-            new GetAttributeDto()
+            new()
             {
                 Id = 2,
                 Name = AttName2
             }
         };
-        
+
         var dataset = new DataGroup("Dataset1", 1)
         {
             VertexEntity = new VertexEntity("Account", 1)
             {
                 VertexAttributes = new List<VertexAttribute>
                 {
-                    new VertexAttribute(AttName1, 1)
+                    new(AttName1, 1)
                     {
                         Id = 1
                     },
-                    new VertexAttribute(AttName2, 1)
+                    new(AttName2, 1)
                     {
                         Id = 2
                     }
@@ -77,14 +78,14 @@ public class VertexServiceTest
         context.Add(dataset);
         context.SaveChanges();
 
-        _mapper.Map<GetAttributeDto>(Arg.Is<VertexAttribute>(value=>value.Id == 1))
+        _mapper.Map<GetAttributeDto>(Arg.Is<VertexAttribute>(value => value.Id == 1))
             .Returns(new GetAttributeDto()
             {
                 Id = 1,
                 Name = AttName1
             });
-        
-        _mapper.Map<GetAttributeDto>(Arg.Is<VertexAttribute>(value=>value.Id == 2))
+
+        _mapper.Map<GetAttributeDto>(Arg.Is<VertexAttribute>(value => value.Id == 2))
             .Returns(new GetAttributeDto()
             {
                 Id = 2,
@@ -93,11 +94,11 @@ public class VertexServiceTest
 
         // Act
         var actual = _sut.GetVertexAttributes(vertexEntityId);
-        
+
         // Assert
         Assert.Equivalent(expected, actual);
     }
-    
+
     [Fact]
     public void GetVertexDetails_ReturnsCorrectDetails()
     {
@@ -112,22 +113,16 @@ public class VertexServiceTest
         att1.Id = 1;
         att2.Id = 2;
 
-        List<VertexAttribute> att = new List<VertexAttribute>() { att1, att2 };
+        List<VertexAttribute> att = new() { att1, att2 };
 
-        foreach (var attribute in att)
-        {
-            mockContext.Add(attribute);
-        }
+        foreach (var attribute in att) mockContext.Add(attribute);
 
         var val1 = new VertexValue("val1", 1, objectId2);
         var val2 = new VertexValue("val2", 1, objectId1);
         var val3 = new VertexValue("val3", 2, objectId1);
         var val4 = new VertexValue("val4", 2, objectId2);
-        List<VertexValue> vertexValues = new List<VertexValue>() { val1, val2, val3, val4 };
-        foreach (var value in vertexValues)
-        {
-            mockContext.Add(value);
-        }
+        List<VertexValue> vertexValues = new() { val1, val2, val3, val4 };
+        foreach (var value in vertexValues) mockContext.Add(value);
 
         mockContext.SaveChanges();
         var expected = new Dictionary<string, string>();
@@ -138,7 +133,7 @@ public class VertexServiceTest
         //assert
         Assert.Equal(result.AttributeValue, expected);
     }
-    
+
     [Fact]
     public void GetAllVertices_ShouldReturnAllVertices_WhenGivenCorrectDatasetName()
     {
@@ -146,8 +141,8 @@ public class VertexServiceTest
         var mockContext = scope.ServiceProvider.GetRequiredService<DataContext>();
 
         // Arrange
-        string datasetName = "DataSet1";
-        string vertexIdentifierFieldName = "CardID";
+        var datasetName = "DataSet1";
+        var vertexIdentifierFieldName = "CardID";
 
         var dataset = new DataGroup(datasetName, 1)
         {
@@ -155,12 +150,14 @@ public class VertexServiceTest
             {
                 VertexAttributes = new List<VertexAttribute>
                 {
-                    new VertexAttribute(vertexIdentifierFieldName, 1)
+                    new(vertexIdentifierFieldName, 1)
                     {
                         VertexValues = new List<VertexValue>
                         {
-                            new VertexValue("val1", 1, "id1"){ VertexAttribute = new VertexAttribute(vertexIdentifierFieldName, 1)},
-                            new VertexValue("val2", 1, "id2") { VertexAttribute = new VertexAttribute(vertexIdentifierFieldName, 1)}
+                            new("val1", 1, "id1")
+                                { VertexAttribute = new VertexAttribute(vertexIdentifierFieldName, 1) },
+                            new("val2", 1, "id2")
+                                { VertexAttribute = new VertexAttribute(vertexIdentifierFieldName, 1) }
                         }
                     }
                 }
@@ -169,27 +166,26 @@ public class VertexServiceTest
 
         mockContext.DataSets.Add(dataset);
         mockContext.SaveChanges();
-        
-        List<Vertex> expected = new List<Vertex>()
+
+        List<Vertex> expected = new()
         {
-            new Vertex()
+            new()
             {
                 Id = "id1",
                 Label = "val1"
-            }, 
-            new Vertex()
+            },
+            new()
             {
                 Id = "id2",
                 Label = "val2"
             }
         };
-        
+
 
         // Act
-        var actual = _sut.GetAllVertices(datasetName, vertexIdentifierFieldName);
+        var actual = _sut.GetAllVertices(1, vertexIdentifierFieldName);
 
         // Assert
         Assert.Equivalent(expected, actual);
     }
-    
 }

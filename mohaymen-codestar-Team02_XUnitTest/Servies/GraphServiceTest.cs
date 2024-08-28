@@ -57,12 +57,12 @@ public class GraphServiceTest
 
         var expected = (expectedVertex, expectedEdge);
 
-        _vertexService.GetAllVertices(datasetName, vertexIdentifierFieldName).Returns(expectedVertex);
-        _edgeService.GetAllEdges(datasetName, vertexIdentifierFieldName, sourceEdgeIdentifierFieldName,
+        _vertexService.GetAllVertices(1, vertexIdentifierFieldName).Returns(expectedVertex);
+        _edgeService.GetAllEdges(1, vertexIdentifierFieldName, sourceEdgeIdentifierFieldName,
             destinationEdgeIdentifierFieldName).Returns(expectedEdge);
 
         // Act
-        var actual = _sut.GetGraph(datasetName, sourceEdgeIdentifierFieldName, destinationEdgeIdentifierFieldName,
+        var actual = _sut.GetGraph(1, sourceEdgeIdentifierFieldName, destinationEdgeIdentifierFieldName,
             vertexIdentifierFieldName);
 
         // Assert

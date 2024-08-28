@@ -9,5 +9,4 @@ public interface IVertexService
     public List<Vertex> GetAllVertices(long dataSetId, string vertexIdentifierFieldName);
     DetailDto GetVertexDetails(string objId);
     public List<GetAttributeDto> GetVertexAttributes(long vertexEntityId);
-
 }

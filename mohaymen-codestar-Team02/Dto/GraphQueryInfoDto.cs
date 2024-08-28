@@ -6,5 +6,4 @@ public class GraphQueryInfoDto
     public string vertexIdentifier { get; set; }
     public string sourceIdentifier { get; set; }
     public string targetIdentifier { get; set; }
-
 }

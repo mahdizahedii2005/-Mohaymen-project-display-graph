@@ -126,7 +126,7 @@ public class DataAdminService
         var att = _vertexService.GetVertexAttributes(vertexEntityId);
         return new ServiceResponse<List<GetAttributeDto>>(att, ApiResponseType.Success, "");
     }
-    
+
     public ServiceResponse<List<GetAttributeDto>> GetEdgeAttributes(long edgeEntityId)
     {
         var att = _edgeService.GetEdgeAttributes(edgeEntityId);
