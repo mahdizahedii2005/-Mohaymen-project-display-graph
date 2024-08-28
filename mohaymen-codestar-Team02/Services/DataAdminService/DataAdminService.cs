@@ -93,7 +93,7 @@ public class DataAdminService
         return new ServiceResponse<List<GetDataGroupDto>>(dataGroupDtos, ApiResponseType.Success, "");
     }
 
-    public async Task<ServiceResponse<DisplayGraphDto>> DisplayGeraphData(string databaseName,
+    public async Task<ServiceResponse<DisplayGraphDto>> DisplayGeraphData(long databaseName,
         string sourceEdgeIdentifierFieldName,
         string destinationEdgeIdentifierFieldName, string vertexIdentifierFieldName)
     {
@@ -120,5 +120,17 @@ public class DataAdminService
     {
         return new ServiceResponse<DetailDto>(_edgeService.GetEdgeDetails(objectId), ApiResponseType.Success,
             string.Empty);
+    }
+
+    public ServiceResponse<List<GetAttributeDto>> GetVertexAttributes(long vertexEntityId)
+    {
+        var att = _vertexService.GetVertexAttributes(vertexEntityId);
+        return new ServiceResponse<List<GetAttributeDto>>(att, ApiResponseType.Success, "");
+    }
+
+    public ServiceResponse<List<GetAttributeDto>> GetEdgeAttributes(long edgeEntityId)
+    {
+        var att = _edgeService.GetEdgeAttributes(edgeEntityId);
+        return new ServiceResponse<List<GetAttributeDto>>(att, ApiResponseType.Success, "");
     }
 }
