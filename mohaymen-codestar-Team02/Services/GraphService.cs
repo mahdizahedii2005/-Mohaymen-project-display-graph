@@ -95,19 +95,7 @@ public class GraphService : IGraphService
 
         var dicVertices = vertices.GroupBy(x => x.Value[vertexIdentifierFieldName])
             .ToDictionary(x => x.Key, x => x.ToList());
-
-        /*
-        List<Vertex> resVertices = new List<Vertex>();
-
-        foreach (var record in vertices)
-        {
-            var newVertex = new Vertex()
-            {
-                Id = record.Key,
-                Label = record.Value[vertexIdentifierFieldName]
-            };
-            resVertices.Add(newVertex);
-        }*/
+        
         var resVertices = vertices
             .Select(record => new Vertex
             {
@@ -132,9 +120,6 @@ public class GraphService : IGraphService
                 continue;
             }
 
-            // var sources = dicVertices[sourceValue];
-            // var targets = dicVertices[targetValue];
-
             foreach (var source in sources)
             {
                 foreach (var target in targets)
@@ -152,89 +137,5 @@ public class GraphService : IGraphService
 
         return (resVertices, resEdges);
     }
-
-    /*
-    foreach (var edge in edges)
-    {
-        var sources = groupedVertices[edge["StringValue"]];
-        var destinations = groupedVertices[edge["StringValue"]];
-        foreach (var source in sources)
-        {
-            foreach (var des in destinations)
-            {
-                /*
-                Edge newEdge = new Edge()
-                {
-                    Id = record.Key,
-                    Source = source.Id,
-                    Target = des.Id
-                };
-                edge.Source = source.Id;
-                edge.Target = des.Id;
-                res.Add(edge);
-            }
-        }
-        
-    }*/
-           /* 
-        foreach (var edge in edges)
-        {
-            var sources = dicList[edge.Source];
-            var destinations = dicList[edge.Target];
-
-
-            //return sources.SelectMany(source => destinations.Select(des => edge)).ToList();
-
-            foreach (var source in sources)
-            {
-                foreach (var des in destinations)
-                {
-                    /*
-                    Edge newEdge = new Edge()
-                    {
-                        Id = record.Key,
-                        Source = source.Id,
-                        Target = des.Id
-                    };
-                    edge.Source = source.Id;
-                    edge.Target = des.Id;
-                    res.Add(edge);
-                }
-            }*/
-            /*
-            foreach (var record in edgeRecords)
-            {
-                GetSourceAndDerstinationValues(sourceEdgeIdentifierFieldName, destinationEdgeIdentifierFieldName, record,
-                    out var sourceValue, out var destinationValue);
     
-                GetSourcesAndDestinations(dicList, sourceValue, destinationValue,
-                    out var sources, out var destinations);
-    
-                foreach (var source in sources)
-                {
-                    foreach (var des in destinations)
-                    {
-                        Edge edge = new Edge()
-                        {
-                            Id = record.Key,
-                            Source = source.Id,
-                            Target = des.Id
-                        };
-                        edges.Add(edge);
-                    }
-                }*/
-
-
-        /*
-    public (List<Vertex> vertices, List<Edge> edges) GetGraph(long dataSetID, string sourceEdgeIdentifierFieldName,
-        string destinationEdgeIdentifierFieldName, string vertexIdentifierFieldName, Dictionary<string, string> vertexAttributeVales, Dictionary<string, string> edgeAttributeValues)
-    {
-        var vertices = _vertexService.GetAllVertices(dataSetID, vertexIdentifierFieldName, vertexAttributeVales);
-        var edges = _edgeService.GetAllEdges(dataSetID, sourceEdgeIdentifierFieldName,
-            destinationEdgeIdentifierFieldName, edgeAttributeValues);
-        
-        
-        
-        return (vertices, edges);
-    }*/
 }

@@ -43,17 +43,6 @@ public class VertexService : IVertexService
 
         var vertexRecords = dataSet.VertexEntity.VertexAttributes.Select(a => a.VertexValues).SelectMany(v => v)
             .GroupBy(v => v.ObjectId);
-
-        /*
-        var validVertexRecords = new List<IGrouping<string, VertexValue>>();
-        foreach (var record in vertexRecords)
-        {
-            var dic = record.ToDictionary(x => x.VertexAttribute.Name, x => x.StringValue);
-            if (vertexAttributeVales.Where(x => x.Value == dic[x.Key]).Count()==vertexAttributeVales.Count)
-            {
-                validVertexRecords.Add(record);
-            }    
-        }*/
         
         var validVertexRecords = vertexRecords
             .Where(group =>
@@ -62,41 +51,8 @@ public class VertexService : IVertexService
 
         var res = validVertexRecords.ToDictionary(x => x.Key,
             x => x.ToDictionary(g => g.VertexAttribute.Name, g => g.StringValue));
-
         
-        //var dicList = vertices.GroupBy(x => x.Label).ToDictionary(x=>x.Key, x=>x.ToList());
-
-        //var result = validVertexRecords.Select(x => x.ToDictionary(g => g.VertexAttribute.Name, g => g.StringValue)).ToList();
-        
-        /*
-        var vertices = validVertexRecords
-            .Select(group =>
-            {
-                var value = group.Where(v => v.VertexAttribute.Name == vertexIdentifierFieldName)
-                    .Select(v => v.StringValue).FirstOrDefault();
-                
-                return new Vertex
-                {
-                    Id = group.Key,
-                    Label = value
-                };
-            })
-            .ToList();
-*/
         return res;
-        
-        /*
-        var vertices = new List<Vertex>();
-        foreach (var record in validVertexRecords)
-        {
-            var value = record.SingleOrDefault(r => r.VertexAttribute.Name == vertexIdentifierFieldName).StringValue;
-            Vertex v = new Vertex()
-            {
-                Id = record.Key,
-                Label = value
-            };
-            vertices.Add(v);    
-        }*/
     }
 
     public DetailDto GetVertexDetails(string objId)

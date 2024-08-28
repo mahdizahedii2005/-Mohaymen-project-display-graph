@@ -41,13 +41,9 @@ public class EdgeService : IEdgeService
     {
         var scope = _serviceProvider.CreateScope();
         var context = scope.ServiceProvider.GetRequiredService<DataContext>();
-        //var vertexSet = context.DataSets.Where(ds => ds.DataGroupId == dataSetId).Include(ds => ds.VertexEntity)
-          //  .ThenInclude(ve => ve.VertexAttributes).ThenInclude(vv => vv.VertexValues).FirstOrDefault(ds => ds != null);
+
         var edgeSet = context.DataSets.Where(ds => ds.DataGroupId == dataSetId).Include(ds => ds.EdgeEntity)
             .ThenInclude(ee => ee.EdgeAttributes).ThenInclude(ev => ev.EdgeValues).FirstOrDefault(ds => ds != null);;
-
-        //var vertexRecords = vertexSet.VertexEntity.VertexAttributes.Select(a => a.VertexValues).SelectMany(v => v)
-          //  .GroupBy(v => v.ObjectId);
 
         var edgeRecords = edgeSet.EdgeEntity.EdgeAttributes.Select(ea => ea.EdgeValues).SelectMany(v => v)
             .GroupBy(v => v.ObjectId);
@@ -57,8 +53,6 @@ public class EdgeService : IEdgeService
                 edgeAttributeVales.All(attr =>
                     group.Any(v => v.EdgeAttribute.Name == attr.Key && v.StringValue == attr.Value)));
 
-        //var res = validEdgeRecords.Select(x => x.ToDictionary(g => g.EdgeAttribute.Name, g => g.StringValue)).ToList();
-        
         var res = validEdgeRecords.ToDictionary(x => x.Key,
             x => x.ToDictionary(g => g.EdgeAttribute.Name, g => g.StringValue));        
         return res;
