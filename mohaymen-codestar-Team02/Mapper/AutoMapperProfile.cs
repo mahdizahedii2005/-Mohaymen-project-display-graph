@@ -28,5 +28,7 @@ public class AutoMapperProfile : Profile
             .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name));
         CreateMap<EdgeEntity, GetEdgeEntityDto>();
         CreateMap<VertexEntity, GetVertexEntityDto>();
+        CreateMap<EdgeAttribute, GetAttributeDto>();
+        CreateMap<VertexAttribute, GetAttributeDto>();
     }
 }

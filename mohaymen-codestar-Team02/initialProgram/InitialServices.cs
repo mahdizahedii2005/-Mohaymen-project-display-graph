@@ -7,6 +7,7 @@ using mohaymen_codestar_Team02.Mapper;
 using mohaymen_codestar_Team02.Models;
 using mohaymen_codestar_Team02.Services;
 using mohaymen_codestar_Team02.Services.Administration;
+using mohaymen_codestar_Team02.Services.AnalystService;
 using mohaymen_codestar_Team02.Services.Authenticatoin;
 using mohaymen_codestar_Team02.Services.CookieService;
 using mohaymen_codestar_Team02.Services.DataAdminService;
@@ -62,7 +63,8 @@ public class InitialServices
             .AddScoped<IObjectBuilder, ObjectBuilder>()
             .AddScoped<IEdgeService, EdgeService>()
             .AddScoped<IVertexService, VertexService>()
-            .AddScoped<IGraphService, GraphService>();
+            .AddScoped<IGraphService, GraphService>()
+            .AddScoped<IAnalystService, AnalystService>();
         services.AddAutoMapper(typeof(AutoMapperProfile));
         services.AddAuthorization();
 
