@@ -1,49 +1,24 @@
 using Microsoft.EntityFrameworkCore;
 using mohaymen_codestar_Team02.Data;
 using mohaymen_codestar_Team02.Models;
-using mohaymen_codestar_Team02.Services.DynamicService;
-using mohaymen_codestar_Team02.Services.TokenService;
-using QuikGraph;
 
 namespace mohaymen_codestar_Team02.Services;
 
 public class DisplayService : IDisplayDataService
 {
-    private readonly DataContext _context;
+    private readonly IServiceProvider _serviceProvider;
 
-    public DisplayService(DataContext context)
+    public DisplayService(IServiceProvider serviceProvider)
     {
-        _context = context;
-    }
-
-    public List<Vertex> GetVertices(string databaseName, string vertexIdentifierFieldName)
-    {
-        var dataSet = _context.DataSets.Include(ds => ds.VertexEntity)
-            .ThenInclude(ve => ve.VertexAttributes).ThenInclude(vv => vv.VertexValues).Include(ds => ds.EdgeEntity)
-            .ThenInclude(ee => ee.EdgeAttributes).ThenInclude(ev => ev.EdgeValues)
-            .FirstOrDefault(ds => ds.Name.ToLower().Equals(databaseName.ToLower()));
-
-        var vertexRecords = dataSet.VertexEntity.VertexAttributes.Select(a => a.VertexValues).SelectMany(v => v)
-            .GroupBy(v => v.ObjectId);
-
-        List<Vertex> vertices = new();
-        foreach (var record in vertexRecords)
-        {
-            var value = record.SingleOrDefault(r => r.VertexAttribute.Name == vertexIdentifierFieldName).StringValue;
-            var v = new Vertex()
-            {
-                Id = record.Key,
-                Label = value
-            };
-            vertices.Add(v);
-        }
-
-        return vertices;
+        _serviceProvider = serviceProvider;
     }
 
     public (List<Vertex> vertices, List<Edge> edges) GetGraph(string databaseName, string sourceEdgeIdentifierFieldName,
         string destinationEdgeIdentifierFieldName, string vertexIdentifierFieldName)
     {
+        using var scope = _serviceProvider.CreateScope();
+        var _context = scope.ServiceProvider.GetRequiredService<DataContext>();
+
         var dataSet = _context.DataSets.Include(ds => ds.VertexEntity)
             .ThenInclude(ve => ve.VertexAttributes).ThenInclude(vv => vv.VertexValues).Include(ds => ds.EdgeEntity)
             .ThenInclude(ee => ee.EdgeAttributes).ThenInclude(ev => ev.EdgeValues)
@@ -82,38 +57,38 @@ public class DisplayService : IDisplayDataService
             List<Vertex> destinations = new();
 
             foreach (var record1 in vertexRecords)
-                foreach (var item in record1)
+            foreach (var item in record1)
+            {
+                if (item.VertexAttribute.Name == vertexIdentifierFieldName && item.StringValue == sourceValue)
                 {
-                    if (item.VertexAttribute.Name == vertexIdentifierFieldName && item.StringValue == sourceValue)
+                    var vertex = new Vertex()
                     {
-                        var vertex = new Vertex()
-                        {
-                            Id = record1.Key
-                        };
-                        sources.Add(vertex);
-                    }
-
-                    if (item.VertexAttribute.Name == vertexIdentifierFieldName && item.StringValue == destinationValue)
-                    {
-                        var vertex = new Vertex()
-                        {
-                            Id = record1.Key
-                        };
-                        destinations.Add(vertex);
-                    }
+                        Id = record1.Key
+                    };
+                    sources.Add(vertex);
                 }
+
+                if (item.VertexAttribute.Name == vertexIdentifierFieldName && item.StringValue == destinationValue)
+                {
+                    var vertex = new Vertex()
+                    {
+                        Id = record1.Key
+                    };
+                    destinations.Add(vertex);
+                }
+            }
 
             foreach (var source in sources)
-                foreach (var des in destinations)
+            foreach (var des in destinations)
+            {
+                var edge = new Edge()
                 {
-                    var edge = new Edge()
-                    {
-                        Id = record.Key,
-                        Source = source.Id,
-                        Target = des.Id
-                    };
-                    edges.Add(edge);
-                }
+                    Id = record.Key,
+                    Source = source.Id,
+                    Target = des.Id
+                };
+                edges.Add(edge);
+            }
         }
 
         return (vertices, edges);

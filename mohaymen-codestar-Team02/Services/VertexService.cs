@@ -1,11 +1,9 @@
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Update.Internal;
 using mohaymen_codestar_Team02.Data;
 using mohaymen_codestar_Team02.Dto;
 using mohaymen_codestar_Team02.Dto.GraphDTO;
 using mohaymen_codestar_Team02.Models;
-using mohaymen_codestar_Team02.Models.VertexEAV;
 
 namespace mohaymen_codestar_Team02.Services;
 
@@ -52,7 +50,7 @@ public class VertexService : IVertexService
         var res = validVertexRecords.ToDictionary(x => x.Key,
             x => x.ToDictionary(g => g.VertexAttribute.Name, g => g.StringValue));
         
-        return res;
+        return res; 
     }
 
     public DetailDto GetVertexDetails(string objId)
@@ -62,9 +60,7 @@ public class VertexService : IVertexService
         var validValue = context.VertexValues.Where(value => value.ObjectId.ToLower() == objId.ToLower()).ToList();
         var result = new DetailDto();
         foreach (var value in validValue)
-        {
             result.AttributeValue[context.VertexAttributes.Find(value.VertexAttributeId).Name] = value.StringValue;
-        }
 
         return result;
     }

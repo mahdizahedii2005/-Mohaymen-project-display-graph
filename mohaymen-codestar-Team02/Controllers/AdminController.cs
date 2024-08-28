@@ -1,5 +1,5 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using mohaymen_codestar_Team02.Dto.Role;
 using mohaymen_codestar_Team02.Dto.User;
 using mohaymen_codestar_Team02.Dto.UserDtos;
 using mohaymen_codestar_Team02.Dto.UserRole;
@@ -9,6 +9,7 @@ using mohaymen_codestar_Team02.Services.Administration;
 namespace mohaymen_codestar_Team02.Controllers;
 
 [ApiController]
+[Authorize(Roles = nameof(RoleType.SystemAdmin))]
 [Route("[controller]")]
 public class AdminController : ControllerBase
 {
@@ -20,23 +21,23 @@ public class AdminController : ControllerBase
     }
 
     [HttpGet("users")]
-    public async Task<IActionResult> GetAllUsers()
+    public async Task<IActionResult> GetAllUsers([FromQuery] int pageNumber)
     {
-        ServiceResponse<List<GetUserDto>?> response =
-            await _adminService.GetAllUsers();
+        var response =
+            await _adminService.GetUsersPaginated(pageNumber);
         return StatusCode((int)response.Type, response);
     }
 
     [HttpGet("users/{username}")]
     public async Task<IActionResult> GetSingleUser(string? username)
     {
-        ServiceResponse<GetUserDto?> response =
+        var response =
             await _adminService.GetUserByUsername(username);
         return StatusCode((int)response.Type, response);
     }
 
     [HttpPost("users")]
-    public async Task<IActionResult> Register([FromBody] RegisterUserDto request)
+    public async Task<IActionResult> CreateUser([FromQuery] CreateUserDto request)
     {
         var user = new User
         {
@@ -46,52 +47,67 @@ public class AdminController : ControllerBase
             Email = request.Email
         };
 
-        ServiceResponse<GetUserDto?> response =
-            await _adminService.Register(user, request.Password);
+        var response =
+            await _adminService.CreateUser(user, request.Password, request.Roles);
 
         return StatusCode((int)response.Type, response);
     }
 
     [HttpDelete("users/{username}")]
-    public async Task<IActionResult> Delete([FromBody] DeleteUserDto request)
+    public async Task<IActionResult> DeleteUser(string username)
     {
         var user = new User
         {
-            Username = request.Username
+            Username = username
         };
 
-        ServiceResponse<GetUserDto?> response =
+        var response =
             await _adminService.DeleteUser(user);
 
+        return StatusCode((int)response.Type, response);
+    }
+
+    [HttpPut("users/update/{username}")]
+    public async Task<IActionResult> UpdateUser([FromQuery] UpdateUserDto request, string username)
+    {
+        var updateUser = new User()
+        {
+            Username = username,
+            FirstName = request.FirstName,
+            LastName = request.LastName,
+            Email = request.Email
+        };
+
+        ServiceResponse<GetUserDto?> response = await _adminService.UpdateUser(updateUser);
         return StatusCode((int)response.Type, response);
     }
 
     [HttpGet("roles")]
     public async Task<IActionResult> GetAllRoles()
     {
-        ServiceResponse<List<GetRoleDto>> response =
+        var response =
             await _adminService.GetAllRoles();
         return StatusCode((int)response.Type, response);
     }
 
     [HttpPut("users/{username}/roles")]
-    public async Task<IActionResult> AddRole([FromBody] AddUserRoleDto request)
+    public async Task<IActionResult> AddRole([FromQuery] AddUserRoleDto request, string username)
     {
-        ServiceResponse<GetUserDto?> response =
+        var response =
             await _adminService.AddRole(
-                new User { Username = request.Username },
+                new User { Username = username },
                 new Role() { RoleType = request.RoleType }
             );
 
         return StatusCode((int)response.Type, response);
     }
 
-    [HttpDelete("users/{username}/roles/{roleType}")]
-    public async Task<IActionResult> DeleteRole([FromBody] DeleteUserRoleDto request)
+    [HttpDelete("users/{username}/roles")]
+    public async Task<IActionResult> DeleteRole([FromQuery] DeleteUserRoleDto request, string username)
     {
-        ServiceResponse<GetUserDto?> response =
+        var response =
             await _adminService.DeleteRole(
-                new User { Username = request.Username },
+                new User { Username = username },
                 new Role() { RoleType = request.RoleType }
             );
 

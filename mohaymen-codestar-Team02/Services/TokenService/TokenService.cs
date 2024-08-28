@@ -17,7 +17,7 @@ public class TokenService : ITokenService
     }
 
 
-    public string CreateToken(Claim[] claims)
+    public string CreateToken(List<Claim> claims)
     {
         var key = new SymmetricSecurityKey(
             Encoding.UTF8.GetBytes(_configuration.GetSection("AppSettings:Token").Value ?? string.Empty));
@@ -36,5 +36,12 @@ public class TokenService : ITokenService
         var user = _httpContextAccessor.HttpContext?.User;
         var usernameClaim = user?.FindFirst(ClaimTypes.Name);
         return usernameClaim?.Value;
+    }
+
+    public string? GetRolesFromToken()
+    {
+        var user = _httpContextAccessor.HttpContext?.User;
+        var userRolesClaim = user?.FindFirst(ClaimTypes.Role);
+        return userRolesClaim?.Value;
     }
 }

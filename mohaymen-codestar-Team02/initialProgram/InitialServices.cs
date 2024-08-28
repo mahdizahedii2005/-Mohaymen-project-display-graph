@@ -7,6 +7,7 @@ using mohaymen_codestar_Team02.Mapper;
 using mohaymen_codestar_Team02.Models;
 using mohaymen_codestar_Team02.Services;
 using mohaymen_codestar_Team02.Services.Administration;
+using mohaymen_codestar_Team02.Services.AnalystService;
 using mohaymen_codestar_Team02.Services.Authenticatoin;
 using mohaymen_codestar_Team02.Services.CookieService;
 using mohaymen_codestar_Team02.Services.DataAdminService;
@@ -62,7 +63,8 @@ public class InitialServices
             .AddScoped<IObjectBuilder, ObjectBuilder>()
             .AddScoped<IEdgeService, EdgeService>()
             .AddScoped<IVertexService, VertexService>()
-            .AddScoped<IGraphService, GraphService>();
+            .AddScoped<IGraphService, GraphService>()
+            .AddScoped<IAnalystService, AnalystService>();
         services.AddAutoMapper(typeof(AutoMapperProfile));
         services.AddAuthorization();
 
@@ -195,7 +197,10 @@ public class InitialServices
         {
             var admin = new User()
             {
-                Username = "admin"
+                Username = "admin",
+                FirstName = "admin",
+                LastName = "admin",
+                Email = "admin@gmail.com"
             };
             _passwordService.CreatePasswordHash("admin", out var passwordHash, out var passwordSalt);
             admin.PasswordHash = passwordHash;
@@ -205,7 +210,7 @@ public class InitialServices
                 r.RoleType.ToLower().Equals(RoleType.SystemAdmin.ToString().ToLower()));
 
             var userRole = new UserRole()
-            { RoleId = role.RoleId, UserId = admin.UserId, Role = role, User = admin };
+                { RoleId = role.RoleId, UserId = admin.UserId, Role = role, User = admin };
             _context.UserRoles.Add(userRole);
 
             _context.Users.Add(admin);

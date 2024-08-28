@@ -45,22 +45,16 @@ public class EdgeServiceTest
         att1.Id = 1;
         att2.Id = 2;
 
-        List<EdgeAttribute> att = new List<EdgeAttribute>() { att1, att2 };
+        List<EdgeAttribute> att = new() { att1, att2 };
 
-        foreach (var attribute in att)
-        {
-            mockContext.Add(attribute);
-        }
+        foreach (var attribute in att) mockContext.Add(attribute);
 
         var val1 = new EdgeValue("val1", 1, objectId2);
         var val2 = new EdgeValue("val2", 1, objectId1);
         var val3 = new EdgeValue("val3", 2, objectId1);
         var val4 = new EdgeValue("val4", 2, objectId2);
-        List<EdgeValue> vertexValues = new List<EdgeValue>() { val1, val2, val3, val4 };
-        foreach (var value in vertexValues)
-        {
-            mockContext.Add(value);
-        }
+        List<EdgeValue> vertexValues = new() { val1, val2, val3, val4 };
+        foreach (var value in vertexValues) mockContext.Add(value);
 
         mockContext.SaveChanges();
         var expected = new Dictionary<string, string>();
@@ -71,7 +65,7 @@ public class EdgeServiceTest
         //assert
         Assert.Equal(result.AttributeValue, expected);
     }
-    
+
     [Fact]
     public void GetEdgeAttribute_ShouldReturnAllAttributes_WhenGivenCorrectEdgeId()
     {
@@ -85,18 +79,18 @@ public class EdgeServiceTest
 
         var expected = new List<GetAttributeDto>()
         {
-            new GetAttributeDto()
+            new()
             {
                 Id = 1,
                 Name = AttName1
             },
-            new GetAttributeDto()
+            new()
             {
                 Id = 2,
                 Name = AttName2
             }
         };
-        
+
         var dataset = new DataGroup("Dataset1", 1)
         {
             DataGroupId = 1,
@@ -104,11 +98,11 @@ public class EdgeServiceTest
             {
                 EdgeAttributes = new List<EdgeAttribute>
                 {
-                    new EdgeAttribute(AttName1, edgeEntityId)
+                    new(AttName1, edgeEntityId)
                     {
                         Id = 1
                     },
-                    new EdgeAttribute(AttName2, edgeEntityId)
+                    new(AttName2, edgeEntityId)
                     {
                         Id = 2
                     }
@@ -119,14 +113,14 @@ public class EdgeServiceTest
         context.Add(dataset);
         context.SaveChanges();
 
-        _mapper.Map<GetAttributeDto>(Arg.Is<EdgeAttribute>(value=>value.Id == 1))
+        _mapper.Map<GetAttributeDto>(Arg.Is<EdgeAttribute>(value => value.Id == 1))
             .Returns(new GetAttributeDto()
             {
                 Id = 1,
                 Name = AttName1
             });
-        
-        _mapper.Map<GetAttributeDto>(Arg.Is<EdgeAttribute>(value=>value.Id == 2))
+
+        _mapper.Map<GetAttributeDto>(Arg.Is<EdgeAttribute>(value => value.Id == 2))
             .Returns(new GetAttributeDto()
             {
                 Id = 2,
@@ -135,12 +129,12 @@ public class EdgeServiceTest
 
         // Act
         var actual = _sut.GetEdgeAttributes(edgeEntityId);
-        
+
         // Assert
         Assert.Equivalent(expected, actual);
     }
-    
-     [Fact]
+
+    [Fact]
     public void GetAllEdges_ShouldReturnAllEdges_WhenGivenCorrectDatasetAndIdentifiersName()
     {
         using var scope = _serviceProvider.CreateScope();
@@ -213,10 +207,13 @@ public class EdgeServiceTest
                             new EdgeValue("val12", 2, "id8") { EdgeAttribute = new EdgeAttribute(attName3, 1)},
                             new EdgeValue("val12", 2, "id9") { EdgeAttribute = new EdgeAttribute(attName3, 1)},
                             new EdgeValue("val8", 2, "id10") { EdgeAttribute = new EdgeAttribute(attName3, 1)}
-                        }
+                        }        
                     }
+                    
                 }
+                
             }
+            
         };
 
         var expected = new Dictionary<string, Dictionary<string, string>>()
@@ -244,7 +241,7 @@ public class EdgeServiceTest
         contex.DataSets.Add(dataset);
         contex.SaveChanges();
 
-        
+
         // Act
         var actual = _sut.GetAllEdges(datasetId, sourceEdgeIdentifierFieldName,
             destinationEdgeIdentifierFieldName, attValue);
