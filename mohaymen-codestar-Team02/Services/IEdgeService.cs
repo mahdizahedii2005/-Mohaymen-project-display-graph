@@ -7,9 +7,9 @@ namespace mohaymen_codestar_Team02.Services;
 
 public interface IEdgeService
 {
-    public List<Edge> GetAllEdges(long dataSetId, string vertexIdentifierFieldName,
+    public Dictionary<string, Dictionary<string, string>> GetAllEdges(long dataSetId,
         string sourceEdgeIdentifierFieldName,
-        string destinationEdgeIdentifierFieldName);
+        string destinationEdgeIdentifierFieldName, Dictionary<string, string> edgeAttributeVales);
 
     DetailDto GetEdgeDetails(string objId);
     public List<GetAttributeDto> GetEdgeAttributes(long edgeEntityId);

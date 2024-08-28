@@ -12,7 +12,7 @@ public interface IDataAdminService
     ServiceResponse<List<GetDataGroupDto>> DisplayDataSet();
 
     Task<ServiceResponse<DisplayGraphDto>> DisplayGeraphData(long dataSetId, string sourceEdgeIdentifierFieldName,
-        string destinationEdgeIdentifierFieldName, string vertexIdentifierFieldName);
+        string destinationEdgeIdentifierFieldName, string vertexIdentifierFieldName, Dictionary<string, string> vertexAttributeVales, Dictionary<string, string> edgeAttributeVales);
 
     ServiceResponse<DetailDto> GetVertexDetail(string objectId);
     ServiceResponse<DetailDto> GetEdgeDetail(string objectId);

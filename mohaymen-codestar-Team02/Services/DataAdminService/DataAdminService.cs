@@ -93,13 +93,14 @@ public class DataAdminService
         return new ServiceResponse<List<GetDataGroupDto>>(dataGroupDtos, ApiResponseType.Success, "");
     }
 
-    public async Task<ServiceResponse<DisplayGraphDto>> DisplayGeraphData(long databaseName,
+    public async Task<ServiceResponse<DisplayGraphDto>> DisplayGeraphData(long databaseId,
         string sourceEdgeIdentifierFieldName,
-        string destinationEdgeIdentifierFieldName, string vertexIdentifierFieldName)
+        string destinationEdgeIdentifierFieldName, string vertexIdentifierFieldName, Dictionary<string, string> vertexAttributeVales, Dictionary<string, string> edgeAttributeVales)
     {
-        var graph = _graphService.GetGraph(databaseName, sourceEdgeIdentifierFieldName,
-            destinationEdgeIdentifierFieldName,
-            vertexIdentifierFieldName);
+        var vertices = _vertexService.GetAllVertices(databaseId, vertexIdentifierFieldName, vertexAttributeVales);
+        var edges = _edgeService.GetAllEdges(databaseId, sourceEdgeIdentifierFieldName,
+            destinationEdgeIdentifierFieldName, edgeAttributeVales);
+        var graph = _graphService.GetGraph(vertices, edges, vertexIdentifierFieldName, sourceEdgeIdentifierFieldName, destinationEdgeIdentifierFieldName);
 
         var dto = new DisplayGraphDto()
         {

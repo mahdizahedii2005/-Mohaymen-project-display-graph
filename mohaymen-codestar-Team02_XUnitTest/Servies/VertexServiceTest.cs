@@ -146,21 +146,32 @@ public class VertexServiceTest
         var mockContext = scope.ServiceProvider.GetRequiredService<DataContext>();
 
         // Arrange
-        string datasetName = "DataSet1";
-        string vertexIdentifierFieldName = "CardID";
+        long datasetId = 1;
+        string attName1 = "AttName1";
+        string attName2 = "AttName2";
+        string vertexIdentifierFieldName = attName1;
 
-        var dataset = new DataGroup(datasetName, 1)
+        var dataset = new DataGroup("DatasetName1", 1)
         {
+            DataGroupId = 1,
             VertexEntity = new VertexEntity("Account", 1)
             {
                 VertexAttributes = new List<VertexAttribute>
                 {
-                    new VertexAttribute(vertexIdentifierFieldName, 1)
+                    new VertexAttribute(attName1, 1)
                     {
                         VertexValues = new List<VertexValue>
                         {
-                            new VertexValue("val1", 1, "id1"){ VertexAttribute = new VertexAttribute(vertexIdentifierFieldName, 1)},
-                            new VertexValue("val2", 1, "id2") { VertexAttribute = new VertexAttribute(vertexIdentifierFieldName, 1)}
+                            new VertexValue("val1", 1, "id1"){ VertexAttribute = new VertexAttribute(attName1, 1)},
+                            new VertexValue("val2", 1, "id2") { VertexAttribute = new VertexAttribute(attName1, 1)}
+                        }
+                    },
+                    new VertexAttribute(attName2, 1)
+                    {
+                        VertexValues = new List<VertexValue>
+                        {
+                            new VertexValue("val3", 2, "id1"){ VertexAttribute = new VertexAttribute(attName2, 1)},
+                            new VertexValue("val4", 2, "id2") { VertexAttribute = new VertexAttribute(attName2, 1)}
                         }
                     }
                 }
@@ -169,24 +180,24 @@ public class VertexServiceTest
 
         mockContext.DataSets.Add(dataset);
         mockContext.SaveChanges();
-        
-        List<Vertex> expected = new List<Vertex>()
+
+        Dictionary<string, Dictionary<string, string>> expected = new Dictionary<string, Dictionary<string, string>>()
         {
-            new Vertex()
+            {"id1", new Dictionary<string, string>()
             {
-                Id = "id1",
-                Label = "val1"
-            }, 
-            new Vertex()
-            {
-                Id = "id2",
-                Label = "val2"
-            }
+                {attName1, "val1"},
+                {attName2, "val3"}
+            }}
         };
-        
+
+        var attValue = new Dictionary<string, string>()
+        {
+            {attName1, "val1"},
+            //{attName2, "val3"},
+        };
 
         // Act
-        var actual = _sut.GetAllVertices(datasetName, vertexIdentifierFieldName);
+        var actual = _sut.GetAllVertices(datasetId, vertexIdentifierFieldName, attValue);
 
         // Assert
         Assert.Equivalent(expected, actual);

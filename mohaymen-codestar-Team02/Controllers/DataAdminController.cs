@@ -50,14 +50,13 @@ public class DataAdminController : ControllerBase
     }
 
     [HttpGet("DataSets/{dataSetId}")]
-    public async Task<IActionResult> DisplayDataSetAsGraph(long dataSetId, [FromQuery] string vertexIdentifier,
-        [FromQuery] string sourceIdentifier, [FromQuery] string targetIdentifier)
+    public async Task<IActionResult> DisplayDataSetAsGraph([FromQuery]GraphQueryInfoDto graphQueryInfoDto, [FromQuery] Dictionary<string, string> vertexAttributeValues, [FromQuery] Dictionary<string, string> edgeAttributeValues)
     {
         //Todo all Of Them
         ServiceResponse<DisplayGraphDto> response =
-            await _dataAdminService.DisplayGeraphData(dataSetId, sourceIdentifier,
-                targetIdentifier, vertexIdentifier);
-        response.Data.GraphId = dataSetId;
+            await _dataAdminService.DisplayGeraphData(graphQueryInfoDto.datasetId, graphQueryInfoDto.sourceIdentifier,
+                graphQueryInfoDto.targetIdentifier, graphQueryInfoDto.vertexIdentifier, vertexAttributeValues, edgeAttributeValues);
+        response.Data.GraphId = graphQueryInfoDto.datasetId;
         return StatusCode((int)response.Type, response);
     }
 

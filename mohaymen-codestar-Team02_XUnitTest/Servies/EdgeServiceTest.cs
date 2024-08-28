@@ -5,7 +5,6 @@ using mohaymen_codestar_Team02.Data;
 using mohaymen_codestar_Team02.Dto;
 using mohaymen_codestar_Team02.Models;
 using mohaymen_codestar_Team02.Models.EdgeEAV;
-using mohaymen_codestar_Team02.Models.VertexEAV;
 using mohaymen_codestar_Team02.Services;
 using NSubstitute;
 
@@ -100,6 +99,7 @@ public class EdgeServiceTest
         
         var dataset = new DataGroup("Dataset1", 1)
         {
+            DataGroupId = 1,
             EdgeEntity = new EdgeEntity("Transaction", 1)
             {
                 EdgeAttributes = new List<EdgeAttribute>
@@ -147,25 +147,18 @@ public class EdgeServiceTest
         var contex = scope.ServiceProvider.GetRequiredService<DataContext>();
 
         // Arrange
-        string datasetName = "DataSet1";
+        long datasetId = 1;
+        string attName1 = "SourceAcount";
+        string attName2 = "DestiantionAccount";
+        string attName3 = "RandomAtt";
         string vertexIdentifierFieldName = "CardID";
-        string sourceEdgeIdentifierFieldName = "SourceAcount";
-        string destinationEdgeIdentifierFieldName = "DestiantionAccount";
+        string sourceEdgeIdentifierFieldName = attName1;
+        string destinationEdgeIdentifierFieldName = attName2;
 
-        var expected = new List<Edge>()
+        var attValue = new Dictionary<string, string>()
         {
-            new Edge()
-            {
-                Id = "id1",
-                Source = "id2",
-                Target = "id3"
-            },
-            new Edge()
-            {
-                Id = "id2",
-                Source = "id4",
-                Target = "id5"
-            }
+            {attName1, "val1"},
+            {attName2, "val8"}
         };
 
         var dataset = new DataGroup("Dataset1", 1)
@@ -174,50 +167,87 @@ public class EdgeServiceTest
             {
                 EdgeAttributes = new List<EdgeAttribute>
                 {
-                    new EdgeAttribute(sourceEdgeIdentifierFieldName, 1)
+                    new EdgeAttribute(attName1, 1)
                     {
                         EdgeValues = new List<EdgeValue>
                         {
-                            new EdgeValue("val1", 1, "id1") { EdgeAttribute = new EdgeAttribute(sourceEdgeIdentifierFieldName, 1)},
-                            new EdgeValue("val2", 1, "id2") { EdgeAttribute = new EdgeAttribute(sourceEdgeIdentifierFieldName, 1)},
-
+                            new EdgeValue("val1", 1, "id1"){ EdgeAttribute = new EdgeAttribute(attName1, 1)},
+                            new EdgeValue("val1", 1, "id2") { EdgeAttribute = new EdgeAttribute(attName1, 1)},
+                            new EdgeValue("val2", 1, "id3") { EdgeAttribute = new EdgeAttribute(attName1, 1)},
+                            new EdgeValue("val2", 1, "id4") { EdgeAttribute = new EdgeAttribute(attName1, 1)},
+                            new EdgeValue("val5", 1, "id5") { EdgeAttribute = new EdgeAttribute(attName1, 1)},
+                            new EdgeValue("val1", 1, "id6") { EdgeAttribute = new EdgeAttribute(attName1, 1)},
+                            new EdgeValue("val1", 1, "id7") { EdgeAttribute = new EdgeAttribute(attName1, 1)},
+                            new EdgeValue("val5", 1, "id8") { EdgeAttribute = new EdgeAttribute(attName1, 1)},
+                            new EdgeValue("val1", 1, "id9") { EdgeAttribute = new EdgeAttribute(attName1, 1)},
+                            new EdgeValue("val3", 1, "id10") { EdgeAttribute = new EdgeAttribute(attName1, 1)}
+                        }
+                    }, // 2, 6, 7
+                    new EdgeAttribute(attName2, 1)
+                    {
+                        EdgeValues = new List<EdgeValue>
+                        {
+                            new EdgeValue("val7", 2, "id1"){ EdgeAttribute = new EdgeAttribute(attName2, 1)},
+                            new EdgeValue("val8", 2, "id2") { EdgeAttribute = new EdgeAttribute(attName2, 1)},
+                            new EdgeValue("val9", 2, "id3") { EdgeAttribute = new EdgeAttribute(attName2, 1)},
+                            new EdgeValue("val10", 2, "id4") { EdgeAttribute = new EdgeAttribute(attName2, 1)},
+                            new EdgeValue("val11", 2, "id5") { EdgeAttribute = new EdgeAttribute(attName2, 1)},
+                            new EdgeValue("val8", 2, "id6") { EdgeAttribute = new EdgeAttribute(attName2, 1)},
+                            new EdgeValue("val8", 2, "id7") { EdgeAttribute = new EdgeAttribute(attName2, 1)},
+                            new EdgeValue("val12", 2, "id8") { EdgeAttribute = new EdgeAttribute(attName2, 1)},
+                            new EdgeValue("val12", 2, "id9") { EdgeAttribute = new EdgeAttribute(attName2, 1)},
+                            new EdgeValue("val8", 2, "id10") { EdgeAttribute = new EdgeAttribute(attName2, 1)}
                         }
                     },
-                    new EdgeAttribute(destinationEdgeIdentifierFieldName, 2)
+                    new EdgeAttribute(attName3, 1)
                     {
                         EdgeValues = new List<EdgeValue>
                         {
-                            new EdgeValue("val3", 2, "id1") { EdgeAttribute = new EdgeAttribute(destinationEdgeIdentifierFieldName, 1)},
-                            new EdgeValue("val3", 2, "id2") { EdgeAttribute = new EdgeAttribute(destinationEdgeIdentifierFieldName, 1)},
-                        }
-                    }
-                }
-            },
-            VertexEntity = new VertexEntity("Account", 1)
-            {
-                VertexAttributes = new List<VertexAttribute>
-                {
-                    new VertexAttribute(vertexIdentifierFieldName, 1)
-                    {
-                        VertexValues = new List<VertexValue>
-                        {
-                            new VertexValue("val1", 1, "id2"){ VertexAttribute = new VertexAttribute(vertexIdentifierFieldName, 1)},
-                            new VertexValue("val3", 1, "id3") { VertexAttribute = new VertexAttribute(vertexIdentifierFieldName, 1)},
-                            new VertexValue("val2", 1, "id4") { VertexAttribute = new VertexAttribute(vertexIdentifierFieldName, 1)},
-                            new VertexValue("val3", 1, "id5") { VertexAttribute = new VertexAttribute(vertexIdentifierFieldName, 1)}
+                            new EdgeValue("val7", 2, "id1"){ EdgeAttribute = new EdgeAttribute(attName3, 1)},
+                            new EdgeValue("val11", 2, "id2") { EdgeAttribute = new EdgeAttribute(attName3, 1)},
+                            new EdgeValue("val9", 2, "id3") { EdgeAttribute = new EdgeAttribute(attName3, 1)},
+                            new EdgeValue("val10", 2, "id4") { EdgeAttribute = new EdgeAttribute(attName3, 1)},
+                            new EdgeValue("val11", 2, "id5") { EdgeAttribute = new EdgeAttribute(attName3, 1)},
+                            new EdgeValue("val8", 2, "id6") { EdgeAttribute = new EdgeAttribute(attName3, 1)},
+                            new EdgeValue("val18", 2, "id7") { EdgeAttribute = new EdgeAttribute(attName3, 1)},
+                            new EdgeValue("val12", 2, "id8") { EdgeAttribute = new EdgeAttribute(attName3, 1)},
+                            new EdgeValue("val12", 2, "id9") { EdgeAttribute = new EdgeAttribute(attName3, 1)},
+                            new EdgeValue("val8", 2, "id10") { EdgeAttribute = new EdgeAttribute(attName3, 1)}
                         }
                     }
                 }
             }
         };
 
+        var expected = new Dictionary<string, Dictionary<string, string>>()
+        {
+            {"id2", new Dictionary<string, string>()
+            {
+                {attName1, "val1"},
+                {attName2, "val8"},
+                {attName3, "val11"}
+            }},
+            {"id6", new Dictionary<string, string>()
+            {
+                {attName1, "val1"},
+                {attName2, "val8"},
+                {attName3, "val8"}
+            }},
+            {"id7", new Dictionary<string, string>()
+            {
+                {attName1, "val1"},
+                {attName2, "val8"},
+                {attName3, "val18"}
+            }}
+        };
+        
         contex.DataSets.Add(dataset);
         contex.SaveChanges();
 
         
         // Act
-        var actual = _sut.GetAllEdges(datasetName, vertexIdentifierFieldName, sourceEdgeIdentifierFieldName,
-            destinationEdgeIdentifierFieldName);
+        var actual = _sut.GetAllEdges(datasetId, sourceEdgeIdentifierFieldName,
+            destinationEdgeIdentifierFieldName, attValue);
 
         // Assert
         Assert.Equivalent(expected, actual);
