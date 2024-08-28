@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using mohaymen_codestar_Team02.Dto.User;
 using mohaymen_codestar_Team02.Dto.UserDtos;
 using mohaymen_codestar_Team02.Dto.UserRole;
 using mohaymen_codestar_Team02.Models;
@@ -36,7 +37,7 @@ public class AdminController : ControllerBase
     }
 
     [HttpPost("users")]
-    public async Task<IActionResult> Register([FromBody] RegisterUserDto request)
+    public async Task<IActionResult> CreateUser([FromBody] RegisterUserDto request)
     {
         var user = new User
         {
@@ -47,13 +48,13 @@ public class AdminController : ControllerBase
         };
 
         var response =
-            await _adminService.Register(user, request.Password, request.Roles);
+            await _adminService.CreateUser(user, request.Password, request.Roles);
 
         return StatusCode((int)response.Type, response);
     }
 
     [HttpDelete("users/{username}")]
-    public async Task<IActionResult> Delete(string username)
+    public async Task<IActionResult> DeleteUser(string username)
     {
         var user = new User
         {
@@ -63,6 +64,21 @@ public class AdminController : ControllerBase
         var response =
             await _adminService.DeleteUser(user);
 
+        return StatusCode((int)response.Type, response);
+    }
+
+    [HttpPut("users/update/{username}")]
+    public async Task<IActionResult> UpdateUser([FromBody] UpdateUserDto request, string username)
+    {
+        var updateUser = new User()
+        {
+            Username = username,
+            FirstName = request.FirstName,
+            LastName = request.LastName,
+            Email = request.Email
+        };
+
+        ServiceResponse<GetUserDto?> response = await _adminService.UpdateUser(updateUser);
         return StatusCode((int)response.Type, response);
     }
 

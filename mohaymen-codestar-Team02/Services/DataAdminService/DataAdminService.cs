@@ -106,7 +106,8 @@ public class DataAdminService
             Vertices = graph.vertices,
             Edges = graph.edges
         };
-        return new ServiceResponse<DisplayGraphDto>(dto, ApiResponseType.Success, Resources.GraphFetchedSuccessfullyMessage);
+        return new ServiceResponse<DisplayGraphDto>(dto, ApiResponseType.Success,
+            Resources.GraphFetchedSuccessfullyMessage);
     }
 
     public ServiceResponse<DetailDto> GetVertexDetail(string objectId)

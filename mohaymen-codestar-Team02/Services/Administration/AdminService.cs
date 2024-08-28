@@ -54,7 +54,7 @@ public class AdminService : IAdminService
     {
         using var scope = _serviceProvider.CreateScope();
         var context = scope.ServiceProvider.GetRequiredService<DataContext>();
-        
+
         var token = _cookieService.GetCookieValue();
         if (string.IsNullOrEmpty(token))
             return new ServiceResponse<List<GetUserDto>?>(null, ApiResponseType.Unauthorized,
@@ -85,7 +85,7 @@ public class AdminService : IAdminService
         return new ServiceResponse<List<GetRoleDto>>(roles, ApiResponseType.Success, Resources.UsersRetrievedMassage);
     }
 
-    public async Task<ServiceResponse<GetUserDto?>> Register(User user, string password, List<string> roles)
+    public async Task<ServiceResponse<GetUserDto?>> CreateUser(User user, string password, List<string> roles)
     {
         using var scope = _serviceProvider.CreateScope();
         var context = scope.ServiceProvider.GetRequiredService<DataContext>();
@@ -104,11 +104,11 @@ public class AdminService : IAdminService
 
         if (!_passwordService.ValidatePassword(password))
             return new ServiceResponse<GetUserDto?>(null, ApiResponseType.BadRequest,
-                Resources.YourPasswordIsNotValidated);
+                Resources.InvalidPasswordMessage);
 
         if (!IsRoleMatching(roles, context))
             return new ServiceResponse<GetUserDto?>(null, ApiResponseType.BadRequest,
-                Resources.SomeRolesAreInvalid);
+                Resources.SomeRolesAreInvalidMessage);
 
         _passwordService.CreatePasswordHash(password, out var passwordHash, out var passwordSalt);
         user.PasswordHash = passwordHash;
@@ -156,12 +156,44 @@ public class AdminService : IAdminService
 
         if (user.Username == admin.Username)
             return new ServiceResponse<GetUserDto?>(null, ApiResponseType.BadRequest,
-                Resources.CanNotDeleteYourself);
+                Resources.CanNotDeleteYourselfMessage);
+
         context.Users.Remove(foundUser);
         await context.SaveChangesAsync();
 
         var userDto = _mapper.Map<GetUserDto>(foundUser);
-        return new ServiceResponse<GetUserDto?>(userDto, ApiResponseType.Success, Resources.UserDeletionSuccessful);
+        return new ServiceResponse<GetUserDto?>(userDto, ApiResponseType.Success,
+            Resources.UserDeletionSuccessfulMessage);
+    }
+
+    public async Task<ServiceResponse<GetUserDto?>> UpdateUser(User user)
+    {
+        using var scope = _serviceProvider.CreateScope();
+        var context = scope.ServiceProvider.GetRequiredService<DataContext>();
+
+        var token = _cookieService.GetCookieValue();
+        if (string.IsNullOrEmpty(token))
+            return new ServiceResponse<GetUserDto?>(null, ApiResponseType.Unauthorized, Resources.UnauthorizedMessage);
+
+        var adminId = _tokenService.GetUserNameFromToken();
+        var admin = await GetUser(adminId, context);
+        if (admin is null)
+            return new ServiceResponse<GetUserDto?>(null, ApiResponseType.BadRequest, Resources.UserNotFoundMessage);
+
+        var foundUser = await GetUser(user.Username, context);
+        if (foundUser is null)
+            return new ServiceResponse<GetUserDto?>(null, ApiResponseType.NotFound, Resources.UserNotFoundMessage);
+
+        foundUser.FirstName = user.FirstName;
+        foundUser.LastName = user.LastName;
+        foundUser.Email = user.Email;
+
+        context.Users.Update(foundUser);
+        await context.SaveChangesAsync();
+
+        var userDto = _mapper.Map<GetUserDto>(user);
+        return new ServiceResponse<GetUserDto?>(userDto, ApiResponseType.Success,
+            Resources.UserUpdateSuccessfulyMessage);
     }
 
     public async Task<ServiceResponse<GetUserDto?>> AddRole(User user, Role role)
@@ -187,7 +219,8 @@ public class AdminService : IAdminService
             return new ServiceResponse<GetUserDto?>(null, ApiResponseType.BadRequest, Resources.RoleNotFoundMessage);
 
         if (await GetUserRole(foundRole, foundUser, context) is not null)
-            return new ServiceResponse<GetUserDto?>(null, ApiResponseType.BadRequest, Resources.RoleAlreadyAssigned);
+            return new ServiceResponse<GetUserDto?>(null, ApiResponseType.BadRequest,
+                Resources.RoleAlreadyAssignedMessage);
 
         var userRole = new UserRole
         {
@@ -229,7 +262,8 @@ public class AdminService : IAdminService
 
         var userRole = await GetUserRole(foundRole, foundUser, context);
         if (userRole is null)
-            return new ServiceResponse<GetUserDto?>(null, ApiResponseType.BadRequest, Resources.DontHaveThisRole);
+            return new ServiceResponse<GetUserDto?>(null, ApiResponseType.BadRequest,
+                Resources.DontHaveThisRoleMessage);
 
         context.UserRoles.Remove(userRole);
         await context.SaveChangesAsync();

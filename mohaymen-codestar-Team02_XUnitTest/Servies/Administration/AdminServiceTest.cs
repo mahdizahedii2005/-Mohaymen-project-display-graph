@@ -47,7 +47,7 @@ public class AdminServiceTest
         _cookieService.GetCookieValue().Returns(string.Empty);
 
         // Act
-        var result = await _sut.Register(null, "password", new List<string>());
+        var result = await _sut.CreateUser(null, "password", new List<string>());
 
         // Assert
         Assert.Equal(ApiResponseType.Unauthorized, result.Type);
@@ -60,7 +60,7 @@ public class AdminServiceTest
         FixTheReturnOfCookies("admin");
 
         // Act
-        var response = await _sut.Register(null, "password", new List<string>());
+        var response = await _sut.CreateUser(null, "password", new List<string>());
 
         // Assert
         Assert.Equal(ApiResponseType.BadRequest, response.Type);
@@ -78,7 +78,7 @@ public class AdminServiceTest
         var existingUser = AddUserWithRole("existingUser", "Analyst", 2, mockContext);
 
         // Act
-        var result = await _sut.Register(existingUser.User, "password", new List<string>());
+        var result = await _sut.CreateUser(existingUser.User, "password", new List<string>());
 
         // Assert
         Assert.Equal(ApiResponseType.Conflict, result.Type);
@@ -111,7 +111,7 @@ public class AdminServiceTest
         _passwordService.ValidatePassword(Arg.Any<string>()).Returns(true);
 
         // Act
-        var result = await _sut.Register(
+        var result = await _sut.CreateUser(
             new User() { UserId = 8, Username = "mamad" }, "password", new List<string>() { "DataAdmin" });
 
         // Assert
@@ -143,7 +143,7 @@ public class AdminServiceTest
         var newUser = new User() { UserId = 8, Username = "mamad" };
 
         // Act
-        var result = await _sut.Register(newUser, "password", new List<string>());
+        var result = await _sut.CreateUser(newUser, "password", new List<string>());
 
         // Assert
         Assert.Equal(ApiResponseType.Created, result.Type);
