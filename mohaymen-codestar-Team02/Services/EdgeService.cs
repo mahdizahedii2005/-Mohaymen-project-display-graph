@@ -44,16 +44,16 @@ public class EdgeService : IEdgeService
                 out var sources, out var destinations);
 
             foreach (var source in sources)
-            foreach (var des in destinations)
-            {
-                var edge = new Edge()
+                foreach (var des in destinations)
                 {
-                    Id = record.Key,
-                    Source = source.Id,
-                    Target = des.Id
-                };
-                edges.Add(edge);
-            }
+                    var edge = new Edge()
+                    {
+                        Id = record.Key,
+                        Source = source.Id,
+                        Target = des.Id
+                    };
+                    edges.Add(edge);
+                }
         }
 
         return edges;
@@ -67,26 +67,26 @@ public class EdgeService : IEdgeService
         destinations = new List<Vertex>();
 
         foreach (var record1 in vertexRecords)
-        foreach (var item in record1)
-        {
-            if (item.VertexAttribute.Name == vertexIdentifierFieldName && item.StringValue == sourceValue)
+            foreach (var item in record1)
             {
-                var vertex = new Vertex()
+                if (item.VertexAttribute.Name == vertexIdentifierFieldName && item.StringValue == sourceValue)
                 {
-                    Id = record1.Key
-                };
-                sources.Add(vertex);
-            }
+                    var vertex = new Vertex()
+                    {
+                        Id = record1.Key
+                    };
+                    sources.Add(vertex);
+                }
 
-            if (item.VertexAttribute.Name == vertexIdentifierFieldName && item.StringValue == destinationValue)
-            {
-                var vertex = new Vertex()
+                if (item.VertexAttribute.Name == vertexIdentifierFieldName && item.StringValue == destinationValue)
                 {
-                    Id = record1.Key
-                };
-                destinations.Add(vertex);
+                    var vertex = new Vertex()
+                    {
+                        Id = record1.Key
+                    };
+                    destinations.Add(vertex);
+                }
             }
-        }
     }
 
     private void GetSourceAndDerstinationValues(string sourceEdgeIdentifierFieldName,
