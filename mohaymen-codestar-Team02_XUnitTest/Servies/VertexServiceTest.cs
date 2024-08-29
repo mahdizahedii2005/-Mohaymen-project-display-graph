@@ -1,9 +1,12 @@
+using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using mohaymen_codestar_Team02.Data;
+using mohaymen_codestar_Team02.Dto;
 using mohaymen_codestar_Team02.Models;
 using mohaymen_codestar_Team02.Models.VertexEAV;
 using mohaymen_codestar_Team02.Services;
+using NSubstitute;
 
 namespace mohaymen_codestar_Team02_XUnitTest.Servies;
 
@@ -11,9 +14,11 @@ public class VertexServiceTest
 {
     private IServiceProvider _serviceProvider;
     private VertexService _sut;
+    private readonly IMapper _mapper;
 
     public VertexServiceTest()
     {
+        _mapper = Substitute.For<IMapper>();
         var serviceCollection = new ServiceCollection();
 
         var options = new DbContextOptionsBuilder<DataContext>()
@@ -23,7 +28,74 @@ public class VertexServiceTest
         serviceCollection.AddScoped(_ => new DataContext(options));
 
         _serviceProvider = serviceCollection.BuildServiceProvider();
-        _sut = new VertexService(_serviceProvider);
+        _sut = new VertexService(_serviceProvider, _mapper);
+    }
+
+    [Fact]
+    public void GetVertexAttribute_ShouldReturnAllAttributes_WhenGivenCorrectVertexId()
+    {
+        var scope = _serviceProvider.CreateScope();
+        var context = scope.ServiceProvider.GetRequiredService<DataContext>();
+
+        // Arrange
+        long vertexEntityId = 1;
+        var AttName1 = "Att1";
+        var AttName2 = "Att2";
+
+        var expected = new List<GetAttributeDto>()
+        {
+            new()
+            {
+                Id = 1,
+                Name = AttName1
+            },
+            new()
+            {
+                Id = 2,
+                Name = AttName2
+            }
+        };
+
+        var dataset = new DataGroup("Dataset1", 1)
+        {
+            VertexEntity = new VertexEntity("Account", 1)
+            {
+                VertexAttributes = new List<VertexAttribute>
+                {
+                    new(AttName1, 1)
+                    {
+                        Id = 1
+                    },
+                    new(AttName2, 1)
+                    {
+                        Id = 2
+                    }
+                }
+            }
+        };
+
+        context.Add(dataset);
+        context.SaveChanges();
+
+        _mapper.Map<GetAttributeDto>(Arg.Is<VertexAttribute>(value => value.Id == 1))
+            .Returns(new GetAttributeDto()
+            {
+                Id = 1,
+                Name = AttName1
+            });
+
+        _mapper.Map<GetAttributeDto>(Arg.Is<VertexAttribute>(value => value.Id == 2))
+            .Returns(new GetAttributeDto()
+            {
+                Id = 2,
+                Name = AttName2
+            });
+
+        // Act
+        var actual = _sut.GetVertexAttributes(vertexEntityId);
+
+        // Assert
+        Assert.Equivalent(expected, actual);
     }
 
     [Fact]
@@ -77,12 +149,14 @@ public class VertexServiceTest
             {
                 VertexAttributes = new List<VertexAttribute>
                 {
-                    new("CardID", 1)
+                    new(vertexIdentifierFieldName, 1)
                     {
                         VertexValues = new List<VertexValue>
                         {
-                            new("value1", 1, "id1") { VertexAttribute = new VertexAttribute("CardID", 1) },
-                            new("value2", 1, "id2") { VertexAttribute = new VertexAttribute("CardID", 1) }
+                            new("val1", 1, "id1")
+                                { VertexAttribute = new VertexAttribute(vertexIdentifierFieldName, 1) },
+                            new("val2", 1, "id2")
+                                { VertexAttribute = new VertexAttribute(vertexIdentifierFieldName, 1) }
                         }
                     }
                 }
@@ -97,18 +171,18 @@ public class VertexServiceTest
             new Vertex
             {
                 Id = "id1",
-                Value = "value1"
+                Label = "val1"
             },
             new Vertex
             {
                 Id = "id2",
-                Value = "value2"
+                Label = "val2"
             }
         };
 
 
         // Act
-        var actual = _sut.GetAllVertices(datasetName, vertexIdentifierFieldName);
+        var actual = _sut.GetAllVertices(1, vertexIdentifierFieldName);
 
         // Assert
         Assert.Equivalent(expected, actual);

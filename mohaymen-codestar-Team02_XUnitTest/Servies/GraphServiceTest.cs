@@ -32,12 +32,12 @@ public class GraphServiceTest
             new()
             {
                 Id = "id1",
-                Value = "value1"
+                Label = "value1"
             },
             new()
             {
                 Id = "id2",
-                Value = "value2"
+                Label = "value2"
             }
         };
 
@@ -53,12 +53,12 @@ public class GraphServiceTest
 
         var expected = (expectedVertex, expectedEdge);
 
-        _vertexService.GetAllVertices(datasetName, vertexIdentifierFieldName).Returns(expectedVertex);
-        _edgeService.GetAllEdges(datasetName, vertexIdentifierFieldName, sourceEdgeIdentifierFieldName,
+        _vertexService.GetAllVertices(1, vertexIdentifierFieldName).Returns(expectedVertex);
+        _edgeService.GetAllEdges(1, vertexIdentifierFieldName, sourceEdgeIdentifierFieldName,
             destinationEdgeIdentifierFieldName).Returns(expectedEdge);
 
         // Act
-        var actual = _sut.GetGraph(datasetName, sourceEdgeIdentifierFieldName, destinationEdgeIdentifierFieldName,
+        var actual = _sut.GetGraph(1, sourceEdgeIdentifierFieldName, destinationEdgeIdentifierFieldName,
             vertexIdentifierFieldName);
 
         // Assert

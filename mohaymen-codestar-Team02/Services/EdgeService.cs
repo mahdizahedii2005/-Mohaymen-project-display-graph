@@ -1,5 +1,8 @@
+using System.Linq;
+using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using mohaymen_codestar_Team02.Data;
+using mohaymen_codestar_Team02.Dto;
 using mohaymen_codestar_Team02.Dto.GraphDTO;
 using mohaymen_codestar_Team02.Models;
 using mohaymen_codestar_Team02.Models.EdgeEAV;
@@ -11,27 +14,43 @@ namespace mohaymen_codestar_Team02.Services;
 public class EdgeService : IEdgeService
 {
     private readonly IServiceProvider _serviceProvider;
+    private readonly IMapper _mapper;
 
-    public EdgeService(IServiceProvider serviceProvider)
+    public EdgeService(IServiceProvider serviceProvider, IMapper mapper)
     {
         _serviceProvider = serviceProvider;
+        _mapper = mapper;
     }
 
-    public List<Edge> GetAllEdges(string databaseName, string vertexIdentifierFieldName,
+
+    public List<GetAttributeDto> GetEdgeAttributes(long edgeEntityId)
+    {
+        var scope = _serviceProvider.CreateScope();
+        var context = scope.ServiceProvider.GetRequiredService<DataContext>();
+
+        var edgeAttribuite = context.EdgeEntities.Include(ve => ve.EdgeAttributes)
+            .FirstOrDefault(ve => ve.EdgeEntityId == edgeEntityId)
+            ?.EdgeAttributes;
+
+        return edgeAttribuite.Select(va => _mapper.Map<GetAttributeDto>(va)).ToList();
+    }
+
+    public List<Edge> GetAllEdges(long dataSetId, string vertexIdentifierFieldName,
         string sourceEdgeIdentifierFieldName,
         string destinationEdgeIdentifierFieldName)
     {
         var scope = _serviceProvider.CreateScope();
         var context = scope.ServiceProvider.GetRequiredService<DataContext>();
-        var dataSet = context.DataSets.Include(ds => ds.VertexEntity)
-            .ThenInclude(ve => ve.VertexAttributes).ThenInclude(vv => vv.VertexValues).Include(ds => ds.EdgeEntity)
-            .ThenInclude(ee => ee.EdgeAttributes).ThenInclude(ev => ev.EdgeValues)
-            .FirstOrDefault(ds => ds.Name.ToLower().Equals(databaseName.ToLower()));
+        var vertexSet = context.DataSets.Where(ds => ds.DataGroupId == dataSetId).Include(ds => ds.VertexEntity)
+            .ThenInclude(ve => ve.VertexAttributes).ThenInclude(vv => vv.VertexValues).FirstOrDefault();
+        var edgeSet = context.DataSets.Where(ds => ds.DataGroupId == dataSetId).Include(ds => ds.EdgeEntity)
+            .ThenInclude(ee => ee.EdgeAttributes).ThenInclude(ev => ev.EdgeValues).FirstOrDefault();
+        ;
 
-        var vertexRecords = dataSet.VertexEntity.VertexAttributes.Select(a => a.VertexValues).SelectMany(v => v)
+        var vertexRecords = vertexSet.VertexEntity.VertexAttributes.Select(a => a.VertexValues).SelectMany(v => v)
             .GroupBy(v => v.ObjectId);
 
-        var edgeRecords = dataSet.EdgeEntity.EdgeAttributes.Select(ea => ea.EdgeValues).SelectMany(v => v)
+        var edgeRecords = edgeSet.EdgeEntity.EdgeAttributes.Select(ea => ea.EdgeValues).SelectMany(v => v)
             .GroupBy(v => v.ObjectId);
 
         List<Edge> edges = new();
@@ -111,6 +130,7 @@ public class EdgeService : IEdgeService
         var result = new DetailDto();
         foreach (var value in validValue)
             result.AttributeValue[context.EdgeAttributes.Find(value.EdgeAttributeId).Name] = value.StringValue;
+
         return result;
     }
 }

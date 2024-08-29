@@ -34,7 +34,7 @@ public class DisplayService : IDisplayDataService
             var v = new Vertex()
             {
                 Id = record.Key,
-                Value = value
+                Label = value
             };
             vertices.Add(v);
         }
