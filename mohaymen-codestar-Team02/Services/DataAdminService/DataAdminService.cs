@@ -95,12 +95,14 @@ public class DataAdminService
 
     public async Task<ServiceResponse<DisplayGraphDto>> DisplayGeraphData(long databaseId,
         string sourceEdgeIdentifierFieldName,
-        string destinationEdgeIdentifierFieldName, string vertexIdentifierFieldName, Dictionary<string, string> vertexAttributeVales, Dictionary<string, string> edgeAttributeVales)
+        string destinationEdgeIdentifierFieldName, string vertexIdentifierFieldName,
+        Dictionary<string, string> vertexAttributeVales, Dictionary<string, string> edgeAttributeVales)
     {
         var vertices = _vertexService.GetAllVertices(databaseId, vertexIdentifierFieldName, vertexAttributeVales);
         var edges = _edgeService.GetAllEdges(databaseId, sourceEdgeIdentifierFieldName,
             destinationEdgeIdentifierFieldName, edgeAttributeVales);
-        var graph = _graphService.GetGraph(vertices, edges, vertexIdentifierFieldName, sourceEdgeIdentifierFieldName, destinationEdgeIdentifierFieldName);
+        var graph = _graphService.GetGraph(vertices, edges, vertexIdentifierFieldName, sourceEdgeIdentifierFieldName,
+            destinationEdgeIdentifierFieldName);
 
         var dto = new DisplayGraphDto()
         {

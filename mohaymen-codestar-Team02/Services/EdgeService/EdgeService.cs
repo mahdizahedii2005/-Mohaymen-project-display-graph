@@ -16,7 +16,7 @@ public class EdgeService : IEdgeService
         _serviceProvider = serviceProvider;
         _mapper = mapper;
     }
-    
+
     public List<GetAttributeDto> GetEdgeAttributes(long edgeEntityId)
     {
         var scope = _serviceProvider.CreateScope();
@@ -48,10 +48,10 @@ public class EdgeService : IEdgeService
                     group.Any(v => v.EdgeAttribute.Name == attr.Key && v.StringValue == attr.Value)));
 
         var res = validEdgeRecords.ToDictionary(x => x.Key,
-            x => x.ToDictionary(g => g.EdgeAttribute.Name, g => g.StringValue));        
+            x => x.ToDictionary(g => g.EdgeAttribute.Name, g => g.StringValue));
         return res;
     }
-    
+
     public DetailDto GetEdgeDetails(string objId)
     {
         using var scope = _serviceProvider.CreateScope();
