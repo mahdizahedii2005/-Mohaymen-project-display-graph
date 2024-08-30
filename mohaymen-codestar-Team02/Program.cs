@@ -10,7 +10,7 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowSpecificOrigins",
         builder =>
         {
-            builder.WithOrigins("http://localhost:4200")
+            builder.WithOrigins("http://localhost:4200" , "https://codestar-g2.abriment.com/")
                 .AllowAnyHeader()
                 .AllowAnyMethod()
                 .AllowCredentials();
