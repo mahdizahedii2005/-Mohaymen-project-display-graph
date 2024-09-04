@@ -15,7 +15,7 @@ public class DataAdminController : ControllerBase
 {
     private readonly IDataAdminService _dataAdminService;
     private readonly IFileReader _fileReader;
-
+    
     public DataAdminController(IDataAdminService dataAdminService,
         IFileReader fileReader)
     {
@@ -48,23 +48,22 @@ public class DataAdminController : ControllerBase
         return StatusCode((int)response.Type, response);
     }
 
-    [HttpGet("DataSets/{dataSetId}")]
-    public async Task<IActionResult> DisplayDataSetAsGraph([FromQuery]GraphQueryInfoDto graphQueryInfoDto, [FromQuery] Dictionary<string, string> vertexAttributeValues, [FromQuery] Dictionary<string, string> edgeAttributeValues)
+    [HttpPost("DataSets")]
+    public async Task<IActionResult> DisplayDataSetAsGraph(GetGraphDto getGraphDto)
     {
         ServiceResponse<DisplayGraphDto> response =
-            await _dataAdminService.DisplayGeraphData(graphQueryInfoDto.datasetId, graphQueryInfoDto.sourceIdentifier,
-                graphQueryInfoDto.targetIdentifier, graphQueryInfoDto.vertexIdentifier, vertexAttributeValues, edgeAttributeValues);
-        response.Data.GraphId = graphQueryInfoDto.datasetId;
+            await _dataAdminService.DisplayGeraphData(getGraphDto.datasetId, getGraphDto.sourceIdentifier,
+                getGraphDto.targetIdentifier, getGraphDto.vertexIdentifier, getGraphDto.vertexAttributeValues, getGraphDto.edgeAttributeValues);
+        response.Data.GraphId = getGraphDto.datasetId;
         return StatusCode((int)response.Type, response);
     }
-
 
     [HttpGet("DataSets/Vertices/{objectId}")]
     public async Task<IActionResult> DisplayVertexDetails(string objectId)
     {
         var respond = _dataAdminService.GetVertexDetail(objectId);
         return StatusCode((int)respond.Type, respond);
-    }
+    }       
 
     [HttpGet("DataSets/Edges/{objectId}")]
     public async Task<IActionResult> DisplayEdgeDetails(string objectId)
