@@ -130,7 +130,7 @@ public class AnalystService : IAnalystService
                             validVertexLabel.Add(source.StringValue);
                             validVertexLabel.Add(target.StringValue);
                             validEdges.Add(new Edge()
-                            { Id = edgeValue.Id, Source = source.ObjectId, Target = target.ObjectId });
+                                { Id = edgeValue.Id, Source = source.ObjectId, Target = target.ObjectId });
                         }
                     }
             }
@@ -151,7 +151,7 @@ public class AnalystService : IAnalystService
 
         Console.WriteLine("finish the creating of vertex");
         var responseData = new DisplayGraphDto()
-        { GraphId = graphQueryInfoDto.datasetId, Edges = validEdges, Vertices = resultVertex };
+            { GraphId = graphQueryInfoDto.datasetId, Edges = validEdges, Vertices = resultVertex };
         time.Stop();
         Console.WriteLine("@@@@@@@@@@@@@@@@@@@@@@@@@@@@  that take (" + time.ElapsedMilliseconds +
                           ") milieSec to find the VertexNeighbor @@@@@@@@@@@@@@@@@@@@@@@@@@@@");

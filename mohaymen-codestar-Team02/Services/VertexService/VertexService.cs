@@ -17,7 +17,7 @@ public class VertexService : IVertexService
         _serviceProvider = serviceProvider;
         _mapper = mapper;
     }
-    
+
     public List<GetAttributeDto> GetVertexAttributes(long vertexEntityId)
     {
         var scope = _serviceProvider.CreateScope();
@@ -30,7 +30,8 @@ public class VertexService : IVertexService
         return vertexAttribuite.Select(va => _mapper.Map<GetAttributeDto>(va)).ToList();
     }
 
-    public Dictionary<string, Dictionary<string, string>> GetAllVertices(long dataSetId, string vertexIdentifierFieldName, Dictionary<string, string> vertexAttributeVales)
+    public Dictionary<string, Dictionary<string, string>> GetAllVertices(long dataSetId,
+        string vertexIdentifierFieldName, Dictionary<string, string> vertexAttributeVales)
     {
         using var scope = _serviceProvider.CreateScope();
         var context = scope.ServiceProvider.GetRequiredService<DataContext>();
@@ -41,7 +42,7 @@ public class VertexService : IVertexService
 
         var vertexRecords = dataSet.VertexEntity.VertexAttributes.Select(a => a.VertexValues).SelectMany(v => v)
             .GroupBy(v => v.ObjectId);
-        
+
         var validVertexRecords = vertexRecords
             .Where(group =>
                 vertexAttributeVales.All(attr =>
@@ -49,8 +50,8 @@ public class VertexService : IVertexService
 
         var res = validVertexRecords.ToDictionary(x => x.Key,
             x => x.ToDictionary(g => g.VertexAttribute.Name, g => g.StringValue));
-        
-        return res; 
+
+        return res;
     }
 
     public DetailDto GetVertexDetails(string objId)

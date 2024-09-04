@@ -17,7 +17,7 @@ public class GraphService : IGraphService
         _vertexService = vertexService;
         _edgeService = edgeService;
     }
-    
+
     private void GetSourcesAndDestinations(Dictionary<string, List<Vertex>> vertxAttValues,
         string sourceValue, string destinationValue, out List<Vertex> sources, out List<Vertex> destinations)
     {
@@ -38,7 +38,7 @@ public class GraphService : IGraphService
                 destinations.Add(v);
             }
         }*/
-        
+
         /*
         foreach (var record1 in vertexRecords)
         {
@@ -74,15 +74,9 @@ public class GraphService : IGraphService
         destinationValue = string.Empty;
         foreach (var item in record)
         {
-            if (item.EdgeAttribute.Name == sourceEdgeIdentifierFieldName)
-            {
-                sourceValue = item.StringValue;
-            }
+            if (item.EdgeAttribute.Name == sourceEdgeIdentifierFieldName) sourceValue = item.StringValue;
 
-            if (item.EdgeAttribute.Name == destinationEdgeIdentifierFieldName)
-            {
-                destinationValue = item.StringValue;
-            }
+            if (item.EdgeAttribute.Name == destinationEdgeIdentifierFieldName) destinationValue = item.StringValue;
         }
     }
 
@@ -91,11 +85,11 @@ public class GraphService : IGraphService
         Dictionary<string, Dictionary<string, string>> edges, string vertexIdentifierFieldName,
         string SourceIdentifierFieldName, string TargetIdentifierFieldName)
     {
-        List<Edge> resEdges = new List<Edge>();
+        var resEdges = new List<Edge>();
 
         var dicVertices = vertices.GroupBy(x => x.Value[vertexIdentifierFieldName])
             .ToDictionary(x => x.Key, x => x.ToList());
-        
+
         var resVertices = vertices
             .Select(record => new Vertex
             {
@@ -110,32 +104,23 @@ public class GraphService : IGraphService
             var targetValue = edge.Value[TargetIdentifierFieldName];
 
             List<KeyValuePair<string, Dictionary<string, string>>> sources;
-            if (!dicVertices.TryGetValue(sourceValue, out sources))
-            {
-                continue;
-            }
+            if (!dicVertices.TryGetValue(sourceValue, out sources)) continue;
             List<KeyValuePair<string, Dictionary<string, string>>> targets;
-            if (!dicVertices.TryGetValue(targetValue, out targets))
-            {
-                continue;
-            }
+            if (!dicVertices.TryGetValue(targetValue, out targets)) continue;
 
             foreach (var source in sources)
+            foreach (var target in targets)
             {
-                foreach (var target in targets)
+                var newEdge = new Edge()
                 {
-                    var newEdge = new Edge()
-                    {
-                        Id = edge.Key,
-                        Source = source.Key,
-                        Target = target.Key
-                    };
-                    resEdges.Add(newEdge);
-                }
+                    Id = edge.Key,
+                    Source = source.Key,
+                    Target = target.Key
+                };
+                resEdges.Add(newEdge);
             }
         }
 
         return (resVertices, resEdges);
     }
-    
 }
