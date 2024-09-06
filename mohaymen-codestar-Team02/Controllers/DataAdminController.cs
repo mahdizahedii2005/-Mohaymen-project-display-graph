@@ -53,7 +53,7 @@ public class DataAdminController : ControllerBase
     {
         ServiceResponse<DisplayGraphDto> response =
             await _dataAdminService.DisplayGeraphData(getGraphDto.DatasetId, getGraphDto.SourceIdentifier,
-                getGraphDto.TargetIdentifier, getGraphDto.VertexIdentifier, new Dictionary<string, string>(){}, new Dictionary<string, string>(){});
+                getGraphDto.TargetIdentifier, getGraphDto.VertexIdentifier);
         response.Data.GraphId = getGraphDto.DatasetId;
         return StatusCode((int)response.Type, response);
     }
