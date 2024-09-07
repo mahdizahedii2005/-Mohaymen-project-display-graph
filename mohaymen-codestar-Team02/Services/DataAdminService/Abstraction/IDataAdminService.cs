@@ -16,8 +16,4 @@ public interface IDataAdminService
 
     ServiceResponse<DetailDto> GetVertexDetail(string objectId);
     ServiceResponse<DetailDto> GetEdgeDetail(string objectId);
-
-    ServiceResponse<List<GetAttributeDto>> GetVertexAttributes(long vertexEntityId);
-
-    ServiceResponse<List<GetAttributeDto>> GetEdgeAttributes(long edgeEntityId);
 }

@@ -21,7 +21,7 @@ public class AdminController : ControllerBase
     }
 
     [HttpGet("users")]
-    public async Task<IActionResult> GetAllUsers([FromBody] int pageNumber)
+    public async Task<IActionResult> GetAllUsers([FromQuery] int pageNumber)
     {
         var response =
             await _adminService.GetUsersPaginated(pageNumber);
