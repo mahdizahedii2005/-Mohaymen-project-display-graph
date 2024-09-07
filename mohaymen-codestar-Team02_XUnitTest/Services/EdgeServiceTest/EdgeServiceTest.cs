@@ -8,7 +8,7 @@ using mohaymen_codestar_Team02.Models.EdgeEAV;
 using mohaymen_codestar_Team02.Services;
 using NSubstitute;
 
-namespace mohaymen_codestar_Team02_XUnitTest.Servies;
+namespace mohaymen_codestar_Team02_XUnitTest.Services.EdgeServiceTest;
 
 public class EdgeServiceTest
 {
@@ -74,20 +74,20 @@ public class EdgeServiceTest
 
         // Arrange
         long edgeEntityId = 1;
-        var AttName1 = "Att1";
-        var AttName2 = "Att2";
+        var attName1 = "Att1";
+        var attName2 = "Att2";
 
         var expected = new List<GetAttributeDto>()
         {
             new()
             {
                 Id = 1,
-                Name = AttName1
+                Name = attName1
             },
             new()
             {
                 Id = 2,
-                Name = AttName2
+                Name = attName2
             }
         };
 
@@ -98,11 +98,11 @@ public class EdgeServiceTest
             {
                 EdgeAttributes = new List<EdgeAttribute>
                 {
-                    new(AttName1, edgeEntityId)
+                    new(attName1, edgeEntityId)
                     {
                         Id = 1
                     },
-                    new(AttName2, edgeEntityId)
+                    new(attName2, edgeEntityId)
                     {
                         Id = 2
                     }
@@ -117,14 +117,14 @@ public class EdgeServiceTest
             .Returns(new GetAttributeDto()
             {
                 Id = 1,
-                Name = AttName1
+                Name = attName1
             });
 
         _mapper.Map<GetAttributeDto>(Arg.Is<EdgeAttribute>(value => value.Id == 2))
             .Returns(new GetAttributeDto()
             {
                 Id = 2,
-                Name = AttName2
+                Name = attName2
             });
 
         // Act
@@ -142,17 +142,17 @@ public class EdgeServiceTest
 
         // Arrange
         long datasetId = 1;
-        string attName1 = "SourceAcount";
-        string attName2 = "DestiantionAccount";
-        string attName3 = "RandomAtt";
-        string vertexIdentifierFieldName = "CardID";
-        string sourceEdgeIdentifierFieldName = attName1;
-        string destinationEdgeIdentifierFieldName = attName2;
+        var attName1 = "SourceAcount";
+        var attName2 = "DestiantionAccount";
+        var attName3 = "RandomAtt";
+        var vertexIdentifierFieldName = "CardID";
+        var sourceEdgeIdentifierFieldName = attName1;
+        var destinationEdgeIdentifierFieldName = attName2;
 
         var attValue = new Dictionary<string, string>()
         {
-            {attName1, "val1"},
-            {attName2, "val8"}
+            { attName1, "val1" },
+            { attName2, "val8" }
         };
 
         var dataset = new DataGroup("Dataset1", 1)
@@ -161,83 +161,86 @@ public class EdgeServiceTest
             {
                 EdgeAttributes = new List<EdgeAttribute>
                 {
-                    new EdgeAttribute(attName1, 1)
+                    new(attName1, 1)
                     {
                         EdgeValues = new List<EdgeValue>
                         {
-                            new EdgeValue("val1", 1, "id1"){ EdgeAttribute = new EdgeAttribute(attName1, 1)},
-                            new EdgeValue("val1", 1, "id2") { EdgeAttribute = new EdgeAttribute(attName1, 1)},
-                            new EdgeValue("val2", 1, "id3") { EdgeAttribute = new EdgeAttribute(attName1, 1)},
-                            new EdgeValue("val2", 1, "id4") { EdgeAttribute = new EdgeAttribute(attName1, 1)},
-                            new EdgeValue("val5", 1, "id5") { EdgeAttribute = new EdgeAttribute(attName1, 1)},
-                            new EdgeValue("val1", 1, "id6") { EdgeAttribute = new EdgeAttribute(attName1, 1)},
-                            new EdgeValue("val1", 1, "id7") { EdgeAttribute = new EdgeAttribute(attName1, 1)},
-                            new EdgeValue("val5", 1, "id8") { EdgeAttribute = new EdgeAttribute(attName1, 1)},
-                            new EdgeValue("val1", 1, "id9") { EdgeAttribute = new EdgeAttribute(attName1, 1)},
-                            new EdgeValue("val3", 1, "id10") { EdgeAttribute = new EdgeAttribute(attName1, 1)}
+                            new("val1", 1, "id1") { EdgeAttribute = new EdgeAttribute(attName1, 1) },
+                            new("val1", 1, "id2") { EdgeAttribute = new EdgeAttribute(attName1, 1) },
+                            new("val2", 1, "id3") { EdgeAttribute = new EdgeAttribute(attName1, 1) },
+                            new("val2", 1, "id4") { EdgeAttribute = new EdgeAttribute(attName1, 1) },
+                            new("val5", 1, "id5") { EdgeAttribute = new EdgeAttribute(attName1, 1) },
+                            new("val1", 1, "id6") { EdgeAttribute = new EdgeAttribute(attName1, 1) },
+                            new("val1", 1, "id7") { EdgeAttribute = new EdgeAttribute(attName1, 1) },
+                            new("val5", 1, "id8") { EdgeAttribute = new EdgeAttribute(attName1, 1) },
+                            new("val1", 1, "id9") { EdgeAttribute = new EdgeAttribute(attName1, 1) },
+                            new("val3", 1, "id10") { EdgeAttribute = new EdgeAttribute(attName1, 1) }
                         }
                     }, // 2, 6, 7
-                    new EdgeAttribute(attName2, 1)
+                    new(attName2, 1)
                     {
                         EdgeValues = new List<EdgeValue>
                         {
-                            new EdgeValue("val7", 2, "id1"){ EdgeAttribute = new EdgeAttribute(attName2, 1)},
-                            new EdgeValue("val8", 2, "id2") { EdgeAttribute = new EdgeAttribute(attName2, 1)},
-                            new EdgeValue("val9", 2, "id3") { EdgeAttribute = new EdgeAttribute(attName2, 1)},
-                            new EdgeValue("val10", 2, "id4") { EdgeAttribute = new EdgeAttribute(attName2, 1)},
-                            new EdgeValue("val11", 2, "id5") { EdgeAttribute = new EdgeAttribute(attName2, 1)},
-                            new EdgeValue("val8", 2, "id6") { EdgeAttribute = new EdgeAttribute(attName2, 1)},
-                            new EdgeValue("val8", 2, "id7") { EdgeAttribute = new EdgeAttribute(attName2, 1)},
-                            new EdgeValue("val12", 2, "id8") { EdgeAttribute = new EdgeAttribute(attName2, 1)},
-                            new EdgeValue("val12", 2, "id9") { EdgeAttribute = new EdgeAttribute(attName2, 1)},
-                            new EdgeValue("val8", 2, "id10") { EdgeAttribute = new EdgeAttribute(attName2, 1)}
+                            new("val7", 2, "id1") { EdgeAttribute = new EdgeAttribute(attName2, 1) },
+                            new("val8", 2, "id2") { EdgeAttribute = new EdgeAttribute(attName2, 1) },
+                            new("val9", 2, "id3") { EdgeAttribute = new EdgeAttribute(attName2, 1) },
+                            new("val10", 2, "id4") { EdgeAttribute = new EdgeAttribute(attName2, 1) },
+                            new("val11", 2, "id5") { EdgeAttribute = new EdgeAttribute(attName2, 1) },
+                            new("val8", 2, "id6") { EdgeAttribute = new EdgeAttribute(attName2, 1) },
+                            new("val8", 2, "id7") { EdgeAttribute = new EdgeAttribute(attName2, 1) },
+                            new("val12", 2, "id8") { EdgeAttribute = new EdgeAttribute(attName2, 1) },
+                            new("val12", 2, "id9") { EdgeAttribute = new EdgeAttribute(attName2, 1) },
+                            new("val8", 2, "id10") { EdgeAttribute = new EdgeAttribute(attName2, 1) }
                         }
                     },
-                    new EdgeAttribute(attName3, 1)
+                    new(attName3, 1)
                     {
                         EdgeValues = new List<EdgeValue>
                         {
-                            new EdgeValue("val7", 2, "id1"){ EdgeAttribute = new EdgeAttribute(attName3, 1)},
-                            new EdgeValue("val11", 2, "id2") { EdgeAttribute = new EdgeAttribute(attName3, 1)},
-                            new EdgeValue("val9", 2, "id3") { EdgeAttribute = new EdgeAttribute(attName3, 1)},
-                            new EdgeValue("val10", 2, "id4") { EdgeAttribute = new EdgeAttribute(attName3, 1)},
-                            new EdgeValue("val11", 2, "id5") { EdgeAttribute = new EdgeAttribute(attName3, 1)},
-                            new EdgeValue("val8", 2, "id6") { EdgeAttribute = new EdgeAttribute(attName3, 1)},
-                            new EdgeValue("val18", 2, "id7") { EdgeAttribute = new EdgeAttribute(attName3, 1)},
-                            new EdgeValue("val12", 2, "id8") { EdgeAttribute = new EdgeAttribute(attName3, 1)},
-                            new EdgeValue("val12", 2, "id9") { EdgeAttribute = new EdgeAttribute(attName3, 1)},
-                            new EdgeValue("val8", 2, "id10") { EdgeAttribute = new EdgeAttribute(attName3, 1)}
-                        }        
+                            new("val7", 2, "id1") { EdgeAttribute = new EdgeAttribute(attName3, 1) },
+                            new("val11", 2, "id2") { EdgeAttribute = new EdgeAttribute(attName3, 1) },
+                            new("val9", 2, "id3") { EdgeAttribute = new EdgeAttribute(attName3, 1) },
+                            new("val10", 2, "id4") { EdgeAttribute = new EdgeAttribute(attName3, 1) },
+                            new("val11", 2, "id5") { EdgeAttribute = new EdgeAttribute(attName3, 1) },
+                            new("val8", 2, "id6") { EdgeAttribute = new EdgeAttribute(attName3, 1) },
+                            new("val18", 2, "id7") { EdgeAttribute = new EdgeAttribute(attName3, 1) },
+                            new("val12", 2, "id8") { EdgeAttribute = new EdgeAttribute(attName3, 1) },
+                            new("val12", 2, "id9") { EdgeAttribute = new EdgeAttribute(attName3, 1) },
+                            new("val8", 2, "id10") { EdgeAttribute = new EdgeAttribute(attName3, 1) }
+                        }
                     }
-                    
                 }
-                
             }
-            
         };
 
         var expected = new Dictionary<string, Dictionary<string, string>>()
         {
-            {"id2", new Dictionary<string, string>()
             {
-                {attName1, "val1"},
-                {attName2, "val8"},
-                {attName3, "val11"}
-            }},
-            {"id6", new Dictionary<string, string>()
+                "id2", new Dictionary<string, string>()
+                {
+                    { attName1, "val1" },
+                    { attName2, "val8" },
+                    { attName3, "val11" }
+                }
+            },
             {
-                {attName1, "val1"},
-                {attName2, "val8"},
-                {attName3, "val8"}
-            }},
-            {"id7", new Dictionary<string, string>()
+                "id6", new Dictionary<string, string>()
+                {
+                    { attName1, "val1" },
+                    { attName2, "val8" },
+                    { attName3, "val8" }
+                }
+            },
             {
-                {attName1, "val1"},
-                {attName2, "val8"},
-                {attName3, "val18"}
-            }}
+                "id7", new Dictionary<string, string>()
+                {
+                    { attName1, "val1" },
+                    { attName2, "val8" },
+                    { attName3, "val18" }
+                }
+            }
         };
-        
+
         contex.DataSets.Add(dataset);
         contex.SaveChanges();
 

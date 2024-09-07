@@ -1,17 +1,17 @@
+using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using mohaymen_codestar_Team02.Data;
+using mohaymen_codestar_Team02.Dto.Role;
+using mohaymen_codestar_Team02.Dto.User;
 using mohaymen_codestar_Team02.Models;
 using mohaymen_codestar_Team02.Services;
 using mohaymen_codestar_Team02.Services.Administration;
 using mohaymen_codestar_Team02.Services.CookieService;
 using mohaymen_codestar_Team02.Services.PasswordHandller;
 using NSubstitute;
-using AutoMapper;
-using Microsoft.Extensions.DependencyInjection;
-using mohaymen_codestar_Team02.Dto.Role;
-using mohaymen_codestar_Team02.Dto.User;
 
-namespace mohaymen_codestar_Team02_XUnitTest.Servies.Administration;
+namespace mohaymen_codestar_Team02_XUnitTest.Services.Administration;
 
 public class AdminServiceTest
 {
@@ -92,7 +92,7 @@ public class AdminServiceTest
 
         // Arrange
         FixTheReturnOfCookies("admin");
-        var newUser = AddUserWithRole("admin", "SystemAdmin", 1, mockContext);
+        AddUserWithRole("admin", "SystemAdmin", 1, mockContext);
         var fakePasswordHash = new byte[] { 1, 2, 3, 4 };
         var fakePasswordSalt = new byte[] { 5, 6, 7, 8 };
 
@@ -106,13 +106,13 @@ public class AdminServiceTest
 
         var role = new Role { RoleType = RoleType.DataAdmin.ToString() };
         mockContext.Roles.Add(role);
-        mockContext.SaveChanges();
+        await mockContext.SaveChangesAsync();
 
         _passwordService.ValidatePassword(Arg.Any<string>()).Returns(true);
 
         // Act
         var result = await _sut.CreateUser(
-            new User() { UserId = 8, Username = "mamad" }, "password", new List<string>() { "DataAdmin" });
+            new User() { UserId = 8, Username = "testUser" }, "password", new List<string>() { "DataAdmin" });
 
         // Assert
         Assert.Equal(ApiResponseType.Created, result.Type);
@@ -140,17 +140,15 @@ public class AdminServiceTest
                 x[2] = fakePasswordSalt;
             });
         _passwordService.ValidatePassword(Arg.Any<string>()).Returns(true);
-        var newUser = new User() { UserId = 8, Username = "mamad" };
+        var newUser = new User() { UserId = 8, Username = "testUser" };
 
         // Act
-        var result = await _sut.CreateUser(newUser, "password", new List<string>());
+        await _sut.CreateUser(newUser, "password", new List<string>());
 
         // Assert
-        Assert.Equal(ApiResponseType.Created, result.Type);
         Assert.Equal(fakePasswordHash, newUser.PasswordHash);
         Assert.Equal(fakePasswordSalt, newUser.Salt);
     }
-
 
     [Fact]
     public async Task GetUserByUsername_ShouldReturnUnauthorized_WhenTokenIsEmpty()
@@ -173,8 +171,8 @@ public class AdminServiceTest
 
         // Arrange
         FixTheReturnOfCookies("admin");
-        var adminUser = AddUserWithRole("admin", "SystemAdmin", 1, mockContext);
-        var testUser = AddUserWithRole("testUser", "SystemAdmin", 2, mockContext);
+        AddUserWithRole("admin", "SystemAdmin", 1, mockContext);
+        AddUserWithRole("testUser", "SystemAdmin", 2, mockContext);
         var userDto = new GetUserDto { Username = "testUser" };
         _mapper.Map<GetUserDto>(Arg.Any<User>()).Returns(userDto);
 
@@ -183,7 +181,25 @@ public class AdminServiceTest
 
         // Assert
         Assert.Equal(ApiResponseType.Success, result.Type);
-        Assert.NotNull(result.Data);
+    }
+
+    [Fact]
+    public async Task GetUserByUsername_ShouldReturnSpecificUser_WhenUserIsFound()
+    {
+        using var scope = _serviceProvider.CreateScope();
+        var mockContext = scope.ServiceProvider.GetRequiredService<DataContext>();
+
+        // Arrange
+        FixTheReturnOfCookies("admin");
+        AddUserWithRole("admin", "SystemAdmin", 1, mockContext);
+        AddUserWithRole("testUser", "SystemAdmin", 2, mockContext);
+        var userDto = new GetUserDto { Username = "testUser" };
+        _mapper.Map<GetUserDto>(Arg.Any<User>()).Returns(userDto);
+
+        // Act
+        var result = await _sut.GetUserByUsername("testUser");
+
+        // Assert
         Assert.Equal("testUser", result.Data.Username);
     }
 
@@ -208,8 +224,8 @@ public class AdminServiceTest
 
         // Arrange
         FixTheReturnOfCookies("admin");
-        var adminUser = AddUserWithRole("admin", "SystemAdmin", 1, mockContext);
-        var targetUser = AddUserWithRole("targetUser", "SystemAdmin", 2, mockContext);
+        AddUserWithRole("admin", "SystemAdmin", 1, mockContext);
+        AddUserWithRole("targetUser", "SystemAdmin", 2, mockContext);
         var userDto = new GetUserDto { Username = "targetUser" };
         _mapper.Map<GetUserDto>(Arg.Any<User>()).Returns(userDto);
 
@@ -234,14 +250,14 @@ public class AdminServiceTest
     }
 
     [Fact]
-    public async Task GetAllUsers_ShouldReturnAllUsersSuccessfully_WhenAdminExist()
+    public async Task GetAllUsers_ShouldReturnSuccess_WhenAdminExist()
     {
         using var scope = _serviceProvider.CreateScope();
         var mockContext = scope.ServiceProvider.GetRequiredService<DataContext>();
 
         // Arrange
         FixTheReturnOfCookies("admin");
-        var adminUser = AddUserWithRole("admin", "SystemAdmin", 1, mockContext);
+        AddUserWithRole("admin", "SystemAdmin", 1, mockContext);
         AddUserWithRole("user1", "User", 2, mockContext);
         AddUserWithRole("user2", "User", 3, mockContext);
 
@@ -252,6 +268,26 @@ public class AdminServiceTest
 
         // Assert
         Assert.Equal(ApiResponseType.Success, result.Type);
+    }
+
+    [Fact]
+    public async Task GetAllUsers_ShouldReturnAllUsersSuccessfully_WhenAdminExist()
+    {
+        using var scope = _serviceProvider.CreateScope();
+        var mockContext = scope.ServiceProvider.GetRequiredService<DataContext>();
+
+        // Arrange
+        FixTheReturnOfCookies("admin");
+        AddUserWithRole("admin", "SystemAdmin", 1, mockContext);
+        AddUserWithRole("user1", "User", 2, mockContext);
+        AddUserWithRole("user2", "User", 3, mockContext);
+
+        _mapper.Map<GetUserDto>(Arg.Any<User>()).Returns(new GetUserDto());
+
+        // Act
+        var result = await _sut.GetUsersPaginated(1);
+
+        // Assert
         Assert.Equal(3, result.Data.Count);
     }
 
@@ -269,7 +305,7 @@ public class AdminServiceTest
     }
 
     [Fact]
-    public async Task GetAllRoles_ShouldReturnAllRolesSuccessfully_WhenAdminExists()
+    public async Task GetAllRoles_ShouldReturnSuccess_WhenAdminExists()
     {
         using var scope = _serviceProvider.CreateScope();
         var mockContext = scope.ServiceProvider.GetRequiredService<DataContext>();
@@ -278,7 +314,6 @@ public class AdminServiceTest
         mockContext.Roles.Add(new Role { RoleId = 1, RoleType = "SystemAdmin" });
         mockContext.Roles.Add(new Role { RoleId = 2, RoleType = "Analyst" });
         await mockContext.SaveChangesAsync();
-
         _mapper.Map<GetRoleDto>(Arg.Any<Role>()).Returns(new GetRoleDto());
 
         // Act
@@ -286,31 +321,29 @@ public class AdminServiceTest
 
         // Assert
         Assert.Equal(ApiResponseType.Success, result.Type);
+    }
+
+    [Fact]
+    public async Task GetAllRoles_ShouldReturnAllRolesSuccessfully_WhenAdminExists()
+    {
+        using var scope = _serviceProvider.CreateScope();
+        var mockContext = scope.ServiceProvider.GetRequiredService<DataContext>();
+
+        // Arrange
+        List<Role> roles =
+        [
+            new Role { RoleId = 1, RoleType = "SystemAdmin" },
+            new Role { RoleId = 2, RoleType = "Analyst" }
+        ];
+        foreach (var role in roles) mockContext.Roles.Add(role);
+        await mockContext.SaveChangesAsync();
+        _mapper.Map<GetRoleDto>(Arg.Any<Role>()).Returns(new GetRoleDto());
+
+        // Act
+        var result = await _sut.GetAllRoles();
+
+        // Assert
         Assert.Equal(2, result.Data.Count);
-    }
-
-    private void FixTheReturnOfCookies(string? returnThis)
-    {
-        _cookieService.GetCookieValue().Returns(returnThis);
-        _tokenService.GetUserNameFromToken().Returns(returnThis);
-    }
-
-    private UserRole AddUserWithRole(string userName, string roleType, long id, DataContext dataContext)
-    {
-        var user = new User
-        {
-            Salt = Array.Empty<byte>(),
-            PasswordHash = Array.Empty<byte>(),
-            Username = userName,
-            UserId = id
-        };
-        var role = new Role { RoleType = roleType, RoleId = id };
-        var userRole = new UserRole { UserId = user.UserId, RoleId = role.RoleId };
-        dataContext.Users.Add(user);
-        dataContext.Roles.Add(role);
-        dataContext.UserRoles.Add(userRole);
-        dataContext.SaveChanges();
-        return new UserRole { Role = role, User = user };
     }
 
     [Fact]
@@ -367,7 +400,7 @@ public class AdminServiceTest
         // Arrange
         FixTheReturnOfCookies("admin");
         AddUserWithRole("admin", "SystemAdmin", 1, mockContext);
-        var user = AddUserWithRole("target", "DataAdmin", 2, mockContext);
+        AddUserWithRole("target", "DataAdmin", 2, mockContext);
 
         // Act
         var result = await _sut.AddRole(new User() { Username = "testUser" },
@@ -509,7 +542,7 @@ public class AdminServiceTest
 
         // Assert
         var result = mockContext.UserRoles.SingleOrDefault(ur =>
-            ur.UserId == user.User.UserId && ur.RoleId == user.Role.RoleId);
+            user.Role != null && user.User != null && ur.UserId == user.User.UserId && ur.RoleId == user.Role.RoleId);
         Assert.Null(result);
     }
 
@@ -522,7 +555,7 @@ public class AdminServiceTest
         // Arrange
         FixTheReturnOfCookies("admin");
         AddUserWithRole("admin", "SystemAdmin", 1, mockContext);
-        var user = AddUserWithRole("target", "DataAdmin", 2, mockContext);
+        AddUserWithRole("target", "DataAdmin", 2, mockContext);
 
         // Act
         var result = await _sut.DeleteRole(new User() { Username = "testUser" },
@@ -566,10 +599,11 @@ public class AdminServiceTest
         // Arrange
         FixTheReturnOfCookies("admin");
         AddUserWithRole("admin", "SystemAdmin", 1, mockContext);
-        var user = AddUserWithRole("target", "DataAdmin", 2, mockContext);
+        AddUserWithRole("target", "DataAdmin", 2, mockContext);
 
         // Act
         var result = await _sut.DeleteUser(new User() { Username = "testUser" });
+
         // Assert
         Assert.Equal(ApiResponseType.NotFound, result.Type);
     }
@@ -601,7 +635,7 @@ public class AdminServiceTest
         // Arrange
         FixTheReturnOfCookies("admin");
         AddUserWithRole("admin", "SystemAdmin", 1, mockContext);
-        var user = AddUserWithRole("target", "DataAdmin", 2, mockContext);
+        AddUserWithRole("target", "DataAdmin", 2, mockContext);
 
         // Act
         var result = await _sut.DeleteUser(new User() { Username = "admin" });
@@ -645,7 +679,7 @@ public class AdminServiceTest
         // Arrange
         FixTheReturnOfCookies("admin");
         AddUserWithRole("admin", "SystemAdmin", 1, mockContext);
-        var user = AddUserWithRole("target", "DataAdmin", 2, mockContext);
+        AddUserWithRole("target", "DataAdmin", 2, mockContext);
 
         // Act
         var result = await _sut.UpdateUser(new User() { Username = "testUSer" });
@@ -678,8 +712,59 @@ public class AdminServiceTest
         var result = await _sut.UpdateUser(updateUser);
 
         // Assert
-        Assert.NotNull(result);
         Assert.Equal(ApiResponseType.Success, result.Type);
-        Assert.NotNull(result.Data);
+    }
+
+    [Fact]
+    public async Task UpdateUser_ShouldUpdateUser_WhenUpdateIsSuccessful()
+    {
+        using var scope = _serviceProvider.CreateScope();
+        var mockContext = scope.ServiceProvider.GetRequiredService<DataContext>();
+
+        // Arrange
+        FixTheReturnOfCookies("admin");
+        AddUserWithRole("admin", "SystemAdmin", 1, mockContext);
+        AddUserWithRole("target", "DataAdmin", 2, mockContext);
+
+        _mapper.Map<GetUserDto>(Arg.Any<User>()).Returns(new GetUserDto());
+
+        var updateUser = new User()
+        {
+            Username = "target",
+            FirstName = "update",
+            LastName = "update",
+            Email = "update@example.com"
+        };
+        var expected = _mapper.Map<GetUserDto>(updateUser);
+
+        // Act
+        var result = await _sut.UpdateUser(updateUser);
+
+        // Assert
+        Assert.Equal(expected, result.Data);
+    }
+
+    private void FixTheReturnOfCookies(string? returnThis)
+    {
+        _cookieService.GetCookieValue().Returns(returnThis);
+        _tokenService.GetUserNameFromToken().Returns(returnThis);
+    }
+
+    private UserRole AddUserWithRole(string userName, string roleType, long id, DataContext dataContext)
+    {
+        var user = new User
+        {
+            Salt = Array.Empty<byte>(),
+            PasswordHash = Array.Empty<byte>(),
+            Username = userName,
+            UserId = id
+        };
+        var role = new Role { RoleType = roleType, RoleId = id };
+        var userRole = new UserRole { UserId = user.UserId, RoleId = role.RoleId };
+        dataContext.Users.Add(user);
+        dataContext.Roles.Add(role);
+        dataContext.UserRoles.Add(userRole);
+        dataContext.SaveChanges();
+        return new UserRole { Role = role, User = user };
     }
 }

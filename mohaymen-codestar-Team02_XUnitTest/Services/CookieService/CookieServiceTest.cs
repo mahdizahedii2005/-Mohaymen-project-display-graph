@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Http;
 using NSubstitute;
 
-namespace mohaymen_codestar_Team02_XUnitTest.Servies.CookieService;
+namespace mohaymen_codestar_Team02_XUnitTest.Services.CookieService;
 
 public class CookieServiceTests
 {

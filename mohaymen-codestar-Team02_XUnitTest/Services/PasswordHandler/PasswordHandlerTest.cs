@@ -1,15 +1,10 @@
-namespace mohaymen_codestar_Team02_XUnitTest.Servies.PasswordHandler;
-
 using mohaymen_codestar_Team02.Services.PasswordHandller;
+
+namespace mohaymen_codestar_Team02_XUnitTest.Services.PasswordHandler;
 
 public class PasswordServiceTests
 {
-    private readonly PasswordService _sut;
-
-    public PasswordServiceTests()
-    {
-        _sut = new PasswordService();
-    }
+    private readonly PasswordService _sut = new();
 
     [Fact]
     public void CreatePasswordHash_ShouldGenerateDifferentHashAndSalt_ForDifferentPasswords()

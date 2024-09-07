@@ -1,15 +1,13 @@
-namespace mohaymen_codestar_Team02_XUnitTest.Servies.TokenService;
-
 using System.Security.Claims;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using NSubstitute;
-using Xunit;
-using mohaymen_codestar_Team02.Services.TokenService;
-using Microsoft.AspNetCore.Http;
+
+namespace mohaymen_codestar_Team02_XUnitTest.Services.TokenService;
 
 public class TokenServiceTests
 {
-    private readonly TokenService _sut;
+    private readonly mohaymen_codestar_Team02.Services.TokenService.TokenService _sut;
     private readonly IConfiguration _configuration;
     private readonly IHttpContextAccessor _httpContextAccessor;
 
@@ -22,7 +20,7 @@ public class TokenServiceTests
         _configuration.GetSection("AppSettings:Token").Value
             .Returns("SuperSuperSuperSuperSuperSuperSuperSuperSuperSuperSuperSuperSuperSuperSecretKey");
 
-        _sut = new TokenService(_configuration, _httpContextAccessor);
+        _sut = new mohaymen_codestar_Team02.Services.TokenService.TokenService(_configuration, _httpContextAccessor);
     }
 
     [Fact]

@@ -85,7 +85,7 @@ public class AdminService : IAdminService
         return new ServiceResponse<List<GetRoleDto>>(roles, ApiResponseType.Success, Resources.UsersRetrievedMassage);
     }
 
-    public async Task<ServiceResponse<GetUserDto?>> CreateUser(User user, string password, List<string> roles)
+    public async Task<ServiceResponse<GetUserDto?>> CreateUser(User? user, string password, List<string> roles)
     {
         using var scope = _serviceProvider.CreateScope();
         var context = scope.ServiceProvider.GetRequiredService<DataContext>();
@@ -136,7 +136,7 @@ public class AdminService : IAdminService
         return matchingRoles;
     }
 
-    public async Task<ServiceResponse<GetUserDto?>> DeleteUser(User user)
+    public async Task<ServiceResponse<GetUserDto?>> DeleteUser(User? user)
     {
         using var scope = _serviceProvider.CreateScope();
         var context = scope.ServiceProvider.GetRequiredService<DataContext>();
@@ -166,7 +166,7 @@ public class AdminService : IAdminService
             Resources.UserDeletionSuccessfulMessage);
     }
 
-    public async Task<ServiceResponse<GetUserDto?>> UpdateUser(User user)
+    public async Task<ServiceResponse<GetUserDto?>> UpdateUser(User? user)
     {
         using var scope = _serviceProvider.CreateScope();
         var context = scope.ServiceProvider.GetRequiredService<DataContext>();
@@ -196,7 +196,7 @@ public class AdminService : IAdminService
             Resources.UserUpdateSuccessfulyMessage);
     }
 
-    public async Task<ServiceResponse<GetUserDto?>> AddRole(User user, Role role)
+    public async Task<ServiceResponse<GetUserDto?>> AddRole(User? user, Role? role)
     {
         using var scope = _serviceProvider.CreateScope();
         var context = scope.ServiceProvider.GetRequiredService<DataContext>();
@@ -237,7 +237,7 @@ public class AdminService : IAdminService
             Resources.RoleAddedSuccessfulyMassage);
     }
 
-    public async Task<ServiceResponse<GetUserDto?>> DeleteRole(User user, Role role)
+    public async Task<ServiceResponse<GetUserDto?>> DeleteRole(User? user, Role? role)
     {
         using var scope = _serviceProvider.CreateScope();
         var context = scope.ServiceProvider.GetRequiredService<DataContext>();

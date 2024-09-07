@@ -11,21 +11,21 @@ using mohaymen_codestar_Team02.Services.CookieService;
 using mohaymen_codestar_Team02.Services.StoreData.Abstraction;
 using NSubstitute;
 
-namespace mohaymen_codestar_Team02_XUnitTest.Servies.DataAdminService;
+namespace mohaymen_codestar_Team02_XUnitTest.Services.DataAdminService;
 
 public class DataAdminServiceTest
 {
-    private readonly IStorHandler _storHandler;
+    private readonly IStorHandler _storeHandler;
     private readonly IDisplayDataService _displayDataService;
     private readonly IMapper _mapper;
     private readonly IServiceProvider _serviceProvider;
     private DataContext _dataContext;
-    private readonly mohaymen_codestar_Team02.Services.DataAdminService.DataAdminService _sut;
     private readonly IEdgeService _edgeService;
     private readonly IVertexService _vertexService;
     private readonly ITokenService _tokenService;
     private readonly ICookieService _cookieService;
     private readonly IGraphService _graphService;
+    private readonly mohaymen_codestar_Team02.Services.DataAdminService.DataAdminService _sut;
 
     public DataAdminServiceTest()
     {
@@ -34,7 +34,7 @@ public class DataAdminServiceTest
         _tokenService = Substitute.For<ITokenService>();
         _vertexService = Substitute.For<IVertexService>();
         _edgeService = Substitute.For<IEdgeService>();
-        _storHandler = Substitute.For<IStorHandler>();
+        _storeHandler = Substitute.For<IStorHandler>();
         _displayDataService = Substitute.For<IDisplayDataService>();
         _mapper = Substitute.For<IMapper>();
 
@@ -50,9 +50,9 @@ public class DataAdminServiceTest
 
 
         _sut = new mohaymen_codestar_Team02.Services.DataAdminService.DataAdminService(_serviceProvider, _tokenService,
-            _cookieService, _storHandler, _displayDataService, _edgeService, _vertexService, _mapper, _graphService);
-        _storHandler.EdageStorer.StoreFileData(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<long>()).Returns(true);
-        _storHandler.VertexStorer.StoreFileData(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<long>()).Returns(true);
+            _cookieService, _storeHandler, _displayDataService, _edgeService, _vertexService, _mapper, _graphService);
+        _storeHandler.EdageStorer.StoreFileData(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<long>()).Returns(true);
+        _storeHandler.VertexStorer.StoreFileData(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<long>()).Returns(true);
     }
 
     private void FixTheReturnOfCookies(string? returnThis)
@@ -102,7 +102,7 @@ public class DataAdminServiceTest
         //Arrange
         FixTheReturnOfCookies("admin");
         AddUserWithRole("admin", "SustemAdmin", 1);
-        _storHandler.StoreDataSet("mahdddd", Arg.Any<string>()).Returns(-1);
+        _storeHandler.StoreDataSet("mahdddd", Arg.Any<string>()).Returns(-1);
         //Action
         var result = await _sut.StoreData("sample", "sample", "mahdddd", "name", "ma");
         //Assert
@@ -115,7 +115,7 @@ public class DataAdminServiceTest
         //Arrange
         FixTheReturnOfCookies("admin");
         AddUserWithRole("admin", "SustemAdmin", 1);
-        _storHandler.EdageStorer.StoreFileData(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<long>()).Returns(false);
+        _storeHandler.EdageStorer.StoreFileData(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<long>()).Returns(false);
         //Action
         var result = await _sut.StoreData("sample", "sample", "test", "mahdddd", "mahdddd");
         //Assert
@@ -128,7 +128,7 @@ public class DataAdminServiceTest
         // Arrange
         FixTheReturnOfCookies("admin");
         AddUserWithRole("admin", "SustemAdmin", 1);
-        _storHandler.VertexStorer.StoreFileData(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<long>()).Returns(false);
+        _storeHandler.VertexStorer.StoreFileData(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<long>()).Returns(false);
 
         // Act
         var result = await _sut.StoreData("sampleEdgeFile", "sampleVertexFile", "testData", "mamama", "mmm");
@@ -143,7 +143,7 @@ public class DataAdminServiceTest
         // Arrange
         FixTheReturnOfCookies("admin");
         AddUserWithRole("admin", "SustemAdmin", 1);
-        _storHandler.StoreDataSet(Arg.Any<string>(), Arg.Any<string>()).Returns(9);
+        _storeHandler.StoreDataSet(Arg.Any<string>(), Arg.Any<string>()).Returns(9);
         // Act
         var result = await _sut.StoreData("sampleEdgeFile", "sampleVertexFile", "testData", "a", "lll");
         // Assert
@@ -253,11 +253,5 @@ public class DataAdminServiceTest
 
         // Assert
         Assert.Equivalent(expected, actual);
-    }
-
-    public ServiceResponse<List<GetAttributeDto>> GetVertexAttributes(long vertexEntityId)
-    {
-        var att = _vertexService.GetVertexAttributes(vertexEntityId);
-        return new ServiceResponse<List<GetAttributeDto>>(att, ApiResponseType.Success, "");
     }
 }

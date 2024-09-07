@@ -6,7 +6,7 @@ using mohaymen_codestar_Team02.Services.StoreData;
 using mohaymen_codestar_Team02.Services.StoreData.Abstraction;
 using NSubstitute;
 
-namespace mohaymen_codestar_Team02_XUnitTest.Servies.StorData;
+namespace mohaymen_codestar_Team02_XUnitTest.Services.StoreData;
 
 public class StoreDataServiceTest
 {

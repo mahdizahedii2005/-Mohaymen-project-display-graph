@@ -10,7 +10,7 @@ using mohaymen_codestar_Team02.Services.CookieService;
 using mohaymen_codestar_Team02.Services.PasswordHandller;
 using NSubstitute;
 
-namespace mohaymen_codestar_Team02_XUnitTest.Servies.ProfileService;
+namespace mohaymen_codestar_Team02_XUnitTest.Services.ProfileService;
 
 public class ProfileServiceTests
 {
@@ -163,7 +163,7 @@ public class ProfileServiceTests
         Assert.Equal(ApiResponseType.Success, result.Type);
     }
 
-    private User AddUserToDatabase(string username, string password)
+    private User? AddUserToDatabase(string username, string password)
     {
         using var scope = _serviceProvider.CreateScope();
         var mockContext = scope.ServiceProvider.GetRequiredService<DataContext>();

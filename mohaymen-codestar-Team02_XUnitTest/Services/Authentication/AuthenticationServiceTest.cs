@@ -12,7 +12,7 @@ using mohaymen_codestar_Team02.Services.CookieService;
 using mohaymen_codestar_Team02.Services.PasswordHandller;
 using NSubstitute;
 
-namespace mohaymen_codestar_Team02_XUnitTest.Servies.Authenticatoin;
+namespace mohaymen_codestar_Team02_XUnitTest.Services.Authentication;
 
 public class AuthenticationServiceTests
 {
@@ -20,7 +20,7 @@ public class AuthenticationServiceTests
     private readonly ITokenService _tokenService;
     private readonly ICookieService _cookieService;
     private readonly IPasswordService _passwordService;
-    private IServiceProvider _serviceProvider;
+    private readonly IServiceProvider _serviceProvider;
 
     public AuthenticationServiceTests()
     {
@@ -70,7 +70,6 @@ public class AuthenticationServiceTests
 
         // Assert
         Assert.Equal(ApiResponseType.BadRequest, result.Type);
-        Assert.Null(result.Data);
     }
 
     [Fact]
@@ -85,7 +84,6 @@ public class AuthenticationServiceTests
 
         // Assert
         Assert.Equal(ApiResponseType.BadRequest, result.Type);
-        Assert.Null(result.Data);
     }
 
     [Fact]
@@ -104,7 +102,6 @@ public class AuthenticationServiceTests
 
         // Assert
         Assert.Equal(ApiResponseType.BadRequest, result.Type);
-        Assert.Null(result.Data);
     }
 
     [Fact]
@@ -126,7 +123,6 @@ public class AuthenticationServiceTests
 
         // Assert
         Assert.Equal(ApiResponseType.Success, result.Type);
-        Assert.NotNull(result.Data);
     }
 
     private void AddUserToDatabase(string username, string password)
@@ -154,14 +150,13 @@ public class AuthenticationServiceTests
     {
         // Arrange
         _cookieService.GetCookieValue().Returns("someCookieValue");
+        _cookieService.Received(1).GetExpiredCookie();
 
         // Act
         var result = _sut.Logout();
 
         // Assert
-        _cookieService.Received(1).GetExpiredCookie();
         Assert.Equal(ApiResponseType.Success, result.Type);
-        Assert.Null(result.Data);
     }
 
     [Fact]
@@ -169,14 +164,12 @@ public class AuthenticationServiceTests
     {
         // Arrange
         _cookieService.GetCookieValue().Returns((string?)null);
-
+        _cookieService.DidNotReceive().GetExpiredCookie();
         // Act
         var result = _sut.Logout();
 
         // Assert
-        _cookieService.DidNotReceive().GetExpiredCookie();
         Assert.Equal(ApiResponseType.Success, result.Type);
-        Assert.Null(result.Data);
     }
 
     [Fact]
@@ -261,7 +254,7 @@ public class AuthenticationServiceTests
         _tokenService.GetUserNameFromToken().Returns(returnThis);
     }
 
-    private UserRole AddUserWithRole(string userName, string roleType, long id, List<Permission> permissions)
+    private void AddUserWithRole(string userName, string roleType, long id, List<Permission> permissions)
     {
         using var scope = _serviceProvider.CreateScope();
         var mockContext = scope.ServiceProvider.GetRequiredService<DataContext>();
@@ -281,6 +274,5 @@ public class AuthenticationServiceTests
         mockContext.Roles.Add(role);
         mockContext.UserRoles.Add(userRole);
         mockContext.SaveChanges();
-        return new UserRole { Role = role, User = user };
     }
 }

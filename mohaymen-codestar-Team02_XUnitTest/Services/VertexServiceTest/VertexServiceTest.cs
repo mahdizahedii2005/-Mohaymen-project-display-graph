@@ -8,7 +8,7 @@ using mohaymen_codestar_Team02.Models.VertexEAV;
 using mohaymen_codestar_Team02.Services;
 using NSubstitute;
 
-namespace mohaymen_codestar_Team02_XUnitTest.Servies;
+namespace mohaymen_codestar_Team02_XUnitTest.Services.VertexServiceTest;
 
 public class VertexServiceTest
 {
@@ -39,20 +39,20 @@ public class VertexServiceTest
 
         // Arrange
         long vertexEntityId = 1;
-        var AttName1 = "Att1";
-        var AttName2 = "Att2";
+        var attName1 = "Att1";
+        var attName2 = "Att2";
 
         var expected = new List<GetAttributeDto>()
         {
             new()
             {
                 Id = 1,
-                Name = AttName1
+                Name = attName1
             },
             new()
             {
                 Id = 2,
-                Name = AttName2
+                Name = attName2
             }
         };
 
@@ -62,11 +62,11 @@ public class VertexServiceTest
             {
                 VertexAttributes = new List<VertexAttribute>
                 {
-                    new(AttName1, 1)
+                    new(attName1, 1)
                     {
                         Id = 1
                     },
-                    new(AttName2, 1)
+                    new(attName2, 1)
                     {
                         Id = 2
                     }
@@ -81,14 +81,14 @@ public class VertexServiceTest
             .Returns(new GetAttributeDto()
             {
                 Id = 1,
-                Name = AttName1
+                Name = attName1
             });
 
         _mapper.Map<GetAttributeDto>(Arg.Is<VertexAttribute>(value => value.Id == 2))
             .Returns(new GetAttributeDto()
             {
                 Id = 2,
-                Name = AttName2
+                Name = attName2
             });
 
         // Act
@@ -141,9 +141,9 @@ public class VertexServiceTest
 
         // Arrange
         long datasetId = 1;
-        string attName1 = "AttName1";
-        string attName2 = "AttName2";
-        string vertexIdentifierFieldName = attName1;
+        var attName1 = "AttName1";
+        var attName2 = "AttName2";
+        var vertexIdentifierFieldName = attName1;
 
         var dataset = new DataGroup("DatasetName1", 1)
         {
@@ -152,21 +152,21 @@ public class VertexServiceTest
             {
                 VertexAttributes = new List<VertexAttribute>
                 {
-                    new VertexAttribute(attName1, 1)
+                    new(attName1, 1)
                     {
                         VertexValues = new List<VertexValue>
                         {
-                            new VertexValue("val1", 1, "id1"){ VertexAttribute = new VertexAttribute(attName1, 1)},
-                            new VertexValue("val2", 1, "id2") { VertexAttribute = new VertexAttribute(attName1, 1)}
+                            new("val1", 1, "id1") { VertexAttribute = new VertexAttribute(attName1, 1) },
+                            new("val2", 1, "id2") { VertexAttribute = new VertexAttribute(attName1, 1) }
                         }
                     },
-                    new VertexAttribute(attName2, 1)
+                    new(attName2, 1)
                     {
                         VertexValues = new List<VertexValue>
                         {
-                            new VertexValue("val3", 2, "id1"){ VertexAttribute = new VertexAttribute(attName2, 1)},
-                            new VertexValue("val4", 2, "id2") { VertexAttribute = new VertexAttribute(attName2, 1)}
-                       }
+                            new("val3", 2, "id1") { VertexAttribute = new VertexAttribute(attName2, 1) },
+                            new("val4", 2, "id2") { VertexAttribute = new VertexAttribute(attName2, 1) }
+                        }
                     }
                 }
             }
@@ -175,18 +175,20 @@ public class VertexServiceTest
         mockContext.DataSets.Add(dataset);
         mockContext.SaveChanges();
 
-        Dictionary<string, Dictionary<string, string>> expected = new Dictionary<string, Dictionary<string, string>>()
+        var expected = new Dictionary<string, Dictionary<string, string>>()
         {
-            {"id1", new Dictionary<string, string>()
             {
-                {attName1, "val1"},
-                {attName2, "val3"}
-            }}
+                "id1", new Dictionary<string, string>()
+                {
+                    { attName1, "val1" },
+                    { attName2, "val3" }
+                }
+            }
         };
 
         var attValue = new Dictionary<string, string>()
         {
-            {attName1, "val1"},
+            { attName1, "val1" }
             //{attName2, "val3"},
         };
 
