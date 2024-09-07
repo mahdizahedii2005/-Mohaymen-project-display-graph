@@ -13,10 +13,16 @@ namespace mohaymen_codestar_Team02.Services.AnalystService;
 public class AnalystService : IAnalystService
 {
     private readonly IServiceProvider _serviceProvider;
+    private readonly IVertexService _vertexService;
+    private readonly IEdgeService _edgeService;
+    private readonly IGraphService _graphService;
 
-    public AnalystService(IServiceProvider serviceProvider)
+    public AnalystService(IServiceProvider serviceProvider, IVertexService vertexService, IEdgeService edgeService, IGraphService graphService)
     {
         _serviceProvider = serviceProvider;
+        _vertexService = vertexService;
+        _edgeService = edgeService;
+        _graphService = graphService;
     }
 
     private DataGroup JoinTheEdgeTable(IQueryable<DataGroup> validDataSetTable, GraphQueryInfoDto graphQueryInfoDto)
@@ -157,4 +163,36 @@ public class AnalystService : IAnalystService
                           ") milieSec to find the VertexNeighbor @@@@@@@@@@@@@@@@@@@@@@@@@@@@");
         return new ServiceResponse<DisplayGraphDto>(responseData, ApiResponseType.Success, string.Empty);
     }
+    
+    public async Task<ServiceResponse<DisplayGraphDto>> DisplayGeraphData(long databaseId,
+        string sourceEdgeIdentifierFieldName,
+        string destinationEdgeIdentifierFieldName, string vertexIdentifierFieldName, Dictionary<string, string> vertexAttributeValus, Dictionary<string, string> edgeAttributeValues)
+    {
+        var vertices = _vertexService.GetAllVertices(databaseId, vertexIdentifierFieldName, vertexAttributeValus);
+        var edges = _edgeService.GetAllEdges(databaseId, sourceEdgeIdentifierFieldName,
+            destinationEdgeIdentifierFieldName, edgeAttributeValues);
+        var graph = _graphService.GetGraph(vertices, edges, vertexIdentifierFieldName, sourceEdgeIdentifierFieldName,
+            destinationEdgeIdentifierFieldName);
+
+        var dto = new DisplayGraphDto()
+        {
+            Vertices = graph.vertices,
+            Edges = graph.edges
+        };
+        return new ServiceResponse<DisplayGraphDto>(dto, ApiResponseType.Success,
+            Resources.GraphFetchedSuccessfullyMessage);
+    }
+    
+    public ServiceResponse<List<GetAttributeDto>> GetVertexAttributes(long vertexEntityId)
+    {
+        var att = _vertexService.GetVertexAttributes(vertexEntityId);
+        return new ServiceResponse<List<GetAttributeDto>>(att, ApiResponseType.Success, "");
+    }
+
+    public ServiceResponse<List<GetAttributeDto>> GetEdgeAttributes(long edgeEntityId)
+    {
+        var att = _edgeService.GetEdgeAttributes(edgeEntityId);
+        return new ServiceResponse<List<GetAttributeDto>>(att, ApiResponseType.Success, "");
+    }
+
 }

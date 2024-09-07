@@ -95,12 +95,11 @@ public class DataAdminService
 
     public async Task<ServiceResponse<DisplayGraphDto>> DisplayGeraphData(long databaseId,
         string sourceEdgeIdentifierFieldName,
-        string destinationEdgeIdentifierFieldName, string vertexIdentifierFieldName,
-        Dictionary<string, string> vertexAttributeVales, Dictionary<string, string> edgeAttributeVales)
+        string destinationEdgeIdentifierFieldName, string vertexIdentifierFieldName)
     {
-        var vertices = _vertexService.GetAllVertices(databaseId, vertexIdentifierFieldName, vertexAttributeVales);
+        var vertices = _vertexService.GetAllVertices(databaseId, vertexIdentifierFieldName, new Dictionary<string, string>(){});
         var edges = _edgeService.GetAllEdges(databaseId, sourceEdgeIdentifierFieldName,
-            destinationEdgeIdentifierFieldName, edgeAttributeVales);
+            destinationEdgeIdentifierFieldName, new Dictionary<string, string>(){});
         var graph = _graphService.GetGraph(vertices, edges, vertexIdentifierFieldName, sourceEdgeIdentifierFieldName,
             destinationEdgeIdentifierFieldName);
 
@@ -123,17 +122,5 @@ public class DataAdminService
     {
         return new ServiceResponse<DetailDto>(_edgeService.GetEdgeDetails(objectId), ApiResponseType.Success,
             string.Empty);
-    }
-
-    public ServiceResponse<List<GetAttributeDto>> GetVertexAttributes(long vertexEntityId)
-    {
-        var att = _vertexService.GetVertexAttributes(vertexEntityId);
-        return new ServiceResponse<List<GetAttributeDto>>(att, ApiResponseType.Success, "");
-    }
-
-    public ServiceResponse<List<GetAttributeDto>> GetEdgeAttributes(long edgeEntityId)
-    {
-        var att = _edgeService.GetEdgeAttributes(edgeEntityId);
-        return new ServiceResponse<List<GetAttributeDto>>(att, ApiResponseType.Success, "");
     }
 }
