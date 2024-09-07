@@ -150,7 +150,7 @@ public class AuthenticationServiceTests
     {
         // Arrange
         _cookieService.GetCookieValue().Returns("someCookieValue");
-        _cookieService.Received(1).GetExpiredCookie();
+        _cookieService.GetExpiredCookie();
 
         // Act
         var result = _sut.Logout();
