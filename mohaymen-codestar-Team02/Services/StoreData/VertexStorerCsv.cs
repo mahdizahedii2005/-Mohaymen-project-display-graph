@@ -38,7 +38,7 @@ public class VertexStorerCsv : IVertexStorer
                     headers[headers.Length - 1] = lastWords.Substring(0, lastWords.Length - 1);
                 }
 
-                foreach (var att in headers) edgeAttributes.Add(new VertexAttribute(att, edgeEntity.Id));
+                foreach (var att in headers) edgeAttributes.Add(new VertexAttribute(att, edgeEntity.VertexEntityId));
 
                 foreach (var attribute in edgeAttributes) await dataContext.VertexAttributes.AddAsync(attribute);
 

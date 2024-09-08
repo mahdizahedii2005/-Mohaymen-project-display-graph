@@ -77,11 +77,11 @@ namespace mohaymen_codestar_Team02.Migrations
 
             modelBuilder.Entity("mohaymen_codestar_Team02.Models.EdgeEAV.EdgeEntity", b =>
                 {
-                    b.Property<long>("Id")
+                    b.Property<long>("EdgeEntityId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("EdgeEntityId"));
 
                     b.Property<long>("DataGroupId")
                         .HasColumnType("bigint");
@@ -90,7 +90,7 @@ namespace mohaymen_codestar_Team02.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.HasKey("Id");
+                    b.HasKey("EdgeEntityId");
 
                     b.HasIndex("DataGroupId")
                         .IsUnique();
@@ -226,11 +226,11 @@ namespace mohaymen_codestar_Team02.Migrations
 
             modelBuilder.Entity("mohaymen_codestar_Team02.Models.VertexEAV.VertexEntity", b =>
                 {
-                    b.Property<long>("Id")
+                    b.Property<long>("VertexEntityId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("VertexEntityId"));
 
                     b.Property<long>("DataGroupId")
                         .HasColumnType("bigint");
@@ -239,7 +239,7 @@ namespace mohaymen_codestar_Team02.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.HasKey("Id");
+                    b.HasKey("VertexEntityId");
 
                     b.HasIndex("DataGroupId")
                         .IsUnique();

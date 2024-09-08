@@ -7,6 +7,7 @@ using mohaymen_codestar_Team02.Mapper;
 using mohaymen_codestar_Team02.Models;
 using mohaymen_codestar_Team02.Services;
 using mohaymen_codestar_Team02.Services.Administration;
+using mohaymen_codestar_Team02.Services.AnalystService;
 using mohaymen_codestar_Team02.Services.Authenticatoin;
 using mohaymen_codestar_Team02.Services.CookieService;
 using mohaymen_codestar_Team02.Services.DataAdminService;
@@ -40,6 +41,7 @@ public class InitialServices
 
         // Configure DbContext and Dependency Injection
         var cs = builder.Configuration["CONNECTION_STRING"];
+        Console.WriteLine("your connection string is ==>" + cs);
         services.AddDbContext<DataContext>(options =>
             options.UseNpgsql(cs));
 
@@ -58,8 +60,11 @@ public class InitialServices
             .AddScoped<IDataAdminService, DataAdminService>()
             .AddScoped<IDisplayDataService, DisplayService>()
             .AddScoped<IModelBuilder, ModelBuilderr>()
-            .AddScoped<IObjectBuilder, ObjectBuilder>();
-
+            .AddScoped<IObjectBuilder, ObjectBuilder>()
+            .AddScoped<IEdgeService, EdgeService>()
+            .AddScoped<IVertexService, VertexService>()
+            .AddScoped<IGraphService, GraphService>()
+            .AddScoped<IAnalystService, AnalystService>();
         services.AddAutoMapper(typeof(AutoMapperProfile));
         services.AddAuthorization();
 
@@ -192,7 +197,10 @@ public class InitialServices
         {
             var admin = new User()
             {
-                Username = "admin"
+                Username = "admin",
+                FirstName = "admin",
+                LastName = "admin",
+                Email = "admin@gmail.com"
             };
             _passwordService.CreatePasswordHash("admin", out var passwordHash, out var passwordSalt);
             admin.PasswordHash = passwordHash;

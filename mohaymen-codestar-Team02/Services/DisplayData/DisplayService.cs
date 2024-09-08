@@ -1,39 +1,40 @@
 using Microsoft.EntityFrameworkCore;
 using mohaymen_codestar_Team02.Data;
 using mohaymen_codestar_Team02.Models;
-using mohaymen_codestar_Team02.Services.DynamicService;
-using mohaymen_codestar_Team02.Services.TokenService;
-using QuikGraph;
 
 namespace mohaymen_codestar_Team02.Services;
 
 public class DisplayService : IDisplayDataService
 {
-    private readonly DataContext _context;
+    private readonly IServiceProvider _serviceProvider;
 
-    public DisplayService(DataContext context)
+    public DisplayService(IServiceProvider serviceProvider)
     {
-        _context = context;
+        _serviceProvider = serviceProvider;
     }
 
     public (List<Vertex> vertices, List<Edge> edges) GetGraph(string databaseName, string sourceEdgeIdentifierFieldName,
         string destinationEdgeIdentifierFieldName, string vertexIdentifierFieldName)
     {
+        using var scope = _serviceProvider.CreateScope();
+        var _context = scope.ServiceProvider.GetRequiredService<DataContext>();
+
         var dataSet = _context.DataSets.Include(ds => ds.VertexEntity)
             .ThenInclude(ve => ve.VertexAttributes).ThenInclude(vv => vv.VertexValues).Include(ds => ds.EdgeEntity)
-            .ThenInclude(ee => ee.EdgeAttributes).ThenInclude(ev => ev.EdgeValues).FirstOrDefault(ds => ds.Name.ToLower().Equals(databaseName.ToLower()));
+            .ThenInclude(ee => ee.EdgeAttributes).ThenInclude(ev => ev.EdgeValues)
+            .FirstOrDefault(ds => ds.Name.ToLower().Equals(databaseName.ToLower()));
 
         var vertexRecords = dataSet.VertexEntity.VertexAttributes.Select(a => a.VertexValues).SelectMany(v => v)
             .GroupBy(v => v.ObjectId);
 
-        List<Vertex> vertices = new List<Vertex>();
+        List<Vertex> vertices = new();
         foreach (var record in vertexRecords)
         {
             var value = record.SingleOrDefault(r => r.VertexAttribute.Name == vertexIdentifierFieldName).StringValue;
-            Vertex v = new Vertex()
+            var v = new Vertex()
             {
                 Id = record.Key,
-                Value = value
+                Label = value
             };
             vertices.Add(v);
         }
@@ -41,25 +42,19 @@ public class DisplayService : IDisplayDataService
         var edgeRecords = dataSet.EdgeEntity.EdgeAttributes.Select(ea => ea.EdgeValues).SelectMany(v => v)
             .GroupBy(v => v.ObjectId);
 
-        List<Edge> edges = new List<Edge>();
+        List<Edge> edges = new();
         foreach (var record in edgeRecords)
         {
-            string sourceValue = string.Empty;
-            string destinationValue = string.Empty;
+            var sourceValue = string.Empty;
+            var destinationValue = string.Empty;
             foreach (var item in record)
             {
-                if (item.EdgeAttribute.Name == sourceEdgeIdentifierFieldName)
-                {
-                    sourceValue = item.StringValue;
-                }
-                if (item.EdgeAttribute.Name == destinationEdgeIdentifierFieldName)
-                {
-                    destinationValue = item.StringValue;
-                }
+                if (item.EdgeAttribute.Name == sourceEdgeIdentifierFieldName) sourceValue = item.StringValue;
+                if (item.EdgeAttribute.Name == destinationEdgeIdentifierFieldName) destinationValue = item.StringValue;
             }
 
-            List<Vertex> sources = new List<Vertex>();
-            List<Vertex> destinations = new List<Vertex>();
+            List<Vertex> sources = new();
+            List<Vertex> destinations = new();
 
             foreach (var record1 in vertexRecords)
             {
@@ -67,15 +62,16 @@ public class DisplayService : IDisplayDataService
                 {
                     if (item.VertexAttribute.Name == vertexIdentifierFieldName && item.StringValue == sourceValue)
                     {
-                        Vertex vertex = new Vertex()
+                        var vertex = new Vertex()
                         {
                             Id = record1.Key
                         };
                         sources.Add(vertex);
                     }
+
                     if (item.VertexAttribute.Name == vertexIdentifierFieldName && item.StringValue == destinationValue)
                     {
-                        Vertex vertex = new Vertex()
+                        var vertex = new Vertex()
                         {
                             Id = record1.Key
                         };
@@ -83,11 +79,12 @@ public class DisplayService : IDisplayDataService
                     }
                 }
             }
+
             foreach (var source in sources)
             {
                 foreach (var des in destinations)
                 {
-                    Edge edge = new Edge()
+                    var edge = new Edge()
                     {
                         Id = record.Key,
                         Source = source.Id,
@@ -100,6 +97,7 @@ public class DisplayService : IDisplayDataService
 
         return (vertices, edges);
     }
+
 
     /*
     public void GetGraph(string databaseName, string sourceEdgeIdentifierFieldName,

@@ -1,3 +1,6 @@
+using System.Text.RegularExpressions;
+using mohaymen_codestar_Team02.Models;
+
 namespace mohaymen_codestar_Team02.Services.PasswordHandller;
 
 public class PasswordService : IPasswordService
@@ -23,5 +26,12 @@ public class PasswordService : IPasswordService
 
             return true;
         }
+    }
+
+    public bool ValidatePassword(string password)
+    {
+        const string PasswordPattern = CustomRegexPattern.PasswordPattern;
+        var regex = new Regex(PasswordPattern);
+        return regex.IsMatch(password);
     }
 }

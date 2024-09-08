@@ -69,29 +69,65 @@ namespace mohaymen_codestar_Team02.Data {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Authorized Message.
+        /// </summary>
+        internal static string AuthorizedMessage {
+            get {
+                return ResourceManager.GetString("AuthorizedMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Can Not Delete Yourself.
         /// </summary>
-        internal static string CanNotDeleteYourself {
+        internal static string CanNotDeleteYourselfMessage {
             get {
-                return ResourceManager.GetString("CanNotDeleteYourself", resourceCulture);
+                return ResourceManager.GetString("CanNotDeleteYourselfMessage", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to This User Doesn&apos;t Have This Role.
         /// </summary>
-        internal static string DontHaveThisRole {
+        internal static string DontHaveThisRoleMessage {
             get {
-                return ResourceManager.GetString("DontHaveThisRole", resourceCulture);
+                return ResourceManager.GetString("DontHaveThisRoleMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Permissions Get Successfuly.
+        /// </summary>
+        internal static string GetPermissionsSuccessfulyMessage {
+            get {
+                return ResourceManager.GetString("GetPermissionsSuccessfulyMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to GraphFetchedSuccessfully.
+        /// </summary>
+        internal static string GraphFetchedSuccessfullyMessage {
+            get {
+                return ResourceManager.GetString("GraphFetchedSuccessfullyMessage", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to InvalidInput.
         /// </summary>
-        internal static string InvalidInpute {
+        internal static string InvalidInputeMessage {
             get {
-                return ResourceManager.GetString("InvalidInpute", resourceCulture);
+                return ResourceManager.GetString("InvalidInputeMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Your Password Is Not Validated.
+        /// </summary>
+        internal static string InvalidPasswordMessage {
+            get {
+                return ResourceManager.GetString("InvalidPasswordMessage", resourceCulture);
             }
         }
         
@@ -107,9 +143,9 @@ namespace mohaymen_codestar_Team02.Data {
         /// <summary>
         ///   Looks up a localized string similar to Logout Successfuly.
         /// </summary>
-        internal static string LogoutSuccessfuly {
+        internal static string LogoutSuccessfulyMessage {
             get {
-                return ResourceManager.GetString("LogoutSuccessfuly", resourceCulture);
+                return ResourceManager.GetString("LogoutSuccessfulyMessage", resourceCulture);
             }
         }
         
@@ -143,9 +179,9 @@ namespace mohaymen_codestar_Team02.Data {
         /// <summary>
         ///   Looks up a localized string similar to This Role Is Already Assigned To The User.
         /// </summary>
-        internal static string RoleAlreadyAssigned {
+        internal static string RoleAlreadyAssignedMessage {
             get {
-                return ResourceManager.GetString("RoleAlreadyAssigned", resourceCulture);
+                return ResourceManager.GetString("RoleAlreadyAssignedMessage", resourceCulture);
             }
         }
         
@@ -173,6 +209,15 @@ namespace mohaymen_codestar_Team02.Data {
         internal static string RolesRetrievedMassage {
             get {
                 return ResourceManager.GetString("RolesRetrievedMassage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Some Roles Are Invalid.
+        /// </summary>
+        internal static string SomeRolesAreInvalidMessage {
+            get {
+                return ResourceManager.GetString("SomeRolesAreInvalidMessage", resourceCulture);
             }
         }
         
@@ -206,9 +251,9 @@ namespace mohaymen_codestar_Team02.Data {
         /// <summary>
         ///   Looks up a localized string similar to User Deleted Successfuly.
         /// </summary>
-        internal static string UserDeletionSuccessful {
+        internal static string UserDeletionSuccessfulMessage {
             get {
-                return ResourceManager.GetString("UserDeletionSuccessful", resourceCulture);
+                return ResourceManager.GetString("UserDeletionSuccessfulMessage", resourceCulture);
             }
         }
         
@@ -236,6 +281,15 @@ namespace mohaymen_codestar_Team02.Data {
         internal static string UsersRetrievedMassage {
             get {
                 return ResourceManager.GetString("UsersRetrievedMassage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to User Update Successfuly.
+        /// </summary>
+        internal static string UserUpdateSuccessfulyMessage {
+            get {
+                return ResourceManager.GetString("UserUpdateSuccessfulyMessage", resourceCulture);
             }
         }
         

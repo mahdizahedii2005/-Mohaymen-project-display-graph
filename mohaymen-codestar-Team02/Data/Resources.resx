@@ -4,7 +4,7 @@
     <data name="UnauthorizedMessage">
         <value>Unauthorized</value>
     </data>
-    <data name="InvalidInpute">
+    <data name="InvalidInputeMessage">
         <value>InvalidInput</value>
     </data>
     <data name="UserNotFoundMessage">
@@ -22,7 +22,7 @@
     <data name="UserAlreadyExistsMessage">
         <value>User Already Exists</value>
     </data>
-    <data name="DontHaveThisRole">
+    <data name="DontHaveThisRoleMessage">
         <value>This User Doesn't Have This Role</value>
     </data>
 
@@ -58,7 +58,7 @@
     <data name="RoleAddedSuccessfulyMassage" xml:space="preserve">
         <value>Role Added Successfuly</value>
     </data>
-    <data name="RoleAlreadyAssigned" xml:space="preserve">
+    <data name="RoleAlreadyAssignedMessage" xml:space="preserve">
         <value>This Role Is Already Assigned To The User</value>
     </data>
     <data name="UserCreatedSuccessfullyMessage" xml:space="preserve">
@@ -67,16 +67,16 @@
     <data name="PasswordChangedSuccessfulyMessage" xml:space="preserve">
         <value>Password Changed Successfuly</value>
     </data>
-    <data name="LogoutSuccessfuly" xml:space="preserve">
+    <data name="LogoutSuccessfulyMessage" xml:space="preserve">
         <value>Logout Successfuly</value>
     </data>
     <data name="ProfileInfoUpdateSuccessfulyMessage" xml:space="preserve">
         <value>Your Profile Info Changed Successfuly</value>
     </data>
-    <data name="UserDeletionSuccessful" xml:space="preserve">
+    <data name="UserDeletionSuccessfulMessage" xml:space="preserve">
         <value>User Deleted Successfuly</value>
     </data>
-    <data name="CanNotDeleteYourself" xml:space="preserve">
+    <data name="CanNotDeleteYourselfMessage" xml:space="preserve">
         <value>Can Not Delete Yourself</value>
     </data>
     <data name="UserRetrievedMassage" xml:space="preserve">
@@ -87,5 +87,23 @@
     </data>
     <data name="RolesRetrievedMassage" xml:space="preserve">
         <value>Roles Retrieved Successfully</value>
+    </data>
+    <data name="GetPermissionsSuccessfulyMessage" xml:space="preserve">
+        <value>Permissions Get Successfuly</value>
+    </data>
+    <data name="InvalidPasswordMessage" xml:space="preserve">
+        <value>Your Password Is Not Validated</value>
+    </data>
+    <data name="AuthorizedMessage" xml:space="preserve">
+        <value>Authorized Message</value>
+    </data>
+    <data name="GraphFetchedSuccessfullyMessage" xml:space="preserve">
+        <value>GraphFetchedSuccessfully</value>
+    </data>
+    <data name="SomeRolesAreInvalidMessage" xml:space="preserve">
+        <value>Some Roles Are Invalid</value>
+    </data>
+    <data name="UserUpdateSuccessfulyMessage" xml:space="preserve">
+        <value>User Update Successfuly</value>
     </data>
 </root>
