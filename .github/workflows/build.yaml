@@ -88,6 +88,7 @@ jobs:
     needs: [build, tag]
     steps:
       - name: Check if deployment PAT is set
+        id: deployment_check
         run: |
           if [ -z "${{ secrets.DEPLOYMENT_PAT }}" ]; then
             echo "DEPLOYMENT_PAT is not set. Skipping deployment."
@@ -95,11 +96,12 @@ jobs:
             exit 0
           else
             echo "deployment_enabled=true" >> $GITHUB_OUTPUT
+            echo "deployment_enabled=true" >> $GITHUB_OUTPUT
           fi
 
       - name: Update deployment
         uses: actions/github-script@v7
-        if: steps.deployment.outputs.deployment_enabled == 'true'
+        if: steps.deployment_check.outputs.deployment_enabled == 'true'
         with:
           github-token: ${{ secrets.DEPLOYMENT_PAT }}
           script: |
