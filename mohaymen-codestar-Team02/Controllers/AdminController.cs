@@ -1,8 +1,10 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using mohaymen_codestar_Team02.Dto;
 using mohaymen_codestar_Team02.Dto.User;
 using mohaymen_codestar_Team02.Dto.UserDtos;
 using mohaymen_codestar_Team02.Dto.UserRole;
+using mohaymen_codestar_Team02.Exception;
 using mohaymen_codestar_Team02.Models;
 using mohaymen_codestar_Team02.Services.Administration;
 
@@ -23,32 +25,58 @@ public class AdminController : ControllerBase
     [HttpGet("users")]
     public async Task<IActionResult> GetAllUsers([FromQuery] int pageNumber)
     {
-        var response =
-            await _adminService.GetUsersPaginated(pageNumber);
+        ServiceResponse<List<GetUserDto>> response;
+        try
+        {
+            response =
+                await _adminService.GetUsersPaginated(pageNumber);
+        }
+        catch (ProgramException e)
+        {
+            response = new ServiceResponse<List<GetUserDto>>(null, ApiResponseType.InternalServerError, e.Message);
+        }
+
         return StatusCode((int)response.Type, response);
     }
 
     [HttpGet("users/{username}")]
     public async Task<IActionResult> GetSingleUser(string? username)
     {
-        var response =
-            await _adminService.GetUserByUsername(username);
+        ServiceResponse<GetUserDto> response;
+        try
+        {
+            response =
+                await _adminService.GetUserByUsername(username);
+        }
+        catch (ProgramException e)
+        {
+            response = new ServiceResponse<GetUserDto>(null, ApiResponseType.InternalServerError, e.Message);
+        }
+
         return StatusCode((int)response.Type, response);
     }
 
     [HttpPost("users")]
     public async Task<IActionResult> CreateUser([FromBody] CreateUserDto request)
     {
-        var user = new User
+        ServiceResponse<GetUserDto> response;
+        try
         {
-            Username = request.Username,
-            FirstName = request.FirstName,
-            LastName = request.LastName,
-            Email = request.Email
-        };
+            var user = new User
+            {
+                Username = request.Username,
+                FirstName = request.FirstName,
+                LastName = request.LastName,
+                Email = request.Email
+            };
 
-        var response =
-            await _adminService.CreateUser(user, request.Password, request.Roles);
+            response =
+                await _adminService.CreateUser(user, request.Password, request.Roles);
+        }
+        catch (ProgramException e)
+        {
+            response = new ServiceResponse<GetUserDto>(null, ApiResponseType.InternalServerError, e.Message);
+        }
 
         return StatusCode((int)response.Type, response);
     }
@@ -56,13 +84,21 @@ public class AdminController : ControllerBase
     [HttpDelete("users/{username}")]
     public async Task<IActionResult> DeleteUser(string username)
     {
-        var user = new User
+        ServiceResponse<GetUserDto> response;
+        try
         {
-            Username = username
-        };
+            var user = new User
+            {
+                Username = username
+            };
 
-        var response =
-            await _adminService.DeleteUser(user);
+            response =
+                await _adminService.DeleteUser(user);
+        }
+        catch (ProgramException e)
+        {
+            response = new ServiceResponse<GetUserDto>(null, ApiResponseType.InternalServerError, e.Message);
+        }
 
         return StatusCode((int)response.Type, response);
     }
@@ -70,15 +106,24 @@ public class AdminController : ControllerBase
     [HttpPut("users/update/{username}")]
     public async Task<IActionResult> UpdateUser([FromBody] UpdateUserDto request, string username)
     {
-        var updateUser = new User()
+        ServiceResponse<GetUserDto> response;
+        try
         {
-            Username = username,
-            FirstName = request.FirstName,
-            LastName = request.LastName,
-            Email = request.Email
-        };
+            var updateUser = new User()
+            {
+                Username = username,
+                FirstName = request.FirstName,
+                LastName = request.LastName,
+                Email = request.Email
+            };
 
-        ServiceResponse<GetUserDto?> response = await _adminService.UpdateUser(updateUser);
+            response = await _adminService.UpdateUser(updateUser);
+        }
+        catch (ProgramException e)
+        {
+            response = new ServiceResponse<GetUserDto>(null, ApiResponseType.InternalServerError, e.Message);
+        }
+
         return StatusCode((int)response.Type, response);
     }
 

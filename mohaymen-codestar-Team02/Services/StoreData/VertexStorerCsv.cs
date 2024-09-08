@@ -66,7 +66,7 @@ public class VertexStorerCsv : IVertexStorer
             await dataContext.SaveChangesAsync();
             return true;
         }
-        catch (Exception e)
+        catch (System.Exception e)
         {
             return false;
         }
