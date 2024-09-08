@@ -12,7 +12,7 @@ public interface IAnalystService
         string sourceEdgeIdentifierFieldName,
         string destinationEdgeIdentifierFieldName, string vertexIdentifierFieldName,
         Dictionary<string, string> vertexAttributeValus, Dictionary<string, string> edgeAttributeValues);
-    
+
     ServiceResponse<List<GetAttributeDto>> GetVertexAttributes(long vertexEntityId);
 
     ServiceResponse<List<GetAttributeDto>> GetEdgeAttributes(long edgeEntityId);

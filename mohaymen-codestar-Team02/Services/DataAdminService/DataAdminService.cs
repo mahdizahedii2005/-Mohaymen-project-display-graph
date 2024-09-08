@@ -97,9 +97,9 @@ public class DataAdminService
         string sourceEdgeIdentifierFieldName,
         string destinationEdgeIdentifierFieldName, string vertexIdentifierFieldName)
     {
-        var vertices = _vertexService.GetAllVertices(databaseId, vertexIdentifierFieldName, new Dictionary<string, string>(){});
+        var vertices = _vertexService.GetAllVertices(databaseId, vertexIdentifierFieldName, new Dictionary<string, string>() { });
         var edges = _edgeService.GetAllEdges(databaseId, sourceEdgeIdentifierFieldName,
-            destinationEdgeIdentifierFieldName, new Dictionary<string, string>(){});
+            destinationEdgeIdentifierFieldName, new Dictionary<string, string>() { });
         var graph = _graphService.GetGraph(vertices, edges, vertexIdentifierFieldName, sourceEdgeIdentifierFieldName,
             destinationEdgeIdentifierFieldName);
 

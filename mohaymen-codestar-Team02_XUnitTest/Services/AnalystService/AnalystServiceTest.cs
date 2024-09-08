@@ -71,9 +71,9 @@ public class AnalystServiceTest
         Assert.NotNull(result);
         Assert.Equal(ApiResponseType.Success, result.Type);
         Assert.NotNull(result.Data);
-        Assert.Equal(1, result.Data!.Vertices.Count);
+        Assert.Single(result.Data!.Vertices);
         Assert.Equal("vertex1", result.Data.Vertices.First().Id);
-        Assert.Equal(1, result.Data.Edges.Count);
+        Assert.Single(result.Data.Edges);
         Assert.Equal("vertex1", result.Data.Edges.First().Source);
     }
 
