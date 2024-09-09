@@ -26,38 +26,30 @@ public class AnalystService : IAnalystService
         _graphService = graphService;
     }
 
-    // Method broken into smaller parts
     public async Task<ServiceResponse<DisplayGraphDto>> GetTheVertexNeighbor(GraphQueryInfoDto graphQueryInfoDto,
         string vertexId)
     {
         Console.WriteLine("%%%%%%%&&&&&&&-------------start to Getting the Vertex Neighbor-----------%%%%%%%&&&&&&&\n");
 
-        // 1. ایجاد کانتکست و چک کردن دیتابیس
         var context = GetDbContext();
         if (context == null) throw new DatabaseExceptionCantFindDataBase();
 
-        // 2. گرفتن اطلاعات مربوط به vertex و edge
         var vertexes = GetVertexes(context, graphQueryInfoDto);
         var edges = GetEdges(context, graphQueryInfoDto);
         if (vertexes is null || edges is null) throw new DatabaseExceptionCantFindDataBase();
 
-        // 3. پیدا کردن مقدار BaseValue برای vertex هدف
         var baseValue = FindBaseValue(vertexes, graphQueryInfoDto, vertexId);
         if (baseValue == null)
             return new ServiceResponse<DisplayGraphDto>(null, ApiResponseType.BadRequest, "invalid input for vertex field");
 
-        // 4. پیدا کردن Attributes مرتبط با source و target
         var (sourcesAtt, targetAtt) = FindTargetAttributes(vertexes, graphQueryInfoDto);
         if (targetAtt == null || sourcesAtt == null)
             return new ServiceResponse<DisplayGraphDto>(null, ApiResponseType.BadRequest, "invalid input for the edge field");
 
-        // 5. محاسبه لبه‌های معتبر
         var validEdges = GetValidEdges(edges, baseValue, sourcesAtt, targetAtt);
 
-        // 6. پردازش داده‌ها و یافتن Vertexهای معتبر
         var (validVertexId, validVertexLabel, validEdgeList) = ProcessValidEdges(context, vertexes, validEdges);
 
-        // 7. ساخت و بازگشت نتیجه
         return CreateResponse(graphQueryInfoDto, validVertexId, validVertexLabel, validEdgeList);
     }
 
