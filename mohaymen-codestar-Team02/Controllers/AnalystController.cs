@@ -55,7 +55,7 @@ public class AnalystController : ControllerBase
     }
 
     [HttpGet("Analyst/Vertex/{id}")]
-    public async Task<IActionResult> DisplayVertexAttributes(long id)
+    public IActionResult DisplayVertexAttributes(long id)
     {
         ServiceResponse<List<GetAttributeDto>> response;
         try
@@ -72,7 +72,7 @@ public class AnalystController : ControllerBase
     }
 
     [HttpGet("Analyst/Edge/{id}")]
-    public async Task<IActionResult> DisplayEdgeAttributes(long id)
+    public IActionResult DisplayEdgeAttributes(long id)
     {
         ServiceResponse<List<GetAttributeDto>> response;
         try
