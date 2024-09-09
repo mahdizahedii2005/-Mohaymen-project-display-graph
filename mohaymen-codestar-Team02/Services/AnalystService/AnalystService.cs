@@ -3,10 +3,10 @@ using Microsoft.EntityFrameworkCore;
 using mohaymen_codestar_Team02.Data;
 using mohaymen_codestar_Team02.Dto;
 using mohaymen_codestar_Team02.Dto.GraphDTO;
+using mohaymen_codestar_Team02.Exception;
 using mohaymen_codestar_Team02.Models;
 using mohaymen_codestar_Team02.Models.EdgeEAV;
 using mohaymen_codestar_Team02.Models.VertexEAV;
-using QuikGraph;
 
 namespace mohaymen_codestar_Team02.Services.AnalystService;
 
@@ -17,12 +17,152 @@ public class AnalystService : IAnalystService
     private readonly IEdgeService _edgeService;
     private readonly IGraphService _graphService;
 
-    public AnalystService(IServiceProvider serviceProvider, IVertexService vertexService, IEdgeService edgeService, IGraphService graphService)
+    public AnalystService(IServiceProvider serviceProvider, IVertexService vertexService, IEdgeService edgeService,
+        IGraphService graphService)
     {
         _serviceProvider = serviceProvider;
         _vertexService = vertexService;
         _edgeService = edgeService;
         _graphService = graphService;
+    }
+
+    public async Task<ServiceResponse<DisplayGraphDto>> GetTheVertexNeighbor(GraphQueryInfoDto graphQueryInfoDto,
+        string vertexId)
+    {
+        Console.WriteLine("%%%%%%%&&&&&&&-------------start to Getting the Vertex Neighbor-----------%%%%%%%&&&&&&&\n");
+
+        var context = GetDbContext();
+        if (context == null) throw new DatabaseExceptionCantFindDataBase();
+
+        var vertexes = GetVertexes(context, graphQueryInfoDto);
+        var edges = GetEdges(context, graphQueryInfoDto);
+        if (vertexes is null || edges is null) throw new DatabaseExceptionCantFindDataBase();
+
+        var baseValue = FindBaseValue(vertexes, graphQueryInfoDto, vertexId);
+        if (baseValue == null)
+            return new ServiceResponse<DisplayGraphDto>(null, ApiResponseType.BadRequest, "invalid input for vertex field");
+
+        var (sourcesAtt, targetAtt) = FindTargetAttributes(vertexes, graphQueryInfoDto);
+        if (targetAtt == null || sourcesAtt == null)
+            return new ServiceResponse<DisplayGraphDto>(null, ApiResponseType.BadRequest, "invalid input for the edge field");
+
+        var validEdges = GetValidEdges(edges, baseValue, sourcesAtt, targetAtt);
+
+        var (validVertexId, validVertexLabel, validEdgeList) = ProcessValidEdges(context, vertexes, validEdges);
+
+        return CreateResponse(graphQueryInfoDto, validVertexId, validVertexLabel, validEdgeList);
+    }
+
+    private DataContext GetDbContext()
+    {
+        var scope = _serviceProvider.CreateScope();
+        return scope.ServiceProvider.GetRequiredService<DataContext>();
+    }
+
+    private DataGroup GetVertexes(DataContext context, GraphQueryInfoDto graphQueryInfoDto)
+    {
+        var validDataSetTable = context.DataSets.Where(ds => ds.DataGroupId == graphQueryInfoDto.datasetId);
+        return JoinTheVertexTable(validDataSetTable);
+    }
+
+    private DataGroup GetEdges(DataContext context, GraphQueryInfoDto graphQueryInfoDto)
+    {
+        var validDataSetTable = context.DataSets.Where(ds => ds.DataGroupId == graphQueryInfoDto.datasetId);
+        return JoinTheEdgeTable(validDataSetTable, graphQueryInfoDto);
+    }
+
+    private VertexValue FindBaseValue(DataGroup vertexes, GraphQueryInfoDto graphQueryInfoDto, string vertexId)
+    {
+        return vertexes.VertexEntity.VertexAttributes
+            .FirstOrDefault(att => att.Name == graphQueryInfoDto.vertexIdentifier)?
+            .VertexValues.FirstOrDefault(value => value.ObjectId == vertexId);
+    }
+
+    private (EdgeAttribute, EdgeAttribute) FindTargetAttributes(DataGroup vertexes, GraphQueryInfoDto graphQueryInfoDto)
+    {
+        return findTargetAtt(vertexes, graphQueryInfoDto);
+    }
+
+    private IEnumerable<Edge> GetValidEdges(DataGroup edges, VertexValue baseValue, EdgeAttribute sourcesAtt, EdgeAttribute targetAtt)
+    {
+        var validTargetValueList = targetAtt.EdgeValues.Where(val => val.StringValue == baseValue.StringValue);
+        var validSourceValueList = sourcesAtt.EdgeValues.Where(val => val.StringValue == baseValue.StringValue);
+
+        var validEdgeTarget = validTargetValueList.Select(v => new Edge()
+        {
+            Id = v.ObjectId,
+            Source = edges.EdgeEntity.EdgeAttributes.FirstOrDefault(att => att.Name == sourcesAtt.Name).EdgeValues
+                .FirstOrDefault(val => val.ObjectId == v.ObjectId).StringValue,
+            Target = v.StringValue
+        });
+
+        var validEdgeSource = validSourceValueList.Select(v => new Edge()
+        {
+            Id = v.ObjectId,
+            Target = edges.EdgeEntity.EdgeAttributes.FirstOrDefault(att => att.Name == targetAtt.Name).EdgeValues
+                .FirstOrDefault(val => val.ObjectId == v.ObjectId).StringValue,
+            Source = v.StringValue
+        });
+
+        return validEdgeTarget.Union(validEdgeSource);
+    }
+
+    private (HashSet<string>, List<string>, List<Edge>) ProcessValidEdges(DataContext context, DataGroup vertexes, IEnumerable<Edge> validEdge)
+    {
+        HashSet<string> validVertexId = new();
+        List<string> validVertexLabel = new();
+        List<Edge> validEdges = new();
+        var vertexValueList = new List<VertexValue>(context.VertexAttributes.Find(vertexes.VertexEntity.VertexAttributes.First().Id)?.VertexValues);
+
+        foreach (var edgeValue in validEdge)
+        {
+            foreach (var source in vertexValueList)
+            {
+                if (edgeValue.Source == source.StringValue)
+                {
+                    foreach (var target in vertexValueList)
+                    {
+                        if (edgeValue.Target == target.StringValue)
+                        {
+                            validVertexId.Add(source.ObjectId);
+                            validVertexId.Add(target.ObjectId);
+                            validVertexLabel.Add(source.StringValue);
+                            validVertexLabel.Add(target.StringValue);
+                            validEdges.Add(new Edge()
+                            {
+                                Id = edgeValue.Id,
+                                Source = source.ObjectId,
+                                Target = target.ObjectId
+                            });
+                        }
+                    }
+                }
+            }
+        }
+
+        return (validVertexId, validVertexLabel, validEdges);
+    }
+
+    private ServiceResponse<DisplayGraphDto> CreateResponse(GraphQueryInfoDto graphQueryInfoDto, HashSet<string> validVertexId, List<string> validVertexLabel, List<Edge> validEdges)
+    {
+        var idList = validVertexId.ToList();
+        if (validVertexId.Count != validVertexLabel.Count)
+            return new ServiceResponse<DisplayGraphDto>(null, ApiResponseType.InternalServerError, "don't have sink output");
+
+        List<Vertex> resultVertex = new();
+        for (var l = 0; l < validVertexId.Count; l++)
+        {
+            resultVertex.Add(new Vertex() { Id = idList[l], Label = validVertexLabel[l] });
+        }
+
+        var responseData = new DisplayGraphDto()
+        {
+            GraphId = graphQueryInfoDto.datasetId,
+            Edges = validEdges,
+            Vertices = resultVertex
+        };
+
+        return new ServiceResponse<DisplayGraphDto>(responseData, ApiResponseType.Success, string.Empty);
     }
 
     private DataGroup JoinTheEdgeTable(IQueryable<DataGroup> validDataSetTable, GraphQueryInfoDto graphQueryInfoDto)
@@ -32,8 +172,19 @@ public class AnalystService : IAnalystService
             .ThenInclude(e => e.VertexAttributes.Where(att => att.Name == graphQueryInfoDto.vertexIdentifier))
             .ThenInclude(att => att.VertexValues).FirstOrDefault();
         edgeTime.Stop();
-        Console.WriteLine("it take (" + edgeTime.ElapsedMilliseconds + ") to join th edge table");
+        Console.WriteLine("it takes (" + edgeTime.ElapsedMilliseconds + ") ms to join the edge table");
         return edges;
+    }
+
+    private DataGroup JoinTheVertexTable(IQueryable<DataGroup> validDataSetTable)
+    {
+        var vertexTime = Stopwatch.StartNew();
+        var vertexes = validDataSetTable.Include(s => s.EdgeEntity)
+            .ThenInclude(e => e.EdgeAttributes)
+            .ThenInclude(att => att.EdgeValues).FirstOrDefault();
+        vertexTime.Stop();
+        Console.WriteLine("it takes (" + vertexTime.ElapsedMilliseconds + ") ms to join the vertex table");
+        return vertexes;
     }
 
     private (EdgeAttribute sourcesAtt, EdgeAttribute targetAtt) findTargetAtt(DataGroup vertexes,
@@ -54,119 +205,10 @@ public class AnalystService : IAnalystService
         return (sourcesAtt, targetAtt);
     }
 
-    private DataGroup JoinTheVertexTable(IQueryable<DataGroup> validDataSetTable)
-    {
-        var vertexTime = Stopwatch.StartNew();
-        var vertexes = validDataSetTable.Include(s => s.EdgeEntity)
-            .ThenInclude(e => e.EdgeAttributes)
-            .ThenInclude(att => att.EdgeValues).FirstOrDefault();
-        vertexTime.Stop();
-        Console.WriteLine("it take (" + vertexTime.ElapsedMilliseconds + ") to join th vertex table");
-        return vertexes;
-    }
-
-    public async Task<ServiceResponse<DisplayGraphDto>> GetTheVertexNeighbor(GraphQueryInfoDto graphQueryInfoDto,
-        string vertexId)
-    {
-        Console.WriteLine("%%%%%%%&&&&&&&-------------start to Getting the Vertex Neigbor-----------%%%%%%%&&&&&&&\n");
-        var time = Stopwatch.StartNew();
-        var scope = _serviceProvider.CreateScope();
-        var context = scope.ServiceProvider.GetRequiredService<DataContext>();
-        var validDataSetTable = context.DataSets.Where(ds => ds.DataGroupId == graphQueryInfoDto.datasetId);
-        var vertexes = JoinTheVertexTable(validDataSetTable);
-        var edges = JoinTheEdgeTable(validDataSetTable, graphQueryInfoDto);
-        var BaseValue = vertexes.VertexEntity.VertexAttributes
-            .FirstOrDefault(att => att.Name == graphQueryInfoDto.vertexIdentifier)!
-            .VertexValues.FirstOrDefault(value => value.ObjectId == vertexId);
-        Console.WriteLine("value of the target vertex has been found and its: " + BaseValue.StringValue + "\n");
-        if (BaseValue is null)
-            return new ServiceResponse<DisplayGraphDto>(null, ApiResponseType.BadRequest,
-                "invalid input for vertex field");
-
-        if (vertexes is null)
-            return new ServiceResponse<DisplayGraphDto>(null, ApiResponseType.BadRequest, "database Error");
-        var find = findTargetAtt(vertexes, graphQueryInfoDto);
-        var targetAtt = find.targetAtt;
-        var sourcesAtt = find.sourcesAtt;
-
-        if (targetAtt is null || sourcesAtt is null)
-            return new ServiceResponse<DisplayGraphDto>(null, ApiResponseType.BadRequest,
-                "invalid input for the edge field");
-
-        var validTargetValueList = targetAtt.EdgeValues.Where(val => val.StringValue == BaseValue.StringValue);
-        var validSourseValueList = sourcesAtt.EdgeValues.Where(val => val.StringValue == BaseValue.StringValue);
-
-        var validEdgeTarget = validTargetValueList.Select(v => new Edge()
-        {
-            Id = v.ObjectId,
-            Source = edges.EdgeEntity.EdgeAttributes.FirstOrDefault(att => att.Name == sourcesAtt.Name).EdgeValues
-                .FirstOrDefault(val => val.ObjectId == v.ObjectId).StringValue,
-            Target = v.StringValue
-        });
-        var validEdgeSource = validSourseValueList.Select(v => new Edge()
-        {
-            Id = v.ObjectId,
-            Target = edges.EdgeEntity.EdgeAttributes.FirstOrDefault(att => att.Name == targetAtt.Name).EdgeValues
-                .FirstOrDefault(val => val.ObjectId == v.ObjectId).StringValue,
-            Source = v.StringValue
-        });
-        var validEdge = validEdgeTarget.Union(validEdgeSource);
-        HashSet<string> validVertexId = new();
-        List<string> validVertexLabel = new();
-        List<Edge> validEdges = new();
-        var vertexValueList =
-            new List<VertexValue>(context.VertexAttributes.Find(BaseValue.VertexAttributeId)?.VertexValues);
-        Console.WriteLine("start a big for ........");
-        var forTime = Stopwatch.StartNew();
-        int i = 0, j = 0, k = 0;
-        foreach (var edgeValue in validEdge)
-        {
-            i++;
-            foreach (var source in vertexValueList)
-            {
-                j++;
-                if (edgeValue.Source == source.StringValue)
-                    foreach (var target in vertexValueList)
-                    {
-                        k++;
-                        if (edgeValue.Target == target.StringValue)
-                        {
-                            validVertexId.Add(source.ObjectId);
-                            validVertexId.Add(target.ObjectId);
-                            validVertexLabel.Add(source.StringValue);
-                            validVertexLabel.Add(target.StringValue);
-                            validEdges.Add(new Edge()
-                                { Id = edgeValue.Id, Source = source.ObjectId, Target = target.ObjectId });
-                        }
-                    }
-            }
-        }
-
-        forTime.Stop();
-        Console.WriteLine("finish the huge for and total prosece is : (" + i * j * k + " )");
-        Console.WriteLine("time that take that to finish the for : " + forTime.ElapsedMilliseconds + "");
-
-        var idList = new List<string>(validVertexId);
-        if (validVertexId.Count != validVertexLabel.Count)
-            return new ServiceResponse<DisplayGraphDto>(null, ApiResponseType.InternalServerError,
-                "dont have sink output");
-
-        List<Vertex> resultVertex = new();
-        for (var l = 0; l < validVertexId.Count; l++)
-            resultVertex.Add(new Vertex() { Id = idList[l], Label = validVertexLabel[l] });
-
-        Console.WriteLine("finish the creating of vertex");
-        var responseData = new DisplayGraphDto()
-            { GraphId = graphQueryInfoDto.datasetId, Edges = validEdges, Vertices = resultVertex };
-        time.Stop();
-        Console.WriteLine("@@@@@@@@@@@@@@@@@@@@@@@@@@@@  that take (" + time.ElapsedMilliseconds +
-                          ") milieSec to find the VertexNeighbor @@@@@@@@@@@@@@@@@@@@@@@@@@@@");
-        return new ServiceResponse<DisplayGraphDto>(responseData, ApiResponseType.Success, string.Empty);
-    }
-    
     public async Task<ServiceResponse<DisplayGraphDto>> DisplayGeraphData(long databaseId,
         string sourceEdgeIdentifierFieldName,
-        string destinationEdgeIdentifierFieldName, string vertexIdentifierFieldName, Dictionary<string, string> vertexAttributeValus, Dictionary<string, string> edgeAttributeValues)
+        string destinationEdgeIdentifierFieldName, string vertexIdentifierFieldName,
+        Dictionary<string, string> vertexAttributeValus, Dictionary<string, string> edgeAttributeValues)
     {
         var vertices = _vertexService.GetAllVertices(databaseId, vertexIdentifierFieldName, vertexAttributeValus);
         var edges = _edgeService.GetAllEdges(databaseId, sourceEdgeIdentifierFieldName,
@@ -182,7 +224,7 @@ public class AnalystService : IAnalystService
         return new ServiceResponse<DisplayGraphDto>(dto, ApiResponseType.Success,
             Resources.GraphFetchedSuccessfullyMessage);
     }
-    
+
     public ServiceResponse<List<GetAttributeDto>> GetVertexAttributes(long vertexEntityId)
     {
         var att = _vertexService.GetVertexAttributes(vertexEntityId);
@@ -194,5 +236,4 @@ public class AnalystService : IAnalystService
         var att = _edgeService.GetEdgeAttributes(edgeEntityId);
         return new ServiceResponse<List<GetAttributeDto>>(att, ApiResponseType.Success, "");
     }
-
 }

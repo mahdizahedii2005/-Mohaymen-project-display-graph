@@ -109,16 +109,16 @@ public class GraphService : IGraphService
             if (!dicVertices.TryGetValue(targetValue, out targets)) continue;
 
             foreach (var source in sources)
-            foreach (var target in targets)
-            {
-                var newEdge = new Edge()
+                foreach (var target in targets)
                 {
-                    Id = edge.Key,
-                    Source = source.Key,
-                    Target = target.Key
-                };
-                resEdges.Add(newEdge);
-            }
+                    var newEdge = new Edge()
+                    {
+                        Id = edge.Key,
+                        Source = source.Key,
+                        Target = target.Key
+                    };
+                    resEdges.Add(newEdge);
+                }
         }
 
         return (resVertices, resEdges);

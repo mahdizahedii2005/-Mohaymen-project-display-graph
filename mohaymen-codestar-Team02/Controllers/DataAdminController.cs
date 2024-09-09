@@ -15,7 +15,7 @@ public class DataAdminController : ControllerBase
 {
     private readonly IDataAdminService _dataAdminService;
     private readonly IFileReader _fileReader;
-    
+
     public DataAdminController(IDataAdminService dataAdminService,
         IFileReader fileReader)
     {
@@ -47,7 +47,7 @@ public class DataAdminController : ControllerBase
         var response = _dataAdminService.DisplayDataSet();
         return StatusCode((int)response.Type, response);
     }
-    
+
     [HttpPost("DataSets/Graph")]
     public async Task<IActionResult> DisplayDataSetAsGraph(GetGraphDto getGraphDto)
     {
@@ -63,7 +63,7 @@ public class DataAdminController : ControllerBase
     {
         var respond = _dataAdminService.GetVertexDetail(objectId);
         return StatusCode((int)respond.Type, respond);
-    }       
+    }
 
     [HttpGet("DataSets/Edges/{objectId}")]
     public async Task<IActionResult> DisplayEdgeDetails(string objectId)
