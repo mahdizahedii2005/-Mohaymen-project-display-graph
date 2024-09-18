@@ -1,9 +1,11 @@
-[![codecov](https://codecov.io/gh/Star-Academy/Summer1403-Project-Group02-Backend/graph/badge.svg?token=RTFUFYQP6S)](https://codecov.io/gh/Star-Academy/Summer1403-Project-Group02-Backend)
-# Summer1403-Project-Group02-Backend
-this is a team work project that cant be done without my team mates
-Fatemeh Sayadzadeh
-Ftm-Sayadzadeh
+# DisplayGraph-Backend
+
+this project is the backend of a larger project that unfortunately the frontend project is not available for now
+but if you run the project you can use the project with the swagger to call the project API
+
+
+this is a teamwork project that can't be done without my team
+Fatemeh Sayadzadeh(Ftm-Sayadzadeh)
 and
-Hannaneh Nourvatan
-hanaNrvtn
-lot of thank you to both of them 
+Hannaneh Nourvatan(hanaNrvtn)
+lot of thanks to both of them 
